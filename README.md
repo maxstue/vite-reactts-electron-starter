@@ -1,19 +1,27 @@
-# TrayIconApp
+# Vite + React + Typescript + Electron - Starter
 
-test application for a tray app useing vite2 + react + electron.
+![Vite React+ Typescript + Electron Starter](screenshot.png)
 
-## Dev only in Browser
+> It is a simple starter tempalte without unnecessary packages.
 
-> yarn dev
+This Starter utilizes [Vite](https://github.com/vitejs/vite), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
 
-## Dev electron and Browser
+By default, the React framework is used for the interface, but you can easily use any other frameworks such as Vue, Preact, Angular, Svelte or anything else.
 
-> yarn dev
+> Vite is framework agnostic
 
-The App is starting closed in the traybar.
+## Installation
+
+`yarn`
+
+## Development
+
+`yarn dev`
 
 ## Build
 
-**NOT** implemented yet
+`yarn build`
 
-> yarn build
+## Publish
+
+`yarn dist`
