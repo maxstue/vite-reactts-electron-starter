@@ -1,6 +1,6 @@
 # Vite + React + Typescript + Electron - Starter
 
-![Vite React+ Typescript + Electron Starter](screenshot.png)
+![Vite React+ Typescript + Electron Starter](Screenshot.png)
 
 > It is a simple starter tempalte without unnecessary packages.
 
@@ -11,17 +11,17 @@ By default, the React framework is used for the interface, but you can easily us
 > Vite is framework agnostic
 
 ## Installation
-
-`yarn`
+Clone this repo and install all dependencies  
+`yarn` or `npm install`
 
 ## Development
 
-`yarn dev`
+`yarn dev` or `npm run dev`
 
 ## Build
 
-`yarn build`
+`yarn build` or `npm run build`
 
 ## Publish
 
-`yarn dist`
+`yarn dist` or `npm run dist`
