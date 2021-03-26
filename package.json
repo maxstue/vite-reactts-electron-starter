@@ -18,7 +18,7 @@
   },
   "productName": "vite-reactts-electron-starter",
   "scripts": {
-    "dev": "concurrently \"SET BROWSER=none && yarn dev:vite\" \" yarn dev:electron",
+    "dev": "concurrently \"yarn dev:vite\" \" yarn dev:electron\"",
     "dev:vite": "vite",
     "dev:electron": "npm run build:electron && electron .",
     "build": "npm run build:vite && npm run build:electron",
