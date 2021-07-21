@@ -9,9 +9,9 @@ function App() {
 		if (isOpen) {
 			setOpen(false);
 			setSent(false);
-			setFromMain(null);
 		} else {
 			setOpen(true);
+			setFromMain(null);
 		}
 	};
 	const sendMessageToElectron = () => {
@@ -20,10 +20,11 @@ function App() {
 	};
 
 	useEffect(() => {
-		window.Main.on('message', (fromMain: string) => {
-			setFromMain(fromMain);
-		});
-	}, [fromMain]);
+		if (isSent)
+			window.Main.on('message', (fromMain: string) => {
+				setFromMain(fromMain);
+			});
+	}, [fromMain, isSent]);
 
 	return (
 		<div className=' flex flex-col justify-center items-center h-screen bg-gray-800 space-y-4'>
