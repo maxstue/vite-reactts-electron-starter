@@ -2,18 +2,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ipcRenderer, contextBridge } from 'electron';
 
-// declare global {
-// 	namespace NodeJS {
-// 		interface Global {
-// 			ipcRenderer: IpcRenderer;
-// 		}
-// 	}
-// }
-// Since we disabled nodeIntegration we can reintroduce
-// needed node functionality here
-// process.once('loaded', () => {
-// 	global.ipcRenderer = ipcRenderer;
-// });
 declare global {
 	// eslint-disable-next-line
 	interface Window {
@@ -29,11 +17,9 @@ export const api = {
 	 *
 	 * The function below can accessed using `window.Main.sayHello`
 	 */
-
 	sendMessage: (message: string) => {
 		ipcRenderer.send('message', message);
 	},
-
 	/**
 	 * Provide an easier way to listen to events
 	 */
@@ -41,5 +27,4 @@ export const api = {
 		ipcRenderer.on(channel, (_, data) => callback(data));
 	}
 };
-
 contextBridge.exposeInMainWorld('Main', api);
