@@ -1,6 +1,6 @@
 # Vite + React + Typescript + Electron - Starter
 
-![Vite + React + Typescript + Tailwind + Electron Starter](Screenshot.png)
+![Vite + React + Typescript + Tailwind + Electron Starter](Screenshot.jpg)
 
 > It is a simple starter tempalte without unnecessary packages.
 
