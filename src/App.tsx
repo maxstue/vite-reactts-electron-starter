@@ -1,46 +1,68 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useEffect, useState } from 'react';
 function App() {
-  const [count, setCount] = useState(0);
+	const [isOpen, setOpen] = useState(false);
+	const [isSent, setSent] = useState(false);
 
-  return (
-    <div className='text-center'>
-      <header className='App-header min-h-screen flex flex-col items-center justify-center text-white'>
-        <img src={logo} className='h-40 App-logo' alt='logo' />
-        <p className='mb-5'>Hello Vite + React + Typescript + Electron</p>
-        <p>
-          <button
-            className='border border-solid border-white rounded-lg p-3 hover:bg-yellow-500 outline-none ring-0'
-            onClick={() => setCount((count) => count + 1)}
-          >
-            Press
-          </button>
-        </p>
-        <p className='mt-7'>count is: {count}</p>
-        <p>
-          <a
-            className='text-gray-600'
-            href='https://reactjs.org'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className='text-gray-600'
-            href='https://vitejs.dev/guide/features.html'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  );
+	const [fromMain, setFromMain] = useState<string | null>(null);
+
+	const handleToggle = () => {
+		if (isOpen) {
+			setOpen(false);
+			setSent(false);
+		} else {
+			setOpen(true);
+			setFromMain(null);
+		}
+	};
+	const sendMessageToElectron = () => {
+		window.Main.sendMessage("Hello I'm from React World");
+		setSent(true);
+	};
+
+	useEffect(() => {
+		if (isSent)
+			window.Main.on('message', (fromMain: string) => {
+				setFromMain(fromMain);
+			});
+	}, [fromMain, isSent]);
+
+	return (
+		<div className=' flex flex-col justify-center items-center h-screen bg-gray-800 space-y-4'>
+			<h1 className='text-2xl text-gray-200'>
+				Vite + React + Typescript + Electron + Tailwind
+			</h1>
+			<button
+				className='bg-yellow-400 py-2 px-4 rounded focus:outline-none shadow hover:bg-yellow-200'
+				onClick={handleToggle}>
+				Click Me
+			</button>
+			{isOpen && (
+				<div className='flex flex-col space-y-4 items-center'>
+					<div className='flex space-x-3'>
+						<h1 className='text-xl text-gray-50'>
+							💝 Welcome 💝, now send a massage to the Main 📩📩
+						</h1>
+						<button
+							onClick={sendMessageToElectron}
+							className=' bg-green-400 rounded px-4 py-0 focus:outline-none hover:bg-green-300'>
+							Send
+						</button>
+					</div>
+					{isSent && (
+						<div>
+							<h4 className=' text-green-500'>Massage sent!!</h4>
+						</div>
+					)}
+					{fromMain && (
+						<div>
+							{' '}
+							<h4 className=' text-yellow-200'>{fromMain}</h4>
+						</div>
+					)}
+				</div>
+			)}
+		</div>
+	);
 }
 
 export default App;
