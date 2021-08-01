@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+
 function App() {
+	console.log(window.ipcRenderer);
+	
 	const [isOpen, setOpen] = useState(false);
 	const [isSent, setSent] = useState(false);
 
