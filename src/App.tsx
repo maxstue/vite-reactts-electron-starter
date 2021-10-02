@@ -5,7 +5,6 @@ function App() {
 	
 	const [isOpen, setOpen] = useState(false);
 	const [isSent, setSent] = useState(false);
-
 	const [fromMain, setFromMain] = useState<string | null>(null);
 
 	const handleToggle = () => {
@@ -18,12 +17,16 @@ function App() {
 		}
 	};
 	const sendMessageToElectron = () => {
-		window.Main.sendMessage("Hello I'm from React World");
+		if (window.Main) {
+			window.Main.sendMessage("Hello I'm from React World");			
+		} else {
+			setFromMain('You are in a Browser, so no Electron functions are available');
+		}
 		setSent(true);
 	};
 
 	useEffect(() => {
-		if (isSent)
+		if (isSent && window.Main)
 			window.Main.on('message', (fromMain: string) => {
 				setFromMain(fromMain);
 			});

@@ -22,7 +22,6 @@ export default ({ command }: ConfigEnv): UserConfig => {
         port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
       },
       optimizeDeps: {
-        auto: true,
         exclude: ['path'],
       },
     };
@@ -44,7 +43,6 @@ export default ({ command }: ConfigEnv): UserConfig => {
         port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
       },
       optimizeDeps: {
-        auto: true,
         exclude: ['path'],
       },
     };
