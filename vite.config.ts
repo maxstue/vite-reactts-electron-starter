@@ -11,40 +11,39 @@ export default ({ command }: ConfigEnv): UserConfig => {
       base: '/',
       plugins: [reactRefresh()],
       alias: {
-        '/@': srcRoot,
+        '/@': srcRoot
       },
       build: {
         outDir: join(srcRoot, '/out'),
         emptyOutDir: true,
-        rollupOptions: {},
+        rollupOptions: {}
       },
       server: {
-        port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
+        port: process.env.PORT === undefined ? 3000 : +process.env.PORT
       },
       optimizeDeps: {
-        exclude: ['path'],
-      },
+        exclude: ['path']
+      }
     };
   }
   // PROD
-  else {
-    return {
-      base: `${__dirname}/src/out/`,
-      plugins: [reactRefresh()],
-      alias: {
-        '/@': srcRoot,
-      },
-      build: {
-        outDir: join(srcRoot, '/out'),
-        emptyOutDir: true,
-        rollupOptions: {},
-      },
-      server: {
-        port: process.env.PORT === undefined ? 3000 : +process.env.PORT,
-      },
-      optimizeDeps: {
-        exclude: ['path'],
-      },
-    };
-  }
+
+  return {
+    base: `${__dirname}/src/out/`,
+    plugins: [reactRefresh()],
+    alias: {
+      '/@': srcRoot
+    },
+    build: {
+      outDir: join(srcRoot, '/out'),
+      emptyOutDir: true,
+      rollupOptions: {}
+    },
+    server: {
+      port: process.env.PORT === undefined ? 3000 : +process.env.PORT
+    },
+    optimizeDeps: {
+      exclude: ['path']
+    }
+  };
 };

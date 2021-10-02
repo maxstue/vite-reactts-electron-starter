@@ -11,25 +11,26 @@ const width = 800;
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
-    width: width,
-    height: height,
+    width,
+    height,
     frame: true,
     show: true,
     resizable: true,
     fullscreenable: true,
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
-    },
+      preload: join(__dirname, 'preload.js')
+    }
   });
 
   const port = process.env.PORT || 3000;
-  const url = isDev
-    ? `http://localhost:${port}`
-    : join(__dirname, '../src/out/index.html');
+  const url = isDev ? `http://localhost:${port}` : join(__dirname, '../src/out/index.html');
 
   // and load the index.html of the app.
-  isDev ? window?.loadURL(url) : window?.loadFile(url);
-
+  if (isDev) {
+    window?.loadURL(url);
+  } else {
+    window?.loadFile(url);
+  }
   // Open the DevTools.
   // window.webContents.openDevTools();
 }
@@ -40,7 +41,7 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  app.on('activate', function () {
+  app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -50,7 +51,7 @@ app.whenReady().then(() => {
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
