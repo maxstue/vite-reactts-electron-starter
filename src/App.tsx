@@ -44,7 +44,7 @@ function App() {
       {isOpen && (
         <div className="flex flex-col space-y-4 items-center">
           <div className="flex space-x-3">
-            <h1 className="text-xl text-gray-50">💝 Welcome 💝, now send a massage to the Main 📩📩</h1>
+            <h1 className="text-xl text-gray-50">💝 Welcome 💝, now send a message to the Main 📩📩</h1>
             <button
               onClick={sendMessageToElectron}
               className=" bg-green-400 rounded px-4 py-0 focus:outline-none hover:bg-green-300"
@@ -54,7 +54,7 @@ function App() {
           </div>
           {isSent && (
             <div>
-              <h4 className=" text-green-500">Massage sent!!</h4>
+              <h4 className=" text-green-500">Message sent!!</h4>
             </div>
           )}
           {fromMain && (
