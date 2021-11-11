@@ -13,6 +13,7 @@ function createWindow() {
   const window = new BrowserWindow({
     width,
     height,
+    //  change to false to use AppBar
     frame: false,
     show: true,
     resizable: true,
