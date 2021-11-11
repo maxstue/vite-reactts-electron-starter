@@ -13,7 +13,7 @@ function createWindow() {
   const window = new BrowserWindow({
     width,
     height,
-    frame: true,
+    frame: false,
     show: true,
     resizable: true,
     fullscreenable: true,
