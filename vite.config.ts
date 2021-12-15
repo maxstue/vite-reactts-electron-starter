@@ -1,4 +1,4 @@
-import reactRefresh from '@vitejs/plugin-react-refresh';
+import react from '@vitejs/plugin-react';
 import { UserConfig, ConfigEnv } from 'vite';
 import { join } from 'path';
 
@@ -8,10 +8,13 @@ export default ({ command }: ConfigEnv): UserConfig => {
   // DEV
   if (command === 'serve') {
     return {
+      root: srcRoot,
       base: '/',
-      plugins: [reactRefresh()],
-      alias: {
-        '/@': srcRoot
+      plugins: [react()],
+      resolve: {
+        alias: {
+          '/@': srcRoot
+        }
       },
       build: {
         outDir: join(srcRoot, '/out'),
@@ -27,10 +30,9 @@ export default ({ command }: ConfigEnv): UserConfig => {
     };
   }
   // PROD
-
   return {
     base: `${__dirname}/src/out/`,
-    plugins: [reactRefresh()],
+    plugins: [react()],
     alias: {
       '/@': srcRoot
     },

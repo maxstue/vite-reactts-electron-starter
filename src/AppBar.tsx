@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import Icon from './Icon-Electron.png';
+import Icon from './assets/icons/Icon-Electron.png';
 
-export default function AppBar() {
+function AppBar() {
   const [isMaximize, setMaximize] = useState(false);
 
   const handleToggle = () => {
@@ -45,3 +45,5 @@ export default function AppBar() {
     </>
   );
 }
+
+export default AppBar;

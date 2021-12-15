@@ -39,6 +39,10 @@
         "react/button-has-type": 0,
         "react/no-children-prop": 0,
         "react/jsx-props-no-spreading": 0,
+        "react/function-component-definition": ["warn", {
+            "namedComponents": "function-declaration",
+            "unnamedComponents": "function-expression"
+        }],
         "react/jsx-filename-extension": [
             2,
             {
