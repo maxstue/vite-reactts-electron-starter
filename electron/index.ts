@@ -13,7 +13,8 @@ function createWindow() {
   const window = new BrowserWindow({
     width,
     height,
-    frame: true,
+    //  change to false to use AppBar
+    frame: false,
     show: true,
     resizable: true,
     fullscreenable: true,
@@ -33,6 +34,21 @@ function createWindow() {
   }
   // Open the DevTools.
   // window.webContents.openDevTools();
+
+  // For AppBar
+  ipcMain.on('minimize', () => {
+    // eslint-disable-next-line no-unused-expressions
+    window.isMinimized() ? window.restore() : window.minimize();
+    // or alternatively: win.isVisible() ? win.hide() : win.show()
+  });
+  ipcMain.on('maximize', () => {
+    // eslint-disable-next-line no-unused-expressions
+    window.isMaximized() ? window.restore() : window.maximize();
+  });
+
+  ipcMain.on('close', () => {
+    window.close();
+  });
 }
 
 // This method will be called when Electron has finished
