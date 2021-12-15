@@ -57,7 +57,8 @@
           "node": {
             "extensions": [".js", ".jsx", ".ts", ".tsx"]
           }
-        }
+        },
+        "import/core-modules": [ "electron", "electron-is-dev" ]
     },
     "ignorePatterns": ["node_modules/", "dist/", "main/"]
 }

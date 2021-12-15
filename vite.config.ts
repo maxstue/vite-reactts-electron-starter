@@ -31,10 +31,13 @@ export default ({ command }: ConfigEnv): UserConfig => {
   }
   // PROD
   return {
+    root: srcRoot,
     base: `${__dirname}/src/out/`,
     plugins: [react()],
-    alias: {
-      '/@': srcRoot
+    resolve: {
+      alias: {
+        '/@': srcRoot
+      }
     },
     build: {
       outDir: join(srcRoot, '/out'),
