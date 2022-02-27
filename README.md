@@ -29,7 +29,7 @@ Clone this repo and install all dependencies
 
 ## More advanced templates  
 
-If you are looking for more advanced templates than this, please go to on eof the following links (these are some other links out of the **[awesome-vite](https://github.com/vitejs/awesome-vite)** repo) or you can help me make this template better 🙂  
+If you are looking for more advanced templates than this, please go to one of the following links (these are some other links out of the **[awesome-vite](https://github.com/vitejs/awesome-vite)** repo) or you can help me make this template better 🙂  
 
 Links: 
 - [vite-react-electron](https://github.com/caoxiemeihao/vite-react-electron)
