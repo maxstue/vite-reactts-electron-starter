@@ -32,7 +32,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
   // PROD
   return {
     root: srcRoot,
-    base: `${__dirname}/src/out/`,
+    base: './',
     plugins: [react()],
     resolve: {
       alias: {
