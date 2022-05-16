@@ -9,5 +9,8 @@ module.exports = {
       sans: ['Inter', 'ui-sans-serif', 'system-ui']
     }
   },
-  plugins: []
+  plugins: [
+    require("tailwind-scrollbar"),
+    require("tailwind-scrollbar-hide")
+  ]
 };

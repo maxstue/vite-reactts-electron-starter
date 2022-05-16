@@ -18,6 +18,26 @@ const api = {
   sendMessage: (message: string) => {
     ipcRenderer.send('message', message);
   },
+
+  sendToast: (toast: object) => {
+    ipcRenderer.send("toast", toast)
+  },
+
+  sendData: (data: any) => {
+    ipcRenderer.send("data", data)
+  },
+
+  sendStream: (data: any) => {
+    ipcRenderer.send("stream", data)
+  },
+
+  sendSecondStream: (data: any) => {
+    ipcRenderer.send("second-stream", data)
+  },
+
+  asyncData: async (data: any) => {
+    return await ipcRenderer.invoke("data", data)
+  },
   /**
     Here function for AppBar
    */
@@ -35,6 +55,18 @@ const api = {
    */
   on: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.on(channel, (_, data) => callback(data));
+  },
+
+  once: (channel: string, callback: (data: any) => void) => {
+    ipcRenderer.once(channel, (_, data) => callback(data));
+  },
+  
+  off: (channel: string, callback: (data: any) => void) => {
+    ipcRenderer.removeListener(channel, (_, data) => callback(data));
+  },
+
+  reset: (channel: string) => {
+    ipcRenderer.removeAllListeners(channel)
   }
 };
 contextBridge.exposeInMainWorld('Main', api);

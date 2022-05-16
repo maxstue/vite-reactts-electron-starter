@@ -14,8 +14,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react", 
+    "checkJs": false
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx", "**/*.js"]
 }
+
+
+// Add this to your tsconfig.json:
+
+// {
+//   "compilerOptions": {
+//     ...
+//     "checkJs": false
+//     ...
+//   }
+// }
