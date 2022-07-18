@@ -61,6 +61,16 @@ function App() {
   // }, [selectedAsset])
 
   useHotkeyOrders()
+
+  const [selectedAsset] = useGlobal("selectedAsset")
+  React.useEffect( () => {
+      if (selectedAsset) {
+        window.Main.sendData({
+          type: "selected-asset",
+          content: selectedAsset
+        })
+      }
+  }, [selectedAsset])
   
 
   const [ levels, setLevels ] = useGlobal("levels")
@@ -68,6 +78,8 @@ function App() {
   const [ orders, setOrders ] = useGlobal("orders")
   const [ updatePositions, setUpdatePositions ] = useGlobal("updatePositions")
   const [ rules, setRules ] = useGlobal("rules")
+
+
   React.useEffect(() => {
     window.Main.on("data", (data:any) => {
       // console.log(levels)

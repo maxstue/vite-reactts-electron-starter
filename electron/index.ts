@@ -217,3 +217,30 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
     return response
 
 })
+
+
+// ATTN Ronan-Yann 
+////////////////////
+
+// listen the channel `data` and resend the received message to the renderer process
+ipcMain.on('data', (event: IpcMainEvent, data: any) => {
+
+  if (data.type == "selected-asset") {
+    const selectedAsset = data.content
+
+    // TODO for Ronan-Yann: 
+    //1. Subscribe to market depth data at Interactive Brokers for the selected asset using ibNext
+    let marketDepthData = null 
+
+    //2. Every time market depth data comes in (which is basically a stream i.e. multiple times a second), push it to the frontend using code below
+    if (marketDepthData) {
+      ipcMain.send("market-depth", {
+        symbol: selectedAsset, 
+        content: marketDepthData
+      })
+    }
+    
+  }
+
+});
+

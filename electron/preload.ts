@@ -35,6 +35,10 @@ const api = {
     ipcRenderer.send("second-stream", data)
   },
 
+  sendMarketDepth: (data: any) => {
+    ipcRenderer.send("market-depth", data)
+  },
+
   asyncData: async (data: any) => {
     return await ipcRenderer.invoke("data", data)
   },
