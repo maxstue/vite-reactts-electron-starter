@@ -13,6 +13,7 @@ import Rules from "./rules"
 import "react-grid-layout/css/styles.css"
 import "react-resizable/css/styles.css"
 import TimeAndSales from "./tape";
+import MarketDepth from "./market-depth";
 
 //import AnyChart from "anychart-react.js"
 
@@ -144,6 +145,19 @@ export default class ResponsiveGrid extends React.PureComponent {
               <div className="p-2">
                   <TimeAndSales />
                 </div>
+          </div>
+          <div 
+            key="9"
+            className="border scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300" 
+            data-grid={{ w: 4, h: 5, x: 4, y: 0, minW: 4, minH: 5, isResizable:true }}
+            >
+              <div className="flex items-center mb-2 bg-gray-400">
+                  <span className="dragHandle cursor-move font-semibold"><DragHandleIcon /> </span>
+                  <span className="font-semibold pl-2">Market Depth</span>
+              </div>
+              <div className="p-2">
+                  <MarketDepth />
+              </div>
           </div>
         </ResponsiveReactGridLayout>
       </div>
