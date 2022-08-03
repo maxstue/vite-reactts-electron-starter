@@ -15,14 +15,9 @@ const MarketDepth = function() {
     const [ marketDepthTable, setMarketDepthTable ] = React.useState(null);
 
     const handleMarketDepth = React.useCallback((data) => {
-        console.log(data);
-        console.log(data.symbol);
-        console.log(data.content);
-        //1. Check if incoming data corresponds to the currently selected synbol
-        // if ( data.symbol == selectedAsset) {
-            //2. Populate state of market depth table
-            // setMarketDepthTable(data.content) 
-        // }
+        // console.log(data);
+        // console.log(data.symbol);
+        // console.log(data.content);
         if (data.symbol == selectedAsset) {
             setMarketDepthTable(data.content);
         } else if (data.error) {

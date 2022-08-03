@@ -240,11 +240,11 @@ let subscription$: Subscription = null;
 let lastdata: number = null;
 
 // connection settings
-const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;
-const host: string = process.env.IB_TWS_HOST || "localhost";
-const port: number = parseInt(process.env.IB_TWS_PORT) || 4001;
-const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 7;
-const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5; // threshold speed limit for sending refreshing data to frontend in secs
+const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;  // API reconnect retry interval
+const host: string = process.env.IB_TWS_HOST || "localhost";                            // TWS host name or IP address
+const port: number = parseInt(process.env.IB_TWS_PORT) || 4001;                         // API port
+const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 7;                         // Number of rows to return
+const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
@@ -278,14 +278,10 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
             lastdata = now;
             const bids: OrderBookRows = orderBookUpdate.all.bids;
             const asks: OrderBookRows = orderBookUpdate.all.asks;
-            // console.log("bids", bids);
-            // console.log("asks", asks);
             let content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
             for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
               const bid: OrderBookRow = bids.get(i);
               const ask: OrderBookRow = asks.get(i);
-              // console.log("bids[i]", bid);
-              // console.log("asks[i]", ask);
               if (bid || ask) {
                 const bidMMID = bid?.marketMaker;
                 const bidSize = bid?.size;
