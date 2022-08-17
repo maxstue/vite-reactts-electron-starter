@@ -4,18 +4,7 @@ import { join } from 'path';
 import { io } from "socket.io-client";
 const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import { Subscription } from "rxjs";
-import {
-  IBApiNext,
-  LogLevel,
-  Contract,
-  IBApiNextError,
-  OrderBookUpdate,
-  OrderBookRows,
-  SecType,
-  IBApiNextTickType,
-  IBApiTickType,
-} from "@stoqey/ib";
+import { IbWrapper } from "./ib/wrapper";
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
@@ -230,142 +219,10 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 
 })
 
-/** The [[IBApiNext]] instance. */
-let api: IBApiNext = null;
-/** The subscription on the IBApi errors. */
-let error$: Subscription = null;
-
-// the subscription on the market depth data
-let subscription_mkd: Subscription = null;
-// last time we sent market depth data to frontend
-let last_mkd_data: number = null;
-
-// the subscription on the time and sales data
-let subscription_tape: Subscription = null;
-let last_tape: { ingressTm: number, price: number, size: number } = { ingressTm: 0, price: undefined, size: undefined };
-
-// connection settings
-const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;  // API reconnect retry interval
-const host: string = process.env.IB_TWS_HOST || "localhost";                            // TWS host name or IP address
-const port: number = parseInt(process.env.IB_TWS_PORT) || 4001;                         // API port
-const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 7;                         // Number of rows to return
-const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
-
+let ibWrapper: IbWrapper = new IbWrapper();
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
-  // console.log(rows, refreshing);
-  // Connect to IB gateway
-  if (!api) {
-    api = new IBApiNext({ reconnectInterval, host, port });
-    api.logLevel = LogLevel.DETAIL;
-    this.error$ = api.errorSubject.subscribe((error) => {
-      if (error.reqId === -1) {
-        console.log(`${error.error.message}`);
-      }
-    });
-    try {
-      api.connect(Math.round(Math.random() * 16383));
-    } catch (error) {
-      console.log("Connection error", error.message);
-      console.log(`IB host: ${host} - IB port: ${port}`);
-    }
-  }
+  ibWrapper.onData(event, data);
+}
 
-  if (data.type == "selected-asset") {
-    let contract: Contract = { secType: SecType.STK, currency: "USD", symbol: data.content, exchange: "SMART" };
-    api.getContractDetails(contract).then((details) => {
-      // contract resolved
-      contract = details[0].contract;
-      console.log("selected-asset", contract);
-      // Send market depth data to frontend
-      last_mkd_data = 0;
-      subscription_mkd?.unsubscribe();
-      subscription_mkd = api.getMarketDepth(contract, rows, true).subscribe({
-        next: (orderBookUpdate: OrderBookUpdate) => {
-          // console.log("orderBookUpdate");
-          const now: number = Date.now();
-          if ((now - last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
-            last_mkd_data = now;
-            const bids: OrderBookRows = orderBookUpdate.all.bids;
-            const asks: OrderBookRows = orderBookUpdate.all.asks;
-            let content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
-            for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
-              const bid: OrderBookRow = bids.get(i);
-              const ask: OrderBookRow = asks.get(i);
-              if (bid || ask) {
-                const bidMMID = bid?.marketMaker;
-                const bidSize = bid?.size;
-                const bidPrice = bid?.price;
-                const askPrice = ask?.price;
-                const askSize = ask?.size;
-                const askMMID = ask?.marketMaker;
-                content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
-              }
-            }
-            // console.log("content:", content);
-            event.sender.send("market-depth", {
-              symbol: contract.symbol,
-              content: content,
-            });
-          }
-        },
-        error: (err: IBApiNextError) => {
-          subscription_mkd?.unsubscribe();
-          console.log(`getMarketDepth failed with '${err.error.message}'`);
-          event.sender.send("market-depth", {
-            error: err.error.message,
-          });
-        },
-      });
-
-      // Send time and price data to frontend
-      last_tape = { ingressTm: 0, price: undefined, size: undefined };
-      subscription_tape?.unsubscribe();
-      subscription_tape = api.getMarketData(contract, "", false, false).subscribe({
-        next: (marketData) => {
-          marketData.added?.forEach((tick, type) => {
-            console.log("added", IBApiTickType[type], tick);
-          });
-          marketData.changed?.forEach((tick, type) => {
-            // console.log("changed", type, IBApiTickType[type], tick);
-            if ((type == TickType.LAST) || (type == TickType.LAST_SIZE)) {
-              if (tick.ingressTm != last_tape.ingressTm) last_tape = { ingressTm: tick.ingressTm, price: undefined, size: undefined };
-              if (type == TickType.LAST) last_tape.price = tick.value;
-              if (type == TickType.LAST_SIZE) last_tape.size = tick.value;
-              if (last_tape.price && last_tape.size) {
-                console.log("last_tape:", last_tape);
-                event.sender.send("stream", {
-                  symbol: contract.symbol,
-                  content: last_tape,
-                });
-              }
-            }
-          });
-        },
-        error: (err: IBApiNextError) => {
-          subscription_tape?.unsubscribe();
-          console.log(`getMarketData failed with '${err.error.message}'`);
-          event.sender.send("stream", {
-            error: err.error.message,
-          });
-        },
-      });
-
-    }).catch((err: IBApiNextError) => {
-      // Can't get contract details
-      // cancel all subscriptions
-      subscription_mkd?.unsubscribe();
-      subscription_tape?.unsubscribe();
-      // send error report to frontend
-      console.log(`getContractDetails failed with '${err.error.message}'`);
-      event.sender.send("market-depth", {
-        error: err.error.message,
-      });
-      event.sender.send("stream", {
-        error: err.error.message,
-      });
-    });
-
-  }
-
-});
+);
