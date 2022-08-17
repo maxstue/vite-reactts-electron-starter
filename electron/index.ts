@@ -1,9 +1,9 @@
 // Native
 // @ts-nocheck
 import { join } from 'path';
-import { io } from "socket.io-client"
-const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"]})
-import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer"
+import { io } from "socket.io-client";
+const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
+import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { Subscription } from "rxjs";
 import {
   IBApiNext,
@@ -13,13 +13,16 @@ import {
   OrderBookUpdate,
   OrderBookRows,
   SecType,
+  IBApiNextTickType,
+  IBApiTickType,
 } from "@stoqey/ib";
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
+import TickType from '@stoqey/ib/dist/api/market/tickType';
 
-let ipcStream = null 
+let ipcStream = null
 const height = 800;
 const width = 1200;
 
@@ -56,7 +59,7 @@ function createWindow() {
     const { initLevels, pollIndicatorLevels } = require("./levels/publish")
     initLevels(window.webContents)
     pollIndicatorLevels(window.webContents)
-    
+
     const executeOrders = require("./orders/execute")
     executeOrders(window.webContents)
     ipcStream = window.webContents
@@ -66,9 +69,9 @@ function createWindow() {
     //account.on("message", message => console.warn("message:", message))
     account.once("authenticated", () => {
       console.log("account stream authenticated")
-      
+
       account.subscribe("trade_updates")
-    
+
       account.on("trade_updates", data => {
         if (data.event == "fill") console.log(data)
         if (data.event == "fill" && ipcStream) {
@@ -105,9 +108,9 @@ app.whenReady().then(() => {
 
   app.whenReady().then(() => {
     installExtension(REACT_DEVELOPER_TOOLS)
-        .then((name) => console.log(`Added Extension:  ${name}`))
-        .catch((err) => console.log('An error occurred: ', err));
-});
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
+  });
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
@@ -132,7 +135,7 @@ app.on('window-all-closed', () => {
 prodStream.on("connect", () => {
   console.log("connected to prod stream?", prodStream.connected)
   const executeRules = require("./rules/execute")
-  
+
   prodStream.on("alpaca-T", data => {
     if (ipcStream) { // @ts-ignore
       ipcStream.send("stream", data) // @ts-ignore
@@ -161,7 +164,7 @@ prodStream.on("connect", () => {
   //   }
   // }
   // aggs(params)
-  
+
 })
 
 
@@ -182,62 +185,64 @@ ipcMain.on('message', (event: IpcMainEvent, message: any) => {
 
   if (message == "fetch-watchlist-symbols") {
     event.sender.send("data", {
-      type: "watchlist-data", 
-      content: [{symbol: "AAPL", lastPrice: "165"}, {symbol: "TWTR", lastPrice: "54"}]
+      type: "watchlist-data",
+      content: [{ symbol: "AAPL", lastPrice: "165" }, { symbol: "TWTR", lastPrice: "54" }]
     })
   }
 
-  
+
   // event.sender.send("message", "this message was sent by Idris")
   // setTimeout(() => event.sender.send('message', 'hi from electron'), 1000);
   // setTimeout(() => event.sender.send('message', 'this message was sent by Idris'), 3000);
 
-  
+
   // prodStream.on("alpaca-T", function(data: any) {
   //     //event.sender.send("message", data.S)
   //     // io.emit("trades-"+data.S, data)
   //     // event.emit("alpaca-T", data)
-      
+
   //     if (data.S == "NVDA") {
   //         event.sender.send("message", "NVDA " + data.p)
   //         //console.log(data.p)
   //     }
-      
+
   // })
 
 });
 
 ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 
-    let response = null
-    const resource = require("./" + data.route)
-    try {
-      if (data.content) response = await resource(data.content, event.sender)
-      else response = await resource(event.sender)
-     
-      if (response) {
-        //console.log("data stuff", data)  
-      } else throw "Undefined response for the requested resource at " + data.route
-    } catch (e) {
-      response = {status: "error", content: e || `Could not add ${data.content} to the watchlist`}
-    }
+  let response = null
+  const resource = require("./" + data.route)
+  try {
+    if (data.content) response = await resource(data.content, event.sender)
+    else response = await resource(event.sender)
 
-    event.sender.send("toast", response)
-    return response
+    if (response) {
+      //console.log("data stuff", data)  
+    } else throw "Undefined response for the requested resource at " + data.route
+  } catch (e) {
+    response = { status: "error", content: e || `Could not add ${data.content} to the watchlist` }
+  }
+
+  event.sender.send("toast", response)
+  return response
 
 })
 
 /** The [[IBApiNext]] instance. */
 let api: IBApiNext = null;
-
 /** The subscription on the IBApi errors. */
 let error$: Subscription = null;
 
 // the subscription on the market depth data
-let subscription$: Subscription = null;
+let subscription_mkd: Subscription = null;
+// last time we sent market depth data to frontend
+let last_mkd_data: number = null;
 
-// last time we sent data to frontend
-let lastdata: number = null;
+// the subscription on the time and sales data
+let subscription_tape: Subscription = null;
+let last_tape: { ingressTm: number, price: number, size: number } = { ingressTm: 0, price: undefined, size: undefined };
 
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;  // API reconnect retry interval
@@ -248,7 +253,7 @@ const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5;    
 
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
-
+  // console.log(rows, refreshing);
   // Connect to IB gateway
   if (!api) {
     api = new IBApiNext({ reconnectInterval, host, port });
@@ -267,15 +272,20 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
   }
 
   if (data.type == "selected-asset") {
-    const contract: Contract = { secType: SecType.STK, currency: "USD", symbol: data.content, exchange: "SMART" };
+    let contract: Contract = { secType: SecType.STK, currency: "USD", symbol: data.content, exchange: "SMART" };
     api.getContractDetails(contract).then((details) => {
-      lastdata = 0;
-      subscription$?.unsubscribe();
-      subscription$ = api.getMarketDepth(details[0].contract, rows, true).subscribe({
+      // contract resolved
+      contract = details[0].contract;
+      console.log("selected-asset", contract);
+      // Send market depth data to frontend
+      last_mkd_data = 0;
+      subscription_mkd?.unsubscribe();
+      subscription_mkd = api.getMarketDepth(contract, rows, true).subscribe({
         next: (orderBookUpdate: OrderBookUpdate) => {
+          // console.log("orderBookUpdate");
           const now: number = Date.now();
-          if ((now - lastdata) > refreshing * 1000) {  // limit to refresh rate to every x seconds
-            lastdata = now;
+          if ((now - last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
+            last_mkd_data = now;
             const bids: OrderBookRows = orderBookUpdate.all.bids;
             const asks: OrderBookRows = orderBookUpdate.all.asks;
             let content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
@@ -292,7 +302,7 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
                 content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
               }
             }
-            console.log("content:", content);
+            // console.log("content:", content);
             event.sender.send("market-depth", {
               symbol: contract.symbol,
               content: content,
@@ -300,22 +310,62 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
           }
         },
         error: (err: IBApiNextError) => {
-          subscription$?.unsubscribe();
+          subscription_mkd?.unsubscribe();
           console.log(`getMarketDepth failed with '${err.error.message}'`);
           event.sender.send("market-depth", {
             error: err.error.message,
           });
         },
       });
-    })
-    .catch((err: IBApiNextError) => {
-      subscription$?.unsubscribe();
+
+      // Send time and price data to frontend
+      last_tape = { ingressTm: 0, price: undefined, size: undefined };
+      subscription_tape?.unsubscribe();
+      subscription_tape = api.getMarketData(contract, "", false, false).subscribe({
+        next: (marketData) => {
+          marketData.added?.forEach((tick, type) => {
+            console.log("added", IBApiTickType[type], tick);
+          });
+          marketData.changed?.forEach((tick, type) => {
+            // console.log("changed", type, IBApiTickType[type], tick);
+            if ((type == TickType.LAST) || (type == TickType.LAST_SIZE)) {
+              if (tick.ingressTm != last_tape.ingressTm) last_tape = { ingressTm: tick.ingressTm, price: undefined, size: undefined };
+              if (type == TickType.LAST) last_tape.price = tick.value;
+              if (type == TickType.LAST_SIZE) last_tape.size = tick.value;
+              if (last_tape.price && last_tape.size) {
+                console.log("last_tape:", last_tape);
+                event.sender.send("stream", {
+                  symbol: contract.symbol,
+                  content: last_tape,
+                });
+              }
+            }
+          });
+        },
+        error: (err: IBApiNextError) => {
+          subscription_tape?.unsubscribe();
+          console.log(`getMarketData failed with '${err.error.message}'`);
+          event.sender.send("stream", {
+            error: err.error.message,
+          });
+        },
+      });
+
+    }).catch((err: IBApiNextError) => {
+      // Can't get contract details
+      // cancel all subscriptions
+      subscription_mkd?.unsubscribe();
+      subscription_tape?.unsubscribe();
+      // send error report to frontend
       console.log(`getContractDetails failed with '${err.error.message}'`);
       event.sender.send("market-depth", {
         error: err.error.message,
       });
-  });
+      event.sender.send("stream", {
+        error: err.error.message,
+      });
+    });
 
-}
+  }
 
 });
