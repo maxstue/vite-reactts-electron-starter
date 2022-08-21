@@ -4,7 +4,7 @@ import { join } from 'path';
 import { io } from "socket.io-client";
 const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import { IbWrapper } from "./ib/wrapper";
+import { IbWrapper, ibWrapper } from "./ib/wrapper";
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
@@ -219,7 +219,6 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 
 })
 
-let ibWrapper: IbWrapper = new IbWrapper();
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
   ibWrapper.onData(event, data);

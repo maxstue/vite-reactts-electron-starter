@@ -29,7 +29,8 @@
     "clean": "rimraf dist main src/out",
     "type-check": "tsc",
     "lint": "eslint . --ext js,jsx,ts,tsx",
-    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
+    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix",
+    "tsc": "./node_modules/.bin/tsc"
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^2.14.0",
@@ -47,7 +48,7 @@
     "axios": "^0.27.2",
     "better-sqlite3": "^7.6.2",
     "electron-is-dev": "^2.0.0",
-    "electron-rebuild": "^3.2.7",
+    "electron-devtools-installer": "^3.2.0",
     "framer-motion": "^6.3.2",
     "lodash.groupby": "^4.6.0",
     "node-schedule": "^2.1.0",
@@ -75,8 +76,8 @@
     "autoprefixer": "^10.4.4",
     "concurrently": "^7.0.0",
     "electron": "^17.1.2",
-    "electron-builder": "^22.14.13",
-    "electron-devtools-installer": "^3.2.0",
+    "electron-builder": "^23.0.3",
+    "electron-rebuild": "^3.2.7",
     "eslint": "8.11.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.5.0",

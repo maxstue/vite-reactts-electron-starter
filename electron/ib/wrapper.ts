@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import { Subscription } from "rxjs";
 import {
     IBApiNext,
@@ -20,12 +20,16 @@ import { IpcMainEvent } from "electron";
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
 const host: string = process.env.IB_TWS_HOST || "localhost";                                      // TWS host name or IP address
 const port: number = parseInt(process.env.IB_TWS_PORT as string) || 4001;                         // API port
-const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;                         // Number of rows to return
+const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 700;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 const barSize: number = parseFloat(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
 export type Tape = { ingressTm: number, price?: number, size?: number };
 export type Bar = { t: number, o?: number, c?: number, v: number, h?: number, l?: number };
+export type SymbolInfo = {
+    id: number, symbol: string, exchange: string, type: string, description: string,
+    pricescale: number
+};
 
 export class IbWrapper extends EventEmitter {
 
@@ -113,8 +117,9 @@ export class IbWrapper extends EventEmitter {
         return changed;
     }
 
-    public onAssetSelected(event: IpcMainEvent, data: any): void {
-        let contract: Contract = { secType: SecType.STK, currency: "USD", symbol: data.content, exchange: "SMART" };
+    public onAssetSelected(event: IpcMainEvent, symbol: string): void {
+        console.log("onAssetSelected", symbol);
+        let contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
         this.api?.getContractDetails(contract).then((details) => {
             // contract resolved
             contract = details[0].contract;
@@ -130,7 +135,7 @@ export class IbWrapper extends EventEmitter {
                         this.last_mkd_data = now;
                         const bids: OrderBookRows = orderBookUpdate.all.bids;
                         const asks: OrderBookRows = orderBookUpdate.all.asks;
-                        let content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
+                        const content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
                         for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
                             const bid: OrderBookRow | undefined = bids.get(i);
                             const ask: OrderBookRow | undefined = asks.get(i);
@@ -210,8 +215,34 @@ export class IbWrapper extends EventEmitter {
 
     public onData(event: IpcMainEvent, data: any): void {
         if (data.type == "selected-asset") {
-            this.onAssetSelected(event, data);
+            this.onAssetSelected(event, data.content);
         }
     }
 
+    public async getSymbolInfo(symbol: string): Promise<SymbolInfo | undefined> {
+        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
+        return this.api?.getContractDetails(contract).then((details) => {
+            console.log(details);
+            const result: SymbolInfo = {
+                id: details[0].contract.conId as number,
+                symbol: details[0].contract.symbol as string,
+                exchange: details[0].contract.exchange as string,
+                type: "stock",
+                description: details[0].longName as string,
+                pricescale: 1 / (details[0].minTick || 0.01),
+            };
+            return result;
+        }).catch((err: IBApiNextError) => {
+            // Can't get contract details
+            const msg = `getSymbolInfo.getContractDetails failed with '${err.error.message}'`;
+            console.log(msg);
+            throw Error(msg);
+        });
+    }
+
 }
+
+// singleton instance of IbWrapper
+export const ibWrapper: IbWrapper = new IbWrapper();
+
+ibWrapper.getSymbolInfo("AAPL").then((result) => console.log(result));
