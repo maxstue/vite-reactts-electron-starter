@@ -20,7 +20,7 @@ import { IpcMainEvent } from "electron";
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
 const host: string = process.env.IB_TWS_HOST || "localhost";                                      // TWS host name or IP address
 const port: number = parseInt(process.env.IB_TWS_PORT as string) || 4001;                         // API port
-const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 700;                         // Number of rows to return
+const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 const barSize: number = parseFloat(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
@@ -28,15 +28,17 @@ export type Tape = { ingressTm: number, price?: number, size?: number };
 export type Bar = { t: number, o?: number, c?: number, v: number, h?: number, l?: number };
 export type SymbolInfo = {
     id: number, symbol: string, exchange: string, type: string, description: string,
-    pricescale: number
+    pricescale: number, ticker: string, session: string, session_holidays?: number[],
+    timezone: string, has_intraday: boolean, has_seconds: boolean,
+    has_no_volume: boolean, volume_precision: number, data_status: string
 };
 
 export class IbWrapper extends EventEmitter {
 
     /** The [[IBApiNext]] instance. */
-    private api?: IBApiNext;
+    private api: IBApiNext;
     /** The subscription on the IBApi errors. */
-    // private error$?: Subscription;
+    private error$: Subscription;
 
     // the subscription on the market depth data
     private subscription_mkd?: Subscription;
@@ -53,7 +55,7 @@ export class IbWrapper extends EventEmitter {
 
         this.api = new IBApiNext({ reconnectInterval, host, port });
         this.api.logLevel = LogLevel.DETAIL;
-        /* this.error$ = */ this.api.errorSubject.subscribe((error) => {
+        this.error$ = this.api.errorSubject.subscribe((error) => {
             if (error.reqId === -1) {
                 console.log(`${error.error.message}`);
             }
@@ -98,12 +100,12 @@ export class IbWrapper extends EventEmitter {
                     if (price > this.last_bar.h) this.last_bar.h = price;
                 } else {
                     this.last_bar.h = price;
-                };
+                }
                 if (this.last_bar.l) {
                     if (price < this.last_bar.l) this.last_bar.l = price;
                 } else {
                     this.last_bar.l = price;
-                };
+                }
             }
             if (type == IBApiTickType.LAST_SIZE) {
                 // update tape
@@ -129,7 +131,7 @@ export class IbWrapper extends EventEmitter {
             this.subscription_mkd?.unsubscribe();
             this.subscription_mkd = this.api?.getMarketDepth(contract, rows, true).subscribe({
                 next: (orderBookUpdate: OrderBookUpdate) => {
-                    // console.log("orderBookUpdate");
+                    console.log("orderBookUpdate");
                     const now: number = Date.now();
                     if ((now - this.last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
                         this.last_mkd_data = now;
@@ -180,12 +182,12 @@ export class IbWrapper extends EventEmitter {
                         changed = this.processMarketData(type, tick) || changed;
                     });
                     if (changed) {
-                        console.log("last_tape:", this.last_tape);
+                        // console.log("last_tape:", this.last_tape);
                         event.sender.send("stream", {
                             symbol: contract.symbol,
                             content: this.last_tape,
                         });
-                        console.log("incomplete bar:", this.last_bar);
+                        // console.log("incomplete bar:", this.last_bar);
                     }
                 },
                 error: (err: IBApiNextError) => {
@@ -219,10 +221,17 @@ export class IbWrapper extends EventEmitter {
         }
     }
 
-    public async getSymbolInfo(symbol: string): Promise<SymbolInfo | undefined> {
-        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
+    public async getSymbolInfo(ticker: string): Promise<SymbolInfo | undefined> {
+        const [exchange, symbol] = ticker.split(":");
+        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: exchange || "SMART" };
         return this.api?.getContractDetails(contract).then((details) => {
-            console.log(details);
+            // console.log(details);
+            const liquidHours: string[] = details[0].liquidHours ? details[0].liquidHours.split(";") : [];
+            // console.log(liquidHours);
+            // console.log(liquidHours.filter((item) => item.endsWith(":CLOSED")));
+            const next_session: string = liquidHours.filter((item) => !item.endsWith(":CLOSED")).pop() as string;
+            const session: string = next_session.substring(9, 13) + next_session.substring(22);
+            const session_holidays: number[] = liquidHours.filter((item) => item.endsWith(":CLOSED")).map((item) => parseInt(item.substring(0, 8)));
             const result: SymbolInfo = {
                 id: details[0].contract.conId as number,
                 symbol: details[0].contract.symbol as string,
@@ -230,6 +239,12 @@ export class IbWrapper extends EventEmitter {
                 type: "stock",
                 description: details[0].longName as string,
                 pricescale: 1 / (details[0].minTick || 0.01),
+                ticker,
+                session: session, session_holidays,
+                timezone: details[0].timeZoneId as string,
+                has_intraday: true, has_seconds: true,
+                has_no_volume: false, volume_precision: -2,
+                data_status: "streaming"
             };
             return result;
         }).catch((err: IBApiNextError) => {
@@ -238,6 +253,11 @@ export class IbWrapper extends EventEmitter {
             console.log(msg);
             throw Error(msg);
         });
+    }
+
+    protected stop() {
+        this.api?.disconnect();
+        this.error$.unsubscribe();
     }
 
 }
