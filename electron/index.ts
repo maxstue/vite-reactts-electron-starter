@@ -4,12 +4,11 @@ import { join } from 'path';
 import { io } from "socket.io-client";
 const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import { IbWrapper, ibWrapper } from "./ib/wrapper";
+import { ibWrapper } from "./ib/wrapper";
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
-import TickType from '@stoqey/ib/dist/api/market/tickType';
 
 let ipcStream = null
 const height = 800;
