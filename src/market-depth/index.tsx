@@ -6,13 +6,14 @@ import {
     Tbody,
     Tr,
     Th,
-  } from "@chakra-ui/react"
+} from "@chakra-ui/react";
+import { MarketDephRow } from "../../electron/ib/wrapper";
 
-const MarketDepth = function() {
+const MarketDepth = (props: any) => {
 
-    const [ selectedAsset ] = useGlobal("selectedAsset");
+    const [selectedAsset] = useGlobal("selectedAsset" as never);
 
-    const [ marketDepthTable, setMarketDepthTable ] = React.useState(null);
+    const [marketDepthTable, setMarketDepthTable] = React.useState(null as any);
 
     const handleMarketDepth = React.useCallback((data) => {
         // console.log(data);
@@ -27,7 +28,7 @@ const MarketDepth = function() {
         }
     }, [selectedAsset]);
 
-    React.useEffect( () => {
+    React.useEffect(() => {
         window.Main.on("market-depth", data => handleMarketDepth(data));
     }, [handleMarketDepth]);
 
@@ -48,7 +49,7 @@ const MarketDepth = function() {
                     </Tr>
                 </Thead><Tbody>
                     {
-                        marketDepthTable ? marketDepthTable.map((row, index) => {
+                        marketDepthTable ? marketDepthTable.map((row: MarketDephRow, index: number) => {
                             return (
                                 <Tr key={index}>
                                     <td>{row.bidMMID}</td>
@@ -58,7 +59,7 @@ const MarketDepth = function() {
                                     <td>{row.askSize}</td>
                                     <td>{row.askMMID}</td>
                                 </Tr>
-                            )
+                            );
                         }) : (<Tr><td>marketDepthTable undefined.</td></Tr>)
                     }
                 </Tbody>
@@ -68,6 +69,6 @@ const MarketDepth = function() {
         return (<p>Market depth will be displayed here, select an asset to start.</p>);
     }
 
-}
+};
 
 export default MarketDepth;
