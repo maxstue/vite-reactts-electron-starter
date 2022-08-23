@@ -32,6 +32,11 @@ export type SymbolInfo = {
     timezone: string, has_intraday: boolean, has_seconds: boolean,
     has_no_volume: boolean, volume_precision: number, data_status: string
 };
+export type MarketDephRow = {
+    i: number,
+    bidMMID: string, bidSize: number, bidPrice: number,
+    askPrice: number, askSize: number, askMMID: string
+};
 
 export class IbWrapper extends EventEmitter {
 
@@ -148,7 +153,7 @@ export class IbWrapper extends EventEmitter {
                                 const askPrice: number = ask?.price as number;
                                 const askSize: number = ask?.size as number;
                                 const askMMID: string = ask?.marketMaker as string;
-                                content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
+                                content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID } as MarketDephRow);
                             }
                         }
                         // console.log("content:", content);
@@ -182,10 +187,10 @@ export class IbWrapper extends EventEmitter {
                         changed = this.processMarketData(type, tick) || changed;
                     });
                     if (changed) {
-                        // console.log("last_tape:", this.last_tape);
+                        console.log("last_tape:", this.last_tape);
                         event.sender.send("stream", {
-                            symbol: contract.symbol,
-                            content: this.last_tape,
+                            symbol: contract.symbol as string,
+                            content: this.last_tape as Tape,
                         });
                         // console.log("incomplete bar:", this.last_bar);
                     }
@@ -217,13 +222,13 @@ export class IbWrapper extends EventEmitter {
 
     public onData(event: IpcMainEvent, data: any): void {
         if (data.type == "selected-asset") {
-            this.onAssetSelected(event, data.content);
+            this.onAssetSelected(event, data.content as string);
         }
     }
 
     public async getSymbolInfo(ticker: string): Promise<SymbolInfo | undefined> {
-        const [exchange, symbol] = ticker.split(":");
-        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: exchange || "SMART" };
+        const symbol = ticker.split(":").at(1);
+        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
         return this.api?.getContractDetails(contract).then((details) => {
             // console.log(details);
             const liquidHours: string[] = details[0].liquidHours ? details[0].liquidHours.split(";") : [];
@@ -235,7 +240,7 @@ export class IbWrapper extends EventEmitter {
             const result: SymbolInfo = {
                 id: details[0].contract.conId as number,
                 symbol: details[0].contract.symbol as string,
-                exchange: details[0].contract.exchange as string,
+                exchange: details[0].contract.primaryExch as string,
                 type: "stock",
                 description: details[0].longName as string,
                 pricescale: 1 / (details[0].minTick || 0.01),
@@ -251,6 +256,7 @@ export class IbWrapper extends EventEmitter {
             // Can't get contract details
             const msg = `getSymbolInfo.getContractDetails failed with '${err.error.message}'`;
             console.log(msg);
+            console.log(contract);
             throw Error(msg);
         });
     }
@@ -265,4 +271,4 @@ export class IbWrapper extends EventEmitter {
 // singleton instance of IbWrapper
 export const ibWrapper: IbWrapper = new IbWrapper();
 
-ibWrapper.getSymbolInfo("AAPL").then((result) => console.log(result));
+ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
