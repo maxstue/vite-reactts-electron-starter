@@ -1,3 +1,7 @@
+/**
+ * Wrapper for Interactive Broker API.
+ * @author Ronan-Yann Lorin <rylorin@gmail.com>
+ */
 import { EventEmitter } from "events";
 import { Subscription } from "rxjs";
 import {
@@ -13,6 +17,8 @@ import {
     TickType,
     MarketDataUpdate,
     MarketDataTick,
+    BarSizeSetting,
+    Bar as IbBar,
 } from "@stoqey/ib";
 import { IpcMainEvent } from "electron";
 
@@ -20,25 +26,42 @@ import { IpcMainEvent } from "electron";
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
 const host: string = process.env.IB_TWS_HOST || "localhost";                                      // TWS host name or IP address
 const port: number = parseInt(process.env.IB_TWS_PORT as string) || 4001;                         // API port
+
+// Some configurable parameters
 const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 const barSize: number = parseFloat(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
+/** Type that describes the data returned to frontend for Time and Sales panel. */
 export type Tape = { ingressTm: number, price?: number, size?: number };
-export type Bar = { t: number, o?: number, c?: number, v: number, h?: number, l?: number };
+
+/** Type that describes a bar/candle data used by methods and returned to frontend. */
+export type Bar = {
+    time?: number,
+    open?: number,
+    close?: number,
+    high?: number,
+    low?: number,
+    volume: number
+};
+
+/** Type that describes the data return by getSymbolInfo method. */
 export type SymbolInfo = {
     id: number, symbol: string, exchange: string, type: string, description: string,
     pricescale: number, ticker: string, session: string, session_holidays?: number[],
     timezone: string, has_intraday: boolean, has_seconds: boolean,
     has_no_volume: boolean, volume_precision: number, data_status: string
 };
+
+/** Type that describes market depth rows returned to frontend for Market depth panel. */
 export type MarketDephRow = {
     i: number,
     bidMMID: string, bidSize: number, bidPrice: number,
     askPrice: number, askSize: number, askMMID: string
 };
 
-export class IbWrapper extends EventEmitter {
+/** IbWrapper is the class that hides IB API details and complexity for use in Gurilla Trading Platform. */
+export default class IbWrapper extends EventEmitter {
 
     /** The [[IBApiNext]] instance. */
     private api: IBApiNext;
@@ -55,6 +78,9 @@ export class IbWrapper extends EventEmitter {
     private last_tape: Tape;
     private last_bar: Bar;
 
+    /**
+     * Class constructor. Setup the connection to IB API and initialize some class members.
+     */
     constructor() {
         super();
 
@@ -76,16 +102,68 @@ export class IbWrapper extends EventEmitter {
         this.last_mkd_data = 0;
         this.subscription_tape = undefined;
         this.last_tape = { ingressTm: 0 };
-        this.last_bar = { t: 0, v: 0 };
+        this.last_bar = { volume: 0 };
 
         this.on("emitCandle", this.emitCandle);
         setTimeout(() => this.emit("emitCandle"), 10 * 1000);  // start after 10 secs
     }
 
+    /**
+     * Convert a string in YYYYMMDD HH:MM:SS format to a Date object
+     * @param value string to be converted
+     * @returns Date from string value
+     */
+    protected static stringToDate(value: string): Date {
+        // convert YYYYMMDD HH:MM:SS to Date
+        // console.log(value);
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+        const len = value.length;
+        if (len > 8) {
+            hours = parseInt(value.substring(len - 8, len - 6));
+            minutes = parseInt(value.substring(len - 5, len - 3));
+            seconds = parseInt(value.substring(len - 2));
+        }
+        const result = new Date(
+            parseInt(value.substring(0, 4)),
+            parseInt(value.substring(4, 6)) - 1,
+            parseInt(value.substring(6, 8)),
+            hours, minutes, seconds
+        );
+        // console.log(result);
+        return result;
+    }
+
+    /**
+     * Convert Date to string format YYYYMMDD HH:MM:SS
+     * @param value Date to convert
+     * @returns Date converted as a string
+     */
+    protected static dateToString(value: Date): string {
+        // convert Date to YYYYMMDD HH:MM:SS
+        const day: number = value.getDate();
+        const month: number = value.getMonth() + 1;
+        const year: number = value.getFullYear();
+        const hours: number = value.getHours();
+        const minutes: number = value.getMinutes();
+        const seconds: number = value.getSeconds();
+        const date: string = year.toString() + ((month < 10) ? ("0" + month) : month) + ((day < 10) ? ("0" + day) : day);
+        const time: string = "" + ((hours < 10) ? ("0" + hours) : hours) + ":" + ((minutes < 10) ? ("0" + minutes) : minutes) + ":" + ((seconds < 10) ? ("0" + seconds) : seconds);
+        return date + " " + time;
+    }
+
     protected emitCandle(): void {
         if (this.subscription_tape) {
             console.log("emitCandle", this.last_bar);
-            this.last_bar = { t: Date.now(), o: this.last_bar.c, v: 0, c: this.last_bar.c, h: this.last_bar.c, l: this.last_bar.c };
+            this.last_bar = {
+                time: Date.now(),
+                open: this.last_bar.close,
+                close: this.last_bar.close,
+                high: this.last_bar.close,
+                low: this.last_bar.close,
+                volume: 0
+            };
         }
         setTimeout(() => this.emit("emitCandle"), barSize * 1000);
     }
@@ -99,29 +177,53 @@ export class IbWrapper extends EventEmitter {
                 // update tape
                 this.last_tape = { ingressTm: tick.ingressTm, price, size: undefined };
                 // update candle
-                this.last_bar.c = price;
-                if (!this.last_bar.o) this.last_bar.o = price;
-                if (this.last_bar.h) {
-                    if (price > this.last_bar.h) this.last_bar.h = price;
+                this.last_bar.close = price;
+                if (!this.last_bar.open) this.last_bar.open = price;
+                if (this.last_bar.high) {
+                    if (price > this.last_bar.high) this.last_bar.high = price;
                 } else {
-                    this.last_bar.h = price;
+                    this.last_bar.high = price;
                 }
-                if (this.last_bar.l) {
-                    if (price < this.last_bar.l) this.last_bar.l = price;
+                if (this.last_bar.low) {
+                    if (price < this.last_bar.low) this.last_bar.low = price;
                 } else {
-                    this.last_bar.l = price;
+                    this.last_bar.low = price;
                 }
-            }
-            if (type == IBApiTickType.LAST_SIZE) {
+            } else if ((type == IBApiTickType.LAST_SIZE) && (tick.ingressTm > this.last_tape.ingressTm)) {
                 // update tape
                 this.last_tape.ingressTm = tick.ingressTm;
                 this.last_tape.size = tick.value;
                 changed = true;
                 // update candle
-                this.last_bar.v += tick.value as number;
+                this.last_bar.volume += tick.value as number;
             }
         }
         return changed;
+    }
+
+    /**
+     * find IB contract
+     * @param ticker: string can be either a symbol or a combinaison of Exchange:Symbol.
+     * Valid examples are "AAPL", ":AAPL", "NASDAQ:AAPL".
+     * @param exchange: optional exchange. Ignored if an exchange is provided in ticker.
+     * @returns Promise<Contract> that will resolve as an IB contrat.
+     */
+    public findContract(ticker: string, exchange?: string): Promise<Contract> {
+        let symbol: string;
+        const t = ticker.split(":");
+        if (t.length == 1) {
+            symbol = ticker
+        } else if (t.length == 2) {
+            exchange = t[0] || exchange;
+            symbol = t[1];
+        } else {
+            // Error !
+            throw (`findContract called with invalid parameters: ${ticker} ${exchange}`)
+        }
+        if (!exchange) exchange = "SMART";
+        else if (exchange == "NASDAQ") exchange = "ISLAND"; // depending on IB API version
+        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange };
+        return this.api?.getContractDetails(contract).then((details) => details[0].contract);
     }
 
     public onAssetSelected(event: IpcMainEvent, symbol: string): void {
@@ -136,7 +238,7 @@ export class IbWrapper extends EventEmitter {
             this.subscription_mkd?.unsubscribe();
             this.subscription_mkd = this.api?.getMarketDepth(contract, rows, true).subscribe({
                 next: (orderBookUpdate: OrderBookUpdate) => {
-                    console.log("orderBookUpdate");
+                    // console.log("orderBookUpdate");
                     const now: number = Date.now();
                     if ((now - this.last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
                         this.last_mkd_data = now;
@@ -174,7 +276,7 @@ export class IbWrapper extends EventEmitter {
 
             // Send time and price data to frontend
             this.last_tape = { ingressTm: 0 };
-            this.last_bar = { t: Date.now(), v: 0 };
+            this.last_bar = { time: Date.now(), volume: 0 };
             this.subscription_tape?.unsubscribe();
             this.subscription_tape = this.api?.getMarketData(contract, "", false, false).subscribe({
                 next: (marketData: MarketDataUpdate) => {
@@ -261,14 +363,100 @@ export class IbWrapper extends EventEmitter {
         });
     }
 
-    protected stop() {
+    /**
+     * makeDuration compute duration accepted by IB API from timeframe, starting and ending dates
+     * @param barSize: bar size (timeframe)
+     * @param _from date from
+     * @param to date to
+     * @return string
+     */
+    protected static makeDuration(barSize: string, from: number, to: number): string {
+        const secs = (to - from) / 1000;
+        const days = secs / 3600 / 24;
+        const weeks = days / 7;
+        const months = days / 30.4375;
+        // const _years = days / 365.25;
+        if (barSize == "1 month") return Math.ceil(months) + " M";
+        else if (barSize == "1 week") return Math.ceil(weeks) + " W";
+        else if (barSize == "1 day") return Math.ceil(days) + " D";
+        else if (barSize.endsWith("hour") || barSize.endsWith("hours")) return Math.ceil(days) + " D";
+        else if (days > 3) return Math.ceil(days) + " D";
+        else return Math.ceil(secs) + " S";
+    }
+
+    /**
+     * Fetch Historical Bar Data
+     * @param contract The IB Contract you are interested in.
+     * @param barSize The data's granularity or Valid Bar Sizes.
+     * @param from datetime of first bar in milliseconds since Unix epoch start in UTC timezone.
+     * @param to datetime of last bar in milliseconds since Unix epoch start in UTC timezone.
+     * @return Historical Bar Data as Bar[].
+     */
+    public getHistory(contract: Contract, barSize: string, from: number, to?: number): Promise<Bar[]> {
+        if (!to) to = Date.now();
+        const duration = IbWrapper.makeDuration(barSize, from, to);
+        // console.log(duration);
+        return this.api?.getHistoricalData(contract, IbWrapper.dateToString(new Date(to)), duration, barSize as BarSizeSetting, "TRADES", 1, 1)
+            .then((bars) => {
+                return bars.map((ibbar: IbBar) => {
+                    return {
+                        time: (ibbar.time) ? IbWrapper.stringToDate(ibbar.time).getTime() : undefined,
+                        datetime: (ibbar.time) ? IbWrapper.stringToDate(ibbar.time) : undefined,
+                        open: ibbar.open as number,
+                        close: ibbar.close as number,
+                        low: ibbar.low as number,
+                        high: ibbar.high as number,
+                        volume: ibbar.volume as number,
+                    };
+                });
+            }).catch((err: IBApiNextError) => {
+                // Can't get contract details
+                const msg = `getHistory failed with '${err.error.message}'`;
+                console.log(msg);
+                console.log(contract);
+                throw Error(msg);
+            });
+    }
+
+    /**
+     * getHistoryByTicker: fetch historycal data by ticker
+     * @param symbol: string,
+     * @param timeframe: string
+     * @param from
+     * @param to
+     * @return Bar[]
+     */
+    public getHistoryByTicker(ticker: string, timeframe: string, from: number, to?: number): Promise<Bar[]> {
+        return this.findContract(ticker)
+            .then((contract) => this.getHistory(contract, timeframe, from, to));
+    }
+
+    /**
+     * fetch_main: drop in replacement for fetch/main.py
+     * @param symbol: string,
+     * @param timeframe: string
+     * @return {Promise<string>} Promise<string>
+     */
+    public fetch_main(symbol: string, timeframe: string): Promise<string> {
+        return this.getHistoryByTicker(symbol, timeframe, Date.now())
+            .then((value) => JSON.stringify(value));
+    }
+
+    public stop() {
         this.api?.disconnect();
         this.error$.unsubscribe();
     }
 
 }
 
-// singleton instance of IbWrapper
+/** Singleton instance of IbWrapper */
 export const ibWrapper: IbWrapper = new IbWrapper();
 
+// This stuff for testing
+const ticker = "NASDAQ:AAPL";
 ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
+ibWrapper.findContract(ticker)
+    .then((contract) => ibWrapper.getHistory(contract, "1 hour", (new Date("2022-08-22").getTime()))
+        .then((result) => console.log(result)));
+ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1660654458000)
+    .then((result) => console.log(result));

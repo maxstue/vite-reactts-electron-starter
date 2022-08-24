@@ -22,11 +22,13 @@ const TimeAndSales = (props: any) => {
         console.log(data);
         console.log(prices.length);
         if (data.symbol == selectedAsset) {
-            if (prices) {
-                setPrices([...prices, data.content]);
-            } else {
-                setPrices([data.content]);
-            }
+            // if (prices) {
+            // setPrices([...prices, data.content]);
+            // } else {
+            //     setPrices([data.content]);
+            // }
+            if ((prices as Tape[]).push(data.content) > 16) (prices as Tape[]).shift();
+            setPrices(prices);
         } else if (data.error) {
             setPrices(data.error);
         } else {
@@ -34,6 +36,17 @@ const TimeAndSales = (props: any) => {
         }
         console.log(prices.length);
         console.log(prices);
+        return prices;
+    }, [selectedAsset]);
+
+    // clear prices array when selectedAsset changes
+    // React.useCallback(() => {
+    //     console.log("useCallback[selectedAsset]");
+    //     setPrices([]);
+    // }, [selectedAsset]);
+    React.useEffect(() => {
+        console.log("useEffect[selectedAsset]");
+        setPrices([]);
     }, [selectedAsset]);
 
     // React.useEffect(() => {
@@ -44,6 +57,7 @@ const TimeAndSales = (props: any) => {
     //     };
     // }, [ selectedAsset ]);
     React.useEffect(() => {
+        console.log("useEffect[handlePrice]");
         window.Main.on("stream", data => handlePrice(data));
     }, [handlePrice]);
 
