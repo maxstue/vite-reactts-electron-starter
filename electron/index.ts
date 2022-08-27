@@ -229,3 +229,7 @@ ipcMain.handle("chart-history-data-req", async (event : IpcMainInvokeEvent, symb
   if (firstDataRequest) return await ibWrapper.getHistoryByTicker(symbol, timeframe, from);
   return await ibWrapper.getHistoryByTicker(symbol, timeframe, from, to);
 });
+
+ipcMain.handle("chart-symbolInfo", async (event : IpcMainInvokeEvent, ticker:string) => {
+  return await ibWrapper.getSymbolInfo(ticker);
+});

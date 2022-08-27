@@ -7,11 +7,13 @@ import {
 	unsubscribeFromStream,
 } from './streaming.js';
 
+const dev = true // True to enable logs inside the console
+
 const lastBarsCache = new Map();
 const headTimestampCache = new Map();
 
 const configurationData = {
-	supported_resolutions: ['1D', '1W', '1M'],
+	supported_resolutions: ['1S', '1', '5', '15', '30', '60', '480', '1D', '1W', '1M'],
 	exchanges: [{
 		value: 'Bitfinex',
 		name: 'Bitfinex',
@@ -91,29 +93,34 @@ export default {
 		onSymbolResolvedCallback,
 		onResolveErrorCallback,
 	) => {
+		if (dev)
 		console.log('[resolveSymbol]: Method call', symbolName);
+		var symbolInfo = await window.Main.chartSymbolInfo(symbolName)
+		if (dev)
+		console.log("[resolveSymbol]: Symbolinfo: ",symbolInfo);
 
-		const symbolInfo = {
-			ticker: 'NASDAQ:AAPL',
-			name: 'NASDAQ:AAPL',
-			description: "Apple Inc.",
-			type: "stock",
-			session: '0930-1600',
-			session_holidays: '20220827,20220828',
-			timezone: 'Etc/UTC',
-			exchange: 'NASDAQ',
+		const symbolInfoResolved = {
+			ticker: symbolInfo.ticker,
+			name: symbolInfo.symbol,
+			description: symbolInfo.description,
+			type: symbolInfo.type,
+			session: symbolInfo.session.replace(':','-'),
+			session_holidays: symbolInfo.session_holidays.join(','),
+			timezone: 'America/New_York',
+			exchange: symbolInfo.exchange,
 			minmov: 1,
 			pricescale: 100,
 			visible_plots_set: 'ohlcv',
-			has_intraday: true,
+			has_intraday: symbolInfo.has_intraday,
 			has_weekly_and_monthly: false,
 			supported_resolutions: configurationData.supported_resolutions,
-			volume_precision: 0,
+			volume_precision: symbolInfo.volume_precision,
 			data_status: 'streaming',
 		};
-
+		if (dev)
+		console.log("[resolveSymbol]: Resolved symbolInfo: ", symbolInfoResolved)
 		setTimeout(()=>{
-			onSymbolResolvedCallback(symbolInfo);},0)
+			onSymbolResolvedCallback(symbolInfoResolved);},0)
 	},
 
 	getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
@@ -123,6 +130,7 @@ export default {
 			var data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
 			if (data.length < 1) {
 				// "noData" should be set if there is no data in the requested period.
+				if (dev)
 				console.log("[getBars]: ::data.length < 1 returned noData: true for period::", from, to );
 				onHistoryCallback([], {
 					noData: true,
@@ -159,6 +167,7 @@ export default {
 				});
 				// "noData" should be set if there is no data in the requested period.
 				if (bars.length == 0) {
+					if (dev)
 				console.log("[getBars]: :: bars.length == 0 returned noData: true for period::", from, to );
 				onHistoryCallback([], {
 					noData: true,
@@ -166,6 +175,7 @@ export default {
 				return;
 			}
 			}
+			if (dev)
 			console.log("[getBars]: countBack: ", countBack ," IB returned bars: ", data, "Date filtered bars: ", bars);
 			onHistoryCallback(bars, {
 				noData: false,
@@ -183,19 +193,12 @@ export default {
 		subscribeUID,
 		onResetCacheNeededCallback,
 	) => {
+		if (dev)
 		console.log('[subscribeBars]: Method call with subscribeUID:', subscribeUID);
-		subscribeOnStream(
-			symbolInfo,
-			resolution,
-			onRealtimeCallback,
-			subscribeUID,
-			onResetCacheNeededCallback,
-			lastBarsCache.get(symbolInfo.full_name),
-		);
 	},
 
 	unsubscribeBars: (subscriberUID) => {
+		if (dev)
 		console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
-		unsubscribeFromStream(subscriberUID);
 	},
 };

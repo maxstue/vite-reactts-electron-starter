@@ -47,6 +47,10 @@ const api = {
     return await ipcRenderer.invoke("chart-history-data-req", symbol, resolution, from, to, firstDataRequest)
   },
 
+  chartSymbolInfo: async (ticker : string) => {
+    return await ipcRenderer.invoke("chart-symbolInfo", ticker)
+  },
+
   /**
     Here function for AppBar
    */
