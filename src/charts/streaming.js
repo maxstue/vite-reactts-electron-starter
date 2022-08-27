@@ -1,4 +1,4 @@
-import { parseFullSymbol } from './helpers.js';
+// import { parseFullSymbol } from './helpers.js';
 
 import { io } from 'socket.io-client';
 
@@ -84,7 +84,7 @@ export function subscribeOnStream(
 	onResetCacheNeededCallback,
 	lastDailyBar,
 ) {
-	const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
+	const parsedSymbol ="adkj";
 	const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
 	const handler = {
 		id: subscribeUID,

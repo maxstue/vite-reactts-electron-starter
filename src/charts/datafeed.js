@@ -1,7 +1,6 @@
 import {
-	makeApiRequest,
 	generateSymbol,
-	parseFullSymbol,
+	getIBCompatibleTimeframe,
 } from './helpers.js';
 import {
 	subscribeOnStream,
@@ -9,6 +8,7 @@ import {
 } from './streaming.js';
 
 const lastBarsCache = new Map();
+const headTimestampCache = new Map();
 
 const configurationData = {
 	supported_resolutions: ['1D', '1W', '1M'],
@@ -92,78 +92,81 @@ export default {
 		onResolveErrorCallback,
 	) => {
 		console.log('[resolveSymbol]: Method call', symbolName);
-		const symbols = await getAllSymbols();
-		const symbolItem = symbols.find(({
-			full_name,
-		}) => full_name === symbolName);
-		if (!symbolItem) {
-			console.log('[resolveSymbol]: Cannot resolve symbol', symbolName);
-			onResolveErrorCallback('cannot resolve symbol');
-			return;
-		}
+
 		const symbolInfo = {
-			ticker: symbolItem.full_name,
-			name: symbolItem.symbol,
-			description: symbolItem.description,
-			type: symbolItem.type,
-			session: '24x7',
+			ticker: 'NASDAQ:AAPL',
+			name: 'NASDAQ:AAPL',
+			description: "Apple Inc.",
+			type: "stock",
+			session: '0930-1600',
+			session_holidays: '20220827,20220828',
 			timezone: 'Etc/UTC',
-			exchange: symbolItem.exchange,
+			exchange: 'NASDAQ',
 			minmov: 1,
 			pricescale: 100,
-			has_intraday: false,
-			has_no_volume: true,
+			visible_plots_set: 'ohlcv',
+			has_intraday: true,
 			has_weekly_and_monthly: false,
 			supported_resolutions: configurationData.supported_resolutions,
-			volume_precision: 2,
+			volume_precision: 0,
 			data_status: 'streaming',
 		};
 
-		console.log('[resolveSymbol]: Symbol resolved', symbolName);
-		onSymbolResolvedCallback(symbolInfo);
+		setTimeout(()=>{
+			onSymbolResolvedCallback(symbolInfo);},0)
 	},
 
 	getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-		const { from, to, firstDataRequest } = periodParams;
-		console.log('[getBars]: Method call', symbolInfo, resolution, from, to);
-		const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
-		const urlParameters = {
-			e: parsedSymbol.exchange,
-			fsym: parsedSymbol.fromSymbol,
-			tsym: parsedSymbol.toSymbol,
-			toTs: to,
-			limit: 2000,
-		};
-		const query = Object.keys(urlParameters)
-			.map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
-			.join('&');
+		const { from, to, firstDataRequest, countBack } = periodParams;
+		
 		try {
-			const data = await makeApiRequest(`data/histoday?${query}`);
-			if (data.Response && data.Response === 'Error' || data.Data.length === 0) {
+			var data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
+			if (data.length < 1) {
 				// "noData" should be set if there is no data in the requested period.
+				console.log("[getBars]: ::data.length < 1 returned noData: true for period::", from, to );
 				onHistoryCallback([], {
 					noData: true,
 				});
 				return;
 			}
 			let bars = [];
-			data.Data.forEach(bar => {
-				if (bar.time >= from && bar.time < to) {
+			data.forEach(bar => {
+				if (bar.time >= from*1000 && bar.time < to*1000) {
 					bars = [...bars, {
-						time: bar.time * 1000,
-						low: bar.low,
-						high: bar.high,
+						time: bar.time,
 						open: bar.open,
+						high: bar.high,
+						low: bar.low,
 						close: bar.close,
+						volume: bar.volume,
 					}];
 				}
 			});
-			if (firstDataRequest) {
-				lastBarsCache.set(symbolInfo.full_name, {
-					...bars[bars.length - 1],
+		
+			if (bars.length == 0) {
+				data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), (from-604800)*1000, to*1000, false);
+				data.forEach(bar => {
+					if (bars.length < countBack && bar.time < to*1000) {
+						bars = [...bars, {
+							time: bar.time,
+							open: bar.open,
+							high: bar.high,
+							low: bar.low,
+							close: bar.close,
+							volume: bar.volume,
+						}];
+					}
 				});
+				// "noData" should be set if there is no data in the requested period.
+				if (bars.length == 0) {
+				console.log("[getBars]: :: bars.length == 0 returned noData: true for period::", from, to );
+				onHistoryCallback([], {
+					noData: true,
+				});
+				return;
 			}
-			console.log(`[getBars]: returned ${bars.length} bar(s)`);
+			}
+			console.log("[getBars]: countBack: ", countBack ," IB returned bars: ", data, "Date filtered bars: ", bars);
 			onHistoryCallback(bars, {
 				noData: false,
 			});
