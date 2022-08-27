@@ -378,7 +378,10 @@ export default class IbWrapper extends EventEmitter {
         // const _years = days / 365.25;
         if (barSize == "1 month") return Math.ceil(months) + " M";
         else if (barSize == "1 week") return Math.ceil(weeks) + " W";
-        else if (barSize == "1 day") return Math.ceil(days) + " D";
+        else if (barSize == "1 day") {
+            if (days < 365 ) return Math.ceil(days) + " D";
+            return Math.ceil(days/365) + " Y"
+        }
         else if (barSize.endsWith("hour") || barSize.endsWith("hours")) return Math.ceil(days) + " D";
         else if (days > 3) return Math.ceil(days) + " D";
         else return Math.ceil(secs) + " S";
