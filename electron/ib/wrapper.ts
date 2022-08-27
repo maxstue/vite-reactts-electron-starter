@@ -456,10 +456,10 @@ export default class IbWrapper extends EventEmitter {
 export const ibWrapper: IbWrapper = new IbWrapper();
 
 // This stuff for testing
-const ticker = "NASDAQ:AAPL";
-ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
-ibWrapper.findContract(ticker)
-    .then((contract) => ibWrapper.getHistory(contract, "1 hour", (new Date("2022-08-22").getTime()))
-        .then((result) => console.log(result)));
-ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1660654458000)
-    .then((result) => console.log(result));
+// const ticker = "NASDAQ:AAPL";
+// ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
+// ibWrapper.findContract(ticker)
+//     .then((contract) => ibWrapper.getHistory(contract, "1 hour", (new Date("2022-08-22").getTime()))
+//         .then((result) => console.log(result)));
+// ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1661536827000)
+//     .then((result) => console.log("NASDAQ aapl result:  ", result));
