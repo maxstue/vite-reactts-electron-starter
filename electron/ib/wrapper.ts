@@ -21,6 +21,7 @@ import {
     Bar as IbBar,
 } from "@stoqey/ib";
 import { IpcMainEvent } from "electron";
+import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
 
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
@@ -42,7 +43,14 @@ export type Bar = {
     close?: number,
     high?: number,
     low?: number,
-    volume: number
+    volume: number,
+    // Additional data for levels
+    SMA_50?: number,
+    SMA_200?: number,
+    EMA_5?: number,
+    EMA_9?: number,
+    EMA_20?: number,
+    VWAP_D?: number,
 };
 
 /** Type that describes the data return by getSymbolInfo method. */
@@ -149,7 +157,7 @@ export default class IbWrapper extends EventEmitter {
         const minutes: number = value.getMinutes();
         const seconds: number = value.getSeconds();
         const date: string = year.toString() + ((month < 10) ? ("0" + month) : month) + ((day < 10) ? ("0" + day) : day);
-        const time: string = "" + ((hours < 10) ? ("0" + hours) : hours) + ":" + ((minutes < 10) ? ("0" + minutes) : minutes) + ":" + ((seconds < 10) ? ("0" + seconds) : seconds);
+        const time: string = ((hours < 10) ? ("0" + hours) : hours) + ":" + ((minutes < 10) ? ("0" + minutes) : minutes) + ":" + ((seconds < 10) ? ("0" + seconds) : seconds);
         return date + " " + time;
     }
 
@@ -390,13 +398,14 @@ export default class IbWrapper extends EventEmitter {
      * @param barSize The data's granularity or Valid Bar Sizes.
      * @param from datetime of first bar in milliseconds since Unix epoch start in UTC timezone.
      * @param to datetime of last bar in milliseconds since Unix epoch start in UTC timezone.
+     * @param outRTH include candles/bar outside RTH (Regular Trading Hours)
      * @return Historical Bar Data as Bar[].
      */
-    public getHistory(contract: Contract, barSize: string, from: number, to?: number): Promise<Bar[]> {
+    public getHistory(contract: Contract, barSize: string, from: number, to?: number, outRTH?: boolean): Promise<Bar[]> {
         if (!to) to = Date.now();
         const duration = IbWrapper.makeDuration(barSize, from, to);
-        // console.log(duration);
-        return this.api?.getHistoricalData(contract, IbWrapper.dateToString(new Date(to)), duration, barSize as BarSizeSetting, "TRADES", 1, 1)
+        // console.log(IbWrapper.dateToString(new Date(to)), duration, barSize);
+        return this.api?.getHistoricalData(contract, IbWrapper.dateToString(new Date(to)), duration, barSize as BarSizeSetting, "TRADES", outRTH ? 0 : 1, 1)
             .then((bars) => {
                 return bars.map((ibbar: IbBar) => {
                     return {
@@ -413,7 +422,7 @@ export default class IbWrapper extends EventEmitter {
                 // Can't get contract details
                 const msg = `getHistory failed with '${err.error.message}'`;
                 console.log(msg);
-                console.log(contract);
+                console.log(contract.symbol, barSize, from, to, duration);
                 throw Error(msg);
             });
     }
@@ -433,13 +442,60 @@ export default class IbWrapper extends EventEmitter {
 
     /**
      * fetch_main: drop in replacement for fetch/main.py
-     * @param symbol: string,
+     * @param ticker: string,
      * @param timeframe: string
      * @return {Promise<string>} Promise<string>
      */
-    public fetch_main(symbol: string, timeframe: string): Promise<string> {
-        return this.getHistoryByTicker(symbol, timeframe, Date.now())
-            .then((value) => JSON.stringify(value));
+    public fetch_main(ticker: string, timeframe: string): Promise<string> {
+        var d = new Date();
+        return this.findContract(ticker)
+            .then((contract) => this.getHistory(contract, timeframe, d.setDate(d.getDate() - 9), Date.now(), true)
+                .then((values: Bar[]) => {
+                    // compute trading indicators
+                    let offset: number;
+                    let computed: number[];
+                    // VWAP
+                    const vwap = new VWAP({
+                        high: [] as number[],
+                        low: [] as number[],
+                        close: [] as number[],
+                        volume: [] as number[],
+                    });
+                    values.forEach((value, i) => {
+                        const result = vwap.nextValue({
+                            open: value.open,
+                            high: value.high,
+                            low: value.low,
+                            close: value.close,
+                            volume: value.volume,
+                        });
+                        values[i].VWAP_D = result;
+                    });
+                    // SMA 50
+                    computed = SMA.calculate({ period: 50, values: values.map((i) => (i.close as number)) });
+                    offset = values.length - computed.length;
+                    computed.map((value, index) => values[index + offset].SMA_50 = value);
+                    // SMA 200
+                    computed = SMA.calculate({ period: 200, values: values.map((i) => (i.close as number)) });
+                    offset = values.length - computed.length;
+                    computed.map((value, index) => values[index + offset].SMA_200 = value);
+                    // EMA 5
+                    computed = EMA.calculate({ period: 5, values: values.map((i) => (i.close as number)) });
+                    offset = values.length - computed.length;
+                    computed.map((value, index) => values[index + offset].EMA_5 = value);
+                    // EMA 9
+                    computed = EMA.calculate({ period: 9, values: values.map((i) => (i.close as number)) });
+                    offset = values.length - computed.length;
+                    computed.map((value, index) => values[index + offset].EMA_9 = value);
+                    // EMA 20
+                    computed = EMA.calculate({ period: 20, values: values.map((i) => (i.close as number)) });
+                    offset = values.length - computed.length;
+                    computed.map((value, index) => values[index + offset].EMA_20 = value);
+                    // TD_SEQ
+
+                    // return result as JSON
+                    return JSON.stringify(values.slice(values.length - 1));
+                }));
     }
 
     public stop() {
@@ -453,10 +509,11 @@ export default class IbWrapper extends EventEmitter {
 export const ibWrapper: IbWrapper = new IbWrapper();
 
 // This stuff for testing
-const ticker = "NASDAQ:AAPL";
-ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
-ibWrapper.findContract(ticker)
-    .then((contract) => ibWrapper.getHistory(contract, "1 hour", (new Date("2022-08-22").getTime()))
-        .then((result) => console.log(result)));
-ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1660654458000)
-    .then((result) => console.log(result));
+// const ticker = "NASDAQ:AAPL";
+// ibWrapper.getSymbolInfo("NASDAQ:AAPL").then((result) => console.log(result));
+// ibWrapper.findContract(ticker)
+//     .then((contract) => ibWrapper.getHistory(contract, "1 hour", (new Date("2022-08-22").getTime()))
+//         .then((result) => console.log(result)));
+// ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1660654458000)
+//     .then((result) => console.log(result));
+ibWrapper.fetch_main("NASDAQ:AAPL", "15 mins").then((result) => console.log(result));
