@@ -1,13 +1,14 @@
 import {
 	generateSymbol,
 	getIBCompatibleTimeframe,
+	getBarsTillCountback,
+	getBarsBetweenTimeframe,
+	dev,
 } from './helpers.js';
 import {
 	subscribeOnStream,
 	unsubscribeFromStream,
 } from './streaming.js';
-
-const dev = true // True to enable logs inside the console
 
 const lastBarsCache = new Map();
 const headTimestampCache = new Map();
@@ -125,61 +126,15 @@ export default {
 
 	getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
 		const { from, to, firstDataRequest, countBack } = periodParams;
-		
 		try {
-			var data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
-			if (data.length < 1) {
-				// "noData" should be set if there is no data in the requested period.
-				if (dev)
-				console.log("[getBars]: ::data.length < 1 returned noData: true for period::", from, to );
-				onHistoryCallback([], {
-					noData: true,
-				});
-				return;
+			if (!!countBack) {
+				getBarsTillCountback(symbolInfo, resolution, from, to, firstDataRequest, countBack, onHistoryCallback )
+				return
 			}
-			let bars = [];
-			data.forEach(bar => {
-				if (bar.time >= from*1000 && bar.time < to*1000) {
-					bars = [...bars, {
-						time: bar.time,
-						open: bar.open,
-						high: bar.high,
-						low: bar.low,
-						close: bar.close,
-						volume: bar.volume,
-					}];
-				}
-			});
-		
-			if (bars.length == 0) {
-				data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), (from-604800)*1000, to*1000, false);
-				data.forEach(bar => {
-					if (bars.length < countBack && bar.time < to*1000) {
-						bars = [...bars, {
-							time: bar.time,
-							open: bar.open,
-							high: bar.high,
-							low: bar.low,
-							close: bar.close,
-							volume: bar.volume,
-						}];
-					}
-				});
-				// "noData" should be set if there is no data in the requested period.
-				if (bars.length == 0) {
-					if (dev)
-				console.log("[getBars]: :: bars.length == 0 returned noData: true for period::", from, to );
-				onHistoryCallback([], {
-					noData: true,
-				});
-				return;
+			else {
+				getBarsBetweenTimeframe(symbolInfo, resolution, from, to, firstDataRequest, onHistoryCallback)
+				return
 			}
-			}
-			if (dev)
-			console.log("[getBars]: countBack: ", countBack ," IB returned bars: ", data, "Date filtered bars: ", bars);
-			onHistoryCallback(bars, {
-				noData: false,
-			});
 		} catch (error) {
 			console.log('[getBars]: Get error', error);
 			onErrorCallback(error);
