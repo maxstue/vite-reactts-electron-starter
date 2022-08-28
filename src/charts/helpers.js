@@ -1,3 +1,5 @@
+export const dev = true // True to enable logs inside the console
+
 // Make requests to CryptoCompare API
 export async function makeApiRequest(path) {
 	try {
@@ -28,4 +30,104 @@ export function getIBCompatibleTimeframe(timeframe) {
 		}	
 
 	return timeframes[timeframe];
+}
+
+// look back further according to the resolution when the data wasn't found or not enough to fill the countback in the given timeframe
+export function newFrom(resolution, from) {
+	if (resolution.endsWith('secs')){
+		return from - 3600
+	}
+	else if(resolution.endsWith('min') || resolution.endsWith('mins')) {
+		return from - 86400
+	}
+	else if(resolution.endsWith('hour') || resolution.endsWith('hours')) {
+		return from - 432000
+	}
+	else {
+		return from - 86393
+	}
+}
+
+// Get History data from IB Wrapper over IPC
+export async function getBarsTillCountback (symbolInfo, resolution, from, to, firstDataRequest, countBack, onHistoryCallback, bars = [], offset = 0) {
+	const data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
+	if (data.length == 0) {
+		if (offset > 5) {
+			onHistoryCallback(bars, {
+				noData: true,
+			});
+			return;
+		}
+		getBarsTillCountback(symbolInfo, resolution, newFrom(from), from, false, countBack, onHistoryCallback, bars, offset + 1)
+		return
+	}
+
+	data.forEach(bar => {
+		if (bars.length < countBack && bar.time < to*1000) {
+			bars = [...bars, {
+				time: bar.time,
+				open: bar.open,
+				high: bar.high,
+				low: bar.low,
+				close: bar.close,
+				volume: bar.volume,
+			}];
+		}
+	});
+	if (bars.length >= countBack) {
+		onHistoryCallback(bars, 
+			{
+				noData: false,
+			});
+		return;
+	}
+	else
+	{
+		// old 'from' is now 'to', and we have a new 'from', firstDataRequest is false, countBack stays the same, the bars might have some data already
+		getBarsTillCountback(symbolInfo, resolution, newFrom(from), from, false, countBack, onHistoryCallback, bars )
+	}
+
+}
+
+export async function getBarsBetweenTimeframe (symbol, resolution, from, to, firstDataRequest, onHistoryCallback) {
+	var data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
+			if (data.length < 1) {
+				// "noData" should be set if there is no data in the requested period.
+				if (dev)
+				console.log("[getBars]: ::data.length < 1 returned noData: true for period::", from, to );
+				onHistoryCallback([], {
+					noData: true,
+				});
+				return;
+			}
+			let bars = [];
+			data.forEach(bar => {
+				if (bar.time >= from*1000 && bar.time < to*1000) {
+					bars = [...bars, {
+						time: bar.time,
+						open: bar.open,
+						high: bar.high,
+						low: bar.low,
+						close: bar.close,
+						volume: bar.volume,
+					}];
+				}
+			});
+		
+			if (bars.length == 0) {
+				// "noData" should be set if there is no data in the requested period.
+				if (bars.length == 0) {
+					if (dev)
+				console.log("[getBars]: :: bars.length == 0 returned noData: true for period::", from, to );
+				onHistoryCallback([], {
+					noData: true,
+				});
+				return;
+			}
+			}
+			if (dev)
+			console.log("[getBars]: countBack: ", countBack ," IB returned bars: ", data, "Date filtered bars: ", bars);
+			onHistoryCallback(bars, {
+				noData: false,
+			});
 }
