@@ -50,20 +50,23 @@ export function newFrom(resolution, from) {
 
 // Get History data from IB Wrapper over IPC
 export async function getBarsTillCountback (symbolInfo, resolution, from, to, firstDataRequest, countBack, onHistoryCallback, bars = [], offset = 0) {
-	const data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
+	try {
+		var data = await window.Main.chartHistoryData(symbolInfo.ticker, getIBCompatibleTimeframe(resolution), from*1000, to*1000, firstDataRequest);
+	console.log("[getBarsTillCountback]: bars:", data);
 	if (data.length == 0) {
 		if (offset > 5) {
+			console.log("[getBarsTillCountback] exhausted")
 			onHistoryCallback(bars, {
 				noData: true,
 			});
 			return;
 		}
-		getBarsTillCountback(symbolInfo, resolution, newFrom(from), from, false, countBack, onHistoryCallback, bars, offset + 1)
+		getBarsTillCountback(symbolInfo, resolution, newFrom(getIBCompatibleTimeframe(resolution), from), from, false, countBack, onHistoryCallback, bars, offset + 1)
 		return
 	}
 
 	data.forEach(bar => {
-		if (bars.length < countBack && bar.time < to*1000) {
+		if (bar.time < to*1000) {
 			bars = [...bars, {
 				time: bar.time,
 				open: bar.open,
@@ -86,6 +89,13 @@ export async function getBarsTillCountback (symbolInfo, resolution, from, to, fi
 		// old 'from' is now 'to', and we have a new 'from', firstDataRequest is false, countBack stays the same, the bars might have some data already
 		getBarsTillCountback(symbolInfo, resolution, newFrom(from), from, false, countBack, onHistoryCallback, bars )
 	}
+	} catch (error) {
+		onHistoryCallback(bars, 
+			{
+				noData: true,
+			});
+	}
+	
 
 }
 

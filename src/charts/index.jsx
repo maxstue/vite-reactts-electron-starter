@@ -15,8 +15,9 @@ const Chart = function() {
 	const [tvWidget, setTvWIdget] = useState();
 	const [selectedAsset] = useGlobal("selectedAsset");
 	useEffect(() => {
+		console.log("[Chart] selectedAsset: ", selectedAsset);
 		 setTvWIdget( new TradingView.widget({
-			symbol: selectedAsset == "" ? 'NASDAQ:AAPL' : `NASDAQ:	${selectedAsset}`, // default symbol
+			symbol: !selectedAsset  ? 'NASDAQ:AAPL' : `NASDAQ:	${selectedAsset}`, // default symbol
 			interval: '1D', // default interval
 			fullscreen: false, // displays the chart in the fullscreen mode
 			container: 'tv_chart_container',
