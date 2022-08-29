@@ -22,6 +22,7 @@ import {
 } from "@stoqey/ib";
 import { IpcMainEvent } from "electron";
 import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
+var TDSequential = require("tdsequential");
 
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
@@ -44,13 +45,15 @@ export type Bar = {
     high?: number,
     low?: number,
     volume: number,
-    // Additional data for levels
+    // Additional data for levels. TODO: define a specific type?
     SMA_50?: number,
     SMA_200?: number,
     EMA_5?: number,
     EMA_9?: number,
     EMA_20?: number,
     VWAP_D?: number,
+    TD_SEQ_UPa?: number,
+    TD_SEQ_DNa?: number,
 };
 
 /** Type that describes the data return by getSymbolInfo method. */
@@ -163,7 +166,7 @@ export default class IbWrapper extends EventEmitter {
 
     protected emitCandle(): void {
         if (this.subscription_tape) {
-            console.log("emitCandle", this.last_bar);
+            // console.log("emitCandle", this.last_bar);
             this.last_bar = {
                 time: Date.now(),
                 open: this.last_bar.close,
@@ -297,7 +300,7 @@ export default class IbWrapper extends EventEmitter {
                         changed = this.processMarketData(type, tick) || changed;
                     });
                     if (changed) {
-                        console.log("last_tape:", this.last_tape);
+                        // console.log("last_tape:", this.last_tape);
                         event.sender.send("stream", {
                             symbol: contract.symbol as string,
                             content: this.last_tape as Tape,
@@ -444,9 +447,9 @@ export default class IbWrapper extends EventEmitter {
      * fetch_main: drop in replacement for fetch/main.py
      * @param ticker: string,
      * @param timeframe: string
-     * @return {Promise<string>} Promise<string>
+     * @return Promise of Bar[] historical candles
      */
-    public fetch_main(ticker: string, timeframe: string): Promise<string> {
+    public fetch_main(ticker: string, timeframe: string): Promise<Bar[]> {
         var d = new Date();
         return this.findContract(ticker)
             .then((contract) => this.getHistory(contract, timeframe, d.setDate(d.getDate() - 9), Date.now(), true)
@@ -492,9 +495,13 @@ export default class IbWrapper extends EventEmitter {
                     offset = values.length - computed.length;
                     computed.map((value, index) => values[index + offset].EMA_20 = value);
                     // TD_SEQ
-
-                    // return result as JSON
-                    return JSON.stringify(values.slice(values.length - 1));
+                    const result = TDSequential(values);
+                    result.forEach((v: { buySetupIndex: number, sellSetupIndex: number }, i: number) => {
+                        values[i].TD_SEQ_UPa = v.sellSetupIndex;
+                        values[i].TD_SEQ_DNa = v.buySetupIndex;
+                    });
+                    // return result as JSON. TODO: return as Bar[]
+                    return values.slice(values.length - 9);
                 }));
     }
 
@@ -516,4 +523,4 @@ export const ibWrapper: IbWrapper = new IbWrapper();
 //         .then((result) => console.log(result)));
 // ibWrapper.getHistoryByTicker("NASDAQ:AAPL", "1 day", 1660568058000, 1660654458000)
 //     .then((result) => console.log(result));
-ibWrapper.fetch_main("NASDAQ:AAPL", "15 mins").then((result) => console.log(result));
+// ibWrapper.fetch_main("NASDAQ:AAPL", "15 mins").then((result) => console.log(result));

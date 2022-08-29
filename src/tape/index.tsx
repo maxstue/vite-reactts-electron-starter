@@ -19,8 +19,8 @@ const TimeAndSales = (props: any) => {
     let [prices, setPrices] = React.useState([] as HookType);
 
     const handlePrice = React.useCallback((data) => {
-        console.log(data);
-        console.log(prices.length);
+        // console.log(data);
+        // console.log(prices.length);
         if (data.symbol == selectedAsset) {
             // if (prices) {
             // setPrices([...prices, data.content]);
@@ -34,8 +34,8 @@ const TimeAndSales = (props: any) => {
         } else {
             setPrices([]);
         }
-        console.log(prices.length);
-        console.log(prices);
+        // console.log(prices.length);
+        // console.log(prices);
         return prices;
     }, [selectedAsset]);
 
@@ -45,7 +45,7 @@ const TimeAndSales = (props: any) => {
     //     setPrices([]);
     // }, [selectedAsset]);
     React.useEffect(() => {
-        console.log("useEffect[selectedAsset]");
+        // console.log("useEffect[selectedAsset]");
         setPrices([]);
     }, [selectedAsset]);
 
@@ -57,7 +57,7 @@ const TimeAndSales = (props: any) => {
     //     };
     // }, [ selectedAsset ]);
     React.useEffect(() => {
-        console.log("useEffect[handlePrice]");
+        // console.log("useEffect[handlePrice]");
         window.Main.on("stream", data => handlePrice(data));
     }, [handlePrice]);
 
