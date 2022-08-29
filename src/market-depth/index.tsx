@@ -6,6 +6,7 @@ import {
     Tbody,
     Tr,
     Th,
+    Td,
 } from "@chakra-ui/react";
 import { MarketDephRow } from "../../electron/ib/wrapper";
 
@@ -29,7 +30,7 @@ const MarketDepth = (props: any) => {
     }, [selectedAsset]);
 
     React.useEffect(() => {
-        window.Main.on("market-depth", data => handleMarketDepth(data));
+        window.Main.on("market-depth", (data) => handleMarketDepth(data));
     }, [handleMarketDepth]);
 
     // console.log(typeof marketDepthTable);
@@ -52,15 +53,15 @@ const MarketDepth = (props: any) => {
                         marketDepthTable ? marketDepthTable.map((row: MarketDephRow, index: number) => {
                             return (
                                 <Tr key={index}>
-                                    <td>{row.bidMMID}</td>
-                                    <td>{row.bidSize}</td>
-                                    <td>{row.bidPrice}</td>
-                                    <td>{row.askPrice}</td>
-                                    <td>{row.askSize}</td>
-                                    <td>{row.askMMID}</td>
+                                    <Td>{row.bidMMID}</Td>
+                                    <Td>{row.bidSize}</Td>
+                                    <Td>{row.bidPrice}</Td>
+                                    <Td>{row.askPrice}</Td>
+                                    <Td>{row.askSize}</Td>
+                                    <Td>{row.askMMID}</Td>
                                 </Tr>
                             );
-                        }) : (<Tr><td>marketDepthTable undefined.</td></Tr>)
+                        }) : (<Tr><Td>marketDepthTable undefined.</Td></Tr>)
                     }
                 </Tbody>
             </Table>

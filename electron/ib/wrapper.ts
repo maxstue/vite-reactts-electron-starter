@@ -35,7 +35,7 @@ const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) |
 const barSize: number = parseFloat(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
 /** Type that describes the data returned to frontend for Time and Sales panel. */
-export type Tape = { ingressTm: number, price?: number, size?: number };
+export type Tape = { ingressTm?: number, price?: number, size?: number };
 
 /** Type that describes a bar/candle data used by methods and returned to frontend. */
 export type Bar = {
@@ -200,7 +200,7 @@ export default class IbWrapper extends EventEmitter {
                 } else {
                     this.last_bar.low = price;
                 }
-            } else if ((type == IBApiTickType.LAST_SIZE) && (tick.ingressTm > this.last_tape.ingressTm)) {
+            } else if (type == IBApiTickType.LAST_SIZE) {
                 // update tape
                 this.last_tape.ingressTm = tick.ingressTm;
                 this.last_tape.size = tick.value;
@@ -300,7 +300,7 @@ export default class IbWrapper extends EventEmitter {
                         changed = this.processMarketData(type, tick) || changed;
                     });
                     if (changed) {
-                        // console.log("last_tape:", this.last_tape);
+                        console.log("last_tape:", this.last_tape);
                         event.sender.send("stream", {
                             symbol: contract.symbol as string,
                             content: this.last_tape as Tape,
