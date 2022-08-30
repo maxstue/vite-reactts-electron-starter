@@ -19,6 +19,10 @@ import {
     MarketDataTick,
     BarSizeSetting,
     Bar as IbBar,
+    Order,
+    OrderType,
+    OrderAction,
+    OpenOrdersUpdate,
 } from "@stoqey/ib";
 import { IpcMainEvent } from "electron";
 import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
@@ -88,6 +92,9 @@ export default class IbWrapper extends EventEmitter {
     private subscription_tape?: Subscription;
     private last_tape: Tape;
     private last_bar: Bar;
+
+    // the subscription on orders updates
+    private ordersSubscription$?: Subscription;
 
     /**
      * Class constructor. Setup the connection to IB API and initialize some class members.
@@ -237,13 +244,12 @@ export default class IbWrapper extends EventEmitter {
         return this.api?.getContractDetails(contract).then((details) => details[0].contract);
     }
 
-    public onAssetSelected(event: IpcMainEvent, symbol: string): void {
-        console.log("onAssetSelected", symbol);
+    public subscribeMarketData(event: IpcMainEvent, symbol: string): void {
         let contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
         this.api?.getContractDetails(contract).then((details) => {
             // contract resolved
             contract = details[0].contract;
-            console.log("selected-asset", contract);
+            console.log("subscribeMarketData", contract);
             // Send market depth data to frontend
             this.last_mkd_data = 0;
             this.subscription_mkd?.unsubscribe();
@@ -284,7 +290,28 @@ export default class IbWrapper extends EventEmitter {
                     });
                 },
             });
+        }).catch((err: IBApiNextError) => {
+            // Can't get contract details
+            // cancel all subscriptions
+            this.subscription_mkd?.unsubscribe();
+            // send error report to frontend
+            console.log(`getContractDetails failed with '${err.error.message}'`);
+            event.sender.send("market-depth", {
+                error: err.error.message,
+            });
+            event.sender.send("stream", {
+                error: err.error.message,
+            });
+        });
+    }
 
+    public subscribeTimeAndSales(event: IpcMainEvent, symbol: string): void {
+        console.log("onAssetSelected", symbol);
+        let contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
+        this.api?.getContractDetails(contract).then((details) => {
+            // contract resolved
+            contract = details[0].contract;
+            console.log("subscribeTimeAndSales", contract);
             // Send time and price data to frontend
             this.last_tape = { ingressTm: 0 };
             this.last_bar = { time: Date.now(), volume: 0 };
@@ -320,7 +347,6 @@ export default class IbWrapper extends EventEmitter {
         }).catch((err: IBApiNextError) => {
             // Can't get contract details
             // cancel all subscriptions
-            this.subscription_mkd?.unsubscribe();
             this.subscription_tape?.unsubscribe();
             // send error report to frontend
             console.log(`getContractDetails failed with '${err.error.message}'`);
@@ -335,8 +361,34 @@ export default class IbWrapper extends EventEmitter {
 
     public onData(event: IpcMainEvent, data: any): void {
         if (data.type == "selected-asset") {
-            this.onAssetSelected(event, data.content as string);
+            this.subscribeMarketData(event, data.content as string);
+            this.subscribeTimeAndSales(event, data.content as string);
         }
+    }
+
+    public subscribeOrders(event: IpcMainEvent): void {
+        console.log("subscribeOrders");
+        this.ordersSubscription$ = this.api
+            .getOpenOrders()
+            .subscribe({
+                next: (data: OpenOrdersUpdate) => {
+                    if (data) {
+                        console.log("got next event", data.all.length, "open orders");
+                        console.log(`${data.added?.length} orders added, ${data.changed?.length} changed`);
+                        if (data.added && (data.added.length > 0)) {/* TODO */ };
+                        if (data.changed && (data.changed.length > 0)) {/* TODO */ };
+                    }
+                },
+                error: (err: IBApiNextError) => {
+                    console.log(`getOpenOrders failed with '${err.error.message}'`);
+                    event.sender.send("XXX", {
+                        error: err.error.message,
+                    });
+                },
+                complete: () => {
+                    console.log("getOpenOrders completed.");
+                }
+            });
     }
 
     public async getSymbolInfo(ticker: string): Promise<SymbolInfo | undefined> {
@@ -494,7 +546,7 @@ export default class IbWrapper extends EventEmitter {
                     computed = EMA.calculate({ period: 20, values: values.map((i) => (i.close as number)) });
                     offset = values.length - computed.length;
                     computed.map((value, index) => values[index + offset].EMA_20 = value);
-                    // TD_SEQ
+                    // TD_SEQ TODO: check results
                     const result = TDSequential(values);
                     result.forEach((v: { buySetupIndex: number, sellSetupIndex: number }, i: number) => {
                         values[i].TD_SEQ_UPa = v.sellSetupIndex;
@@ -505,7 +557,25 @@ export default class IbWrapper extends EventEmitter {
                 }));
     }
 
-    public stop() {
+    public createOrder(ticker: string, action: string, quantity: number) {
+        const order: Order = {
+            action: action as OrderAction,
+            orderType: OrderType.MKT,
+            totalQuantity: quantity,
+            transmit: false,
+        };
+        return this.findContract(ticker)
+            .then((contract) => this.api.placeNewOrder(contract, order));
+    }
+
+    public cancelOrder(id: number): void {
+        return this.api.cancelOrder(id);
+    }
+
+    public stop(): void {
+        this.subscription_tape?.unsubscribe();
+        this.subscription_mkd?.unsubscribe();
+        this.ordersSubscription$?.unsubscribe();
         this.api?.disconnect();
         this.error$.unsubscribe();
     }
