@@ -4,11 +4,11 @@ import { useGlobal } from "reactn";
 
   import DetailedMarketDepth from "./detailed"
 
-const MarketDepth = function() {
+const MarketDepth = (props: any) => {
 
-    const [ selectedAsset ] = useGlobal("selectedAsset");
+    const [selectedAsset] = useGlobal("selectedAsset" as never);
 
-    const [ marketDepthTable, setMarketDepthTable ] = React.useState(null);
+    const [marketDepthTable, setMarketDepthTable] = React.useState(null as any);
 
     const handleMarketDepth = React.useCallback((data) => {
         // console.log(data);
@@ -23,7 +23,7 @@ const MarketDepth = function() {
         }
     }, [selectedAsset]);
 
-    React.useEffect( () => {
+    React.useEffect(() => {
         window.Main.on("market-depth", data => handleMarketDepth(data));
 
     }, [handleMarketDepth]);
