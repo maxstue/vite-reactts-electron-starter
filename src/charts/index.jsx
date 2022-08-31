@@ -13,11 +13,18 @@ const overrides = {
 
 const Chart = function() {
 	const [tvWidget, setTvWIdget] = useState();
-	const [selectedAsset] = useGlobal("selectedAsset");
+	const [selectedAsset, setSelectedAsset] = useGlobal("selectedAsset")
+		if (!selectedAsset) {
+			setSelectedAsset("AAPL")
+			window.Main.sendData({
+			  type: "selected-asset",
+			  content: selectedAsset
+			})
+		  }
 	useEffect(() => {
 		console.log("[Chart] selectedAsset: ", selectedAsset);
 		 setTvWIdget( new TradingView.widget({
-			symbol: !selectedAsset  ? 'NASDAQ:AAPL' : `NASDAQ:	${selectedAsset}`, // default symbol
+			symbol: !selectedAsset  ? 'NASDAQ:AAPL' : `NASDAQ:${selectedAsset}`, // default symbol
 			interval: '1D', // default interval
 			fullscreen: false, // displays the chart in the fullscreen mode
 			container: 'tv_chart_container',
@@ -27,6 +34,9 @@ const Chart = function() {
 			disabled_features: ["header_symbol_search", "header_compare", "symbol_search_hot_key", "header_screenshot", "main_series_scale_menu", "display_market_status", "timeframes_toolbar", "control_bar"],
 			enabled_features:["hide_left_toolbar_by_default", "hide_resolution_in_legend"],
 			overrides:overrides,
+			charts_storage_url: "http://saveload.tradingview.com/",
+			client_id: 'guerillatrader.com',
+			user_id: 'public_user_id1',	
 			}));
 		
 	}, [])

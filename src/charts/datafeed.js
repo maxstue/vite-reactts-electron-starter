@@ -5,10 +5,7 @@ import {
 	getBarsBetweenTimeframe,
 	dev,
 } from './helpers.js';
-import {
-	subscribeOnStream,
-	unsubscribeFromStream,
-} from './streaming.js';
+import {useGlobal} from 'reactn';
 
 const lastBarsCache = new Map();
 const headTimestampCache = new Map();
@@ -150,6 +147,13 @@ export default {
 	) => {
 		if (dev)
 		console.log('[subscribeBars]: Method call with subscribeUID:', subscribeUID);
+		window.Main.on("stream", (message) => {
+			console.log("[subscribeBars]: stream: ", message?.bar);
+			
+			onRealtimeCallback(message?.bar);
+		  });
+		// onRealtimeCallback({time:1661918905000,close: 10, open: 100, high: 100, low: 10, volume: 200000});
+		// onRealtimeCallback({time:1661919085000,close: 10, open: 100, high: 100, low: 10, volume: 150000});
 	},
 
 	unsubscribeBars: (subscriberUID) => {
