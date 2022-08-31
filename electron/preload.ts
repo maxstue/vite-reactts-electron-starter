@@ -68,7 +68,7 @@ const api = {
   off: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.removeListener(channel, (_, data) => callback(data));
   },
-
+  
   reset: (channel: string) => {
     ipcRenderer.removeAllListeners(channel)
   }

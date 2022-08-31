@@ -23,6 +23,8 @@ let ipcStream = null
 const height = 800;
 const width = 1200;
 
+const windows = new Set()
+
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
@@ -103,19 +105,15 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  app.whenReady().then(() => {
-    installExtension(REACT_DEVELOPER_TOOLS)
-        .then((name) => console.log(`Added Extension:  ${name}`))
-        .catch((err) => console.log('An error occurred: ', err));
-});
+  installExtension(REACT_DEVELOPER_TOOLS)
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -242,8 +240,8 @@ let lastdata: number = null;
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;  // API reconnect retry interval
 const host: string = process.env.IB_TWS_HOST || "localhost";                            // TWS host name or IP address
-const port: number = parseInt(process.env.IB_TWS_PORT) || 4001;                         // API port
-const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 7;                         // Number of rows to return
+const port: number = parseInt(process.env.IB_TWS_PORT) || 7497;                         // API port
+const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 1000;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 
 // listen the channel `data` and resend the received message to the renderer process
@@ -292,7 +290,7 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
                 content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
               }
             }
-            console.log("content:", content);
+            // console.log("content:", content[0]);
             event.sender.send("market-depth", {
               symbol: contract.symbol,
               content: content,

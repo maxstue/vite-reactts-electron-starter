@@ -110,8 +110,8 @@ const PositionsRow = function(props) {
                     </div>
                     <div className="p-2 w-1/4">
                         <Stack direction="column">
-                            {/* <span className="font-semibold">{numeral(latestPrice).format("0.00")}</span>
-                            <span >{numeral(position.market_value).format("0,0")}</span> */}
+                            <span className="font-semibold">{numeral(latestPrice).format("0.00")}</span>
+                            <span >{numeral(position.market_value).format("0,0")}</span>
                         </Stack>
                     </div>
                     <div className="p-2 w-1/4">
