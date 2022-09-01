@@ -4,6 +4,9 @@ import AppBar from './AppBar';
 import { ChakraProvider } from "@chakra-ui/react"
 import ResponsiveGrid from "./grid"
 import useHotkeyOrders from "./orders/hotkeys"
+import { useToast } from "@chakra-ui/react"
+
+
 
 
 function App() {
@@ -12,7 +15,7 @@ function App() {
   const [isOpen, setOpen] = useState(false);
   const [isSent, setSent] = useState(false);
   const [fromMain, setFromMain] = useState<string | null>(null);
-
+  const toast = useToast()
   
 
   const handleToggle = () => {
@@ -83,6 +86,7 @@ function App() {
   React.useEffect(() => {
     window.Main.on("data", (data:any) => {
       // console.log(levels)
+
       if (data.type == "levels") {
         const newLevels = levels
         newLevels[data.content.symbol] = data.content.levels 

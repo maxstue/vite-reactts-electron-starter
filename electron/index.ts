@@ -14,6 +14,8 @@ let ipcStream = null
 const height = 800;
 const width = 1200;
 
+const windows = new Set()
+
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
@@ -96,17 +98,15 @@ app.whenReady().then(() => {
 
   app.whenReady().then(() => {
     installExtension(REACT_DEVELOPER_TOOLS)
-      .then((name) => console.log(`Added Extension:  ${name}`))
-      .catch((err) => console.log('An error occurred: ', err));
-  });
+        .then((name) => console.log(`Added Extension:  ${name}`))
+        .catch((err) => console.log('An error occurred: ', err));
+});
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -218,10 +218,97 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 
 })
 
+/** The [[IBApiNext]] instance. */
+let api: IBApiNext = null;
+
+/** The subscription on the IBApi errors. */
+let error$: Subscription = null;
+
+// the subscription on the market depth data
+let subscription$: Subscription = null;
+
+// last time we sent data to frontend
+let lastdata: number = null;
+
+// connection settings
+const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL) || 5000;  // API reconnect retry interval
+const host: string = process.env.IB_TWS_HOST || "localhost";                            // TWS host name or IP address
+const port: number = parseInt(process.env.IB_TWS_PORT) || 4001;                         // API port
+const rows: number = parseInt(process.env.IB_MARKET_ROWS) || 7;                         // Number of rows to return
+const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
+
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
-  ibWrapper.onData(event, data);
+
+  // Connect to IB gateway
+  if (!api) {
+    api = new IBApiNext({ reconnectInterval, host, port });
+    api.logLevel = LogLevel.DETAIL;
+    this.error$ = api.errorSubject.subscribe((error) => {
+      if (error.reqId === -1) {
+        console.log(`${error.error.message}`);
+      }
+    });
+    try {
+      api.connect(Math.round(Math.random() * 16383));
+    } catch (error) {
+      console.log("Connection error", error.message);
+      console.log(`IB host: ${host} - IB port: ${port}`);
+    }
+  }
+
+  if (data.type == "selected-asset") {
+    const contract: Contract = { secType: SecType.STK, currency: "USD", symbol: data.content, exchange: "SMART" };
+    api.getContractDetails(contract).then((details) => {
+      lastdata = 0;
+      subscription$?.unsubscribe();
+      subscription$ = api.getMarketDepth(details[0].contract, rows, true).subscribe({
+        next: (orderBookUpdate: OrderBookUpdate) => {
+          const now: number = Date.now();
+          if ((now - lastdata) > refreshing * 1000) {  // limit to refresh rate to every x seconds
+            lastdata = now;
+            const bids: OrderBookRows = orderBookUpdate.all.bids;
+            const asks: OrderBookRows = orderBookUpdate.all.asks;
+            let content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
+            for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
+              const bid: OrderBookRow = bids.get(i);
+              const ask: OrderBookRow = asks.get(i);
+              if (bid || ask) {
+                const bidMMID = bid?.marketMaker;
+                const bidSize = bid?.size;
+                const bidPrice = bid?.price;
+                const askPrice = ask?.price;
+                const askSize = ask?.size;
+                const askMMID = ask?.marketMaker;
+                content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
+              }
+            }
+            console.log("content:", content);
+            event.sender.send("market-depth", {
+              symbol: contract.symbol,
+              content: content,
+            });
+          }
+        },
+        error: (err: IBApiNextError) => {
+          subscription$?.unsubscribe();
+          console.log(`getMarketDepth failed with '${err.error.message}'`);
+          event.sender.send("market-depth", {
+            error: err.error.message,
+          });
+        },
+      });
+    })
+    .catch((err: IBApiNextError) => {
+      subscription$?.unsubscribe();
+      console.log(`getContractDetails failed with '${err.error.message}'`);
+      event.sender.send("market-depth", {
+        error: err.error.message,
+      });
+  });
+
 }
+
 
 );
 
@@ -232,4 +319,5 @@ ipcMain.handle("chart-history-data-req", async (event : IpcMainInvokeEvent, symb
 
 ipcMain.handle("chart-symbolInfo", async (event : IpcMainInvokeEvent, ticker:string) => {
   return await ibWrapper.getSymbolInfo(ticker);
+
 });

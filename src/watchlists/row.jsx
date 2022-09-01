@@ -8,12 +8,16 @@ import numeral from "numeral";
 
 import { CMenu, Trigger, Content, MenuItem, VWAPSubMenu, OrderSubMenu } from ".././common/menu/context-menu";
 
-const WatchlistRow = function (props) {
-    const [selectedAsset, setSelectedAsset] = useGlobal("selectedAsset");
-    const [watchlist, setWatchlist] = useGlobal("watchlist");
-    const [symbolsDetails] = useGlobal("symbolsDetails");
-    const [latestPrice, setLatestPrice] = React.useState(0);
-    const [candles] = useGlobal("candles");
+
+const WatchlistRow = function(props) {
+
+    const [selectedAsset, setSelectedAsset] = useGlobal("selectedAsset")
+    const [watchlist, setWatchlist] = useGlobal("watchlist")
+    const [symbolsDetails] = useGlobal("symbolsDetails")
+    const [symbolHighlight] = useGlobal("symbolHighlight")
+    const [ latestPrice, setLatestPrice ] = React.useState(0) 
+    const [ candles ] = useGlobal("candles")
+
     // const [ symbolCandles, setSymbolCandles ] = React.useState([])
     const [atr, setAtr] = React.useState(0);
     const [levels] = useGlobal("levels");
@@ -48,22 +52,34 @@ const WatchlistRow = function (props) {
     //     }
     // }, [socket, handleMinuteBars])
 
-    const deleteSymbol = async function () {
+    const deleteSymbol = async function() {
+        console.log(props.item.symbol)
+        
+
         const response = await window.Main.asyncData({
             route: "watchlists/remove-symbol",
             content: props.item.symbol
-        });
-        console.log(props.item.symbol);
-        console.log(response);
-        if (response.data) setWatchlist(response.data);
-    };
+
+        })
+        console.log(response)
+        
+        if (response.data) { setWatchlist(response.data) }
+        else { setWatchlist(watchlist.filter(asset => asset.symbol != props.item.symbol))}
+    }   
+
 
     const handleSelectedAsset = function (e) {
         setSelectedAsset(props.item.symbol);
         //console.log("symbols details", symbolsDetails)
     };
 
-    const unshortable = props.item.shortable ? null : "!s";
+
+    // const highlight = (props.item.symbol == symbolHighlight) ? " transition-all duration-200 bg-yellow-500 " : "";
+    
+    const highlight = (props.item.symbol == symbolHighlight) ? " animate-[bounce_3s_1s] " : ""; 
+
+    const unshortable = props.item.shortable ? null : "!s"
+
 
     // let lastCandle = {}
     // React.useEffect(() => {
@@ -91,8 +107,10 @@ const WatchlistRow = function (props) {
     }
 
     return (
-        <Tr className={ selectedAsset == props.item.symbol ? "bg-purple-50" : "hover:bg-yellow-50" } onClick={ handleSelectedAsset }>
-            <Td>
+
+        <Tr className={(selectedAsset == props.item.symbol ? " bg-purple-50 " : " hover:bg-yellow-50 ") + (props.item.status ? "": " bg-red-100 ")} onClick={handleSelectedAsset}>
+            <Td className={highlight}>
+
                 <CMenu>
                     <Trigger>
                         { props.item.symbol } { unshortable && <Tag>{ unshortable }</Tag> }

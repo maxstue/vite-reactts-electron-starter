@@ -1,14 +1,9 @@
 import React from "react";
 import { useGlobal } from "reactn";
-import {
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-} from "@chakra-ui/react";
-import { MarketDephRow } from "../../electron/ib/wrapper";
+
+
+import DetailedMarketDepth from "./detailed"
+
 
 const MarketDepth = (props: any) => {
 
@@ -30,46 +25,24 @@ const MarketDepth = (props: any) => {
     }, [selectedAsset]);
 
     React.useEffect(() => {
-        window.Main.on("market-depth", (data) => handleMarketDepth(data));
+
+        window.Main.on("market-depth", data => handleMarketDepth(data));
+
+
     }, [handleMarketDepth]);
+
+    //console.log("selected asset", selectedAsset)
 
     // console.log(typeof marketDepthTable);
     if (typeof marketDepthTable == "string") {
         return (<p>Error: {marketDepthTable}</p>);
     } else if (selectedAsset) {
-        return (
-            <Table size="sm" colorScheme="gray">
-                <Thead>
-                    <Tr>
-                        <Th>MMID</Th>
-                        <Th>Size</Th>
-                        <Th>Bid</Th>
-                        <Th>Ask</Th>
-                        <Th>Size</Th>
-                        <Th>MMID</Th>
-                    </Tr>
-                </Thead><Tbody>
-                    {
-                        marketDepthTable ? marketDepthTable.map((row: MarketDephRow, index: number) => {
-                            return (
-                                <Tr key={index}>
-                                    <Td>{row.bidMMID}</Td>
-                                    <Td>{row.bidSize}</Td>
-                                    <Td>{row.bidPrice}</Td>
-                                    <Td>{row.askPrice}</Td>
-                                    <Td>{row.askSize}</Td>
-                                    <Td>{row.askMMID}</Td>
-                                </Tr>
-                            );
-                        }) : (<Tr><Td>marketDepthTable undefined.</Td></Tr>)
-                    }
-                </Tbody>
-            </Table>
-        );
+
+        return <DetailedMarketDepth marketDepthTable={marketDepthTable} />
+
     } else {
         return (<p>Market depth will be displayed here, select an asset to start.</p>);
     }
-
-};
+}
 
 export default MarketDepth;

@@ -40,6 +40,7 @@ function AppBar() {
           <div className="text-sm w-10  hover:bg-gray-700">View</div>
           <div className="text-sm w-14  hover:bg-gray-700 ">Window</div>
           <div className="text-sm w-9  hover:bg-gray-700 ">Help</div>
+          <div className="text-sm w-24 hover:bg-gray-700">New Watchlist</div>
         </div>
       </div>
     </>

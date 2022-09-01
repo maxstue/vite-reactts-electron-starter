@@ -18,7 +18,7 @@
     "checkJs": false
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "src/tape/index.jsx"]
 }
 
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useGlobal } from "reactn";
 import { WidthProvider, Responsive } from "react-grid-layout";
-import { DragHandleIcon  } from "@chakra-ui/icons";
+import { DragHandleIcon, SettingsIcon  } from "@chakra-ui/icons";
 import Watchlist from "./watchlists"
 // import Ticket from "./ticket"
 import Buttons from "./orders/buttons"
@@ -164,9 +164,12 @@ export default class ResponsiveGrid extends React.PureComponent {
             className="border scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300" 
             data-grid={{ w: 4, h: 5, x: 4, y: 0, minW: 4, minH: 5, isResizable:true }}
             >
-              <div className="flex items-center mb-2 bg-gray-400">
+              <div className="flex justify-between mb-2 bg-gray-400">
+                <div className="flex items-center">
                   <span className="dragHandle cursor-move font-semibold"><DragHandleIcon /> </span>
                   <span className="font-semibold pl-2">Market Depth</span>
+                </div>
+                <div><span className="cursor-pointer font-semibold mr-2"><SettingsIcon /></span></div>
               </div>
               <div className="p-2">
                   <MarketDepth />

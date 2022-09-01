@@ -28,7 +28,7 @@ const WatchlistTable = function(props) {
             </Thead>
             <Tbody>
                 {props.list.map( (item, index) => {
-                    return <WatchlistRow key={item.symbol} item={item} id={index}  />
+                    return <WatchlistRow key={index} item={item} id={index}  />
                 })}
             </Tbody>
         </Table>
