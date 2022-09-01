@@ -241,129 +241,112 @@ export default class IbWrapper extends EventEmitter {
         if (!exchange) exchange = "SMART";
         else if (exchange == "NASDAQ") exchange = "ISLAND"; // depending on IB API version
         const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange };
-        return this.api?.getContractDetails(contract).then((details) => details[0].contract);
+        return this.api?.getContractDetails(contract)
+            .then((details) => details[0].contract);
     }
 
-    public subscribeMarketData(event: IpcMainEvent, symbol: string): void {
-        let contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
-        this.api?.getContractDetails(contract).then((details) => {
-            // contract resolved
-            contract = details[0].contract;
-            console.log("subscribeMarketData", contract);
-            // Send market depth data to frontend
-            this.last_mkd_data = 0;
-            this.subscription_mkd?.unsubscribe();
-            this.subscription_mkd = this.api?.getMarketDepth(contract, rows, true).subscribe({
-                next: (orderBookUpdate: OrderBookUpdate) => {
-                    // console.log("orderBookUpdate");
-                    const now: number = Date.now();
-                    if ((now - this.last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
-                        this.last_mkd_data = now;
-                        const bids: OrderBookRows = orderBookUpdate.all.bids;
-                        const asks: OrderBookRows = orderBookUpdate.all.asks;
-                        const content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
-                        for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
-                            const bid: OrderBookRow | undefined = bids.get(i);
-                            const ask: OrderBookRow | undefined = asks.get(i);
-                            if (bid || ask) {
-                                const bidMMID: string = bid?.marketMaker as string;
-                                const bidSize: number = bid?.size as number;
-                                const bidPrice: number = bid?.price as number;
-                                const askPrice: number = ask?.price as number;
-                                const askSize: number = ask?.size as number;
-                                const askMMID: string = ask?.marketMaker as string;
-                                content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID } as MarketDephRow);
-                            }
+    public subscribeMarketData(event: IpcMainEvent, contract: Contract): void {
+        console.log("subscribeMarketData", contract);
+        // Send market depth data to frontend
+        this.last_mkd_data = 0;
+        this.subscription_mkd?.unsubscribe();
+        this.subscription_mkd = this.api?.getMarketDepth(contract, rows, true).subscribe({
+            next: (orderBookUpdate: OrderBookUpdate) => {
+                // console.log("orderBookUpdate");
+                const now: number = Date.now();
+                if ((now - this.last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
+                    this.last_mkd_data = now;
+                    const bids: OrderBookRows = orderBookUpdate.all.bids;
+                    const asks: OrderBookRows = orderBookUpdate.all.asks;
+                    const content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
+                    for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
+                        const bid: OrderBookRow | undefined = bids.get(i);
+                        const ask: OrderBookRow | undefined = asks.get(i);
+                        if (bid || ask) {
+                            const bidMMID: string = bid?.marketMaker as string;
+                            const bidSize: number = bid?.size as number;
+                            const bidPrice: number = bid?.price as number;
+                            const askPrice: number = ask?.price as number;
+                            const askSize: number = ask?.size as number;
+                            const askMMID: string = ask?.marketMaker as string;
+                            content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID } as MarketDephRow);
                         }
-                        // console.log("content:", content);
-                        event.sender.send("market-depth", {
-                            symbol: contract.symbol,
-                            content: content,
-                        });
                     }
-                },
-                error: (err: IBApiNextError) => {
-                    this.subscription_mkd?.unsubscribe();
-                    console.log(`getMarketDepth failed with '${err.error.message}'`);
+                    // console.log("content:", content);
                     event.sender.send("market-depth", {
-                        error: err.error.message,
+                        symbol: contract.symbol,
+                        content: content,
                     });
-                },
-            });
-        }).catch((err: IBApiNextError) => {
-            // Can't get contract details
-            // cancel all subscriptions
-            this.subscription_mkd?.unsubscribe();
-            // send error report to frontend
-            console.log(`getContractDetails failed with '${err.error.message}'`);
-            event.sender.send("market-depth", {
-                error: err.error.message,
-            });
-            event.sender.send("stream", {
-                error: err.error.message,
-            });
+                }
+            },
+            error: (err: IBApiNextError) => {
+                this.subscription_mkd?.unsubscribe();
+                console.log(`getMarketDepth failed with '${err.error.message}'`);
+                event.sender.send("market-depth", {
+                    error: err.error.message,
+                });
+            },
         });
     }
 
-    public subscribeTimeAndSales(event: IpcMainEvent, symbol: string): void {
-        console.log("onAssetSelected", symbol);
-        let contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
-        this.api?.getContractDetails(contract).then((details) => {
-            // contract resolved
-            contract = details[0].contract;
-            console.log("subscribeTimeAndSales", contract);
-            // Send time and price data to frontend
-            this.last_tape = { ingressTm: 0 };
-            this.last_bar = { time: Date.now(), volume: 0 };
-            this.subscription_tape?.unsubscribe();
-            this.subscription_tape = this.api?.getMarketData(contract, "", false, false).subscribe({
-                next: (marketData: MarketDataUpdate) => {
-                    // console.log("getMarketData");
-                    let changed: boolean = false;
-                    marketData.added?.forEach((tick, type) => {
-                        changed = this.processMarketData(type, tick) || changed;
-                    });
-                    marketData.changed?.forEach((tick, type) => {
-                        changed = this.processMarketData(type, tick) || changed;
-                    });
-                    if (changed) {
-                        console.log("last_tape:", this.last_tape);
-                        event.sender.send("stream", {
-                            symbol: contract.symbol as string,
-                            content: this.last_tape as Tape,
-                            bar: this.last_bar as Bar,
-                        });
-                        // console.log("incomplete bar:", this.last_bar);
-                    }
-                },
-                error: (err: IBApiNextError) => {
-                    this.subscription_tape?.unsubscribe();
-                    console.log(`getMarketData failed with '${err.error.message}'`);
+    public subscribeTimeAndSales(event: IpcMainEvent, contract: Contract): void {
+        console.log("subscribeTimeAndSales", contract);
+        // Send time and price data to frontend
+        this.last_tape = { ingressTm: 0 };
+        this.last_bar = { time: Date.now(), volume: 0 };
+        this.subscription_tape?.unsubscribe();
+        this.subscription_tape = this.api?.getMarketData(contract, "", false, false).subscribe({
+            next: (marketData: MarketDataUpdate) => {
+                // console.log("getMarketData");
+                let changed: boolean = false;
+                marketData.added?.forEach((tick, type) => {
+                    changed = this.processMarketData(type, tick) || changed;
+                });
+                marketData.changed?.forEach((tick, type) => {
+                    changed = this.processMarketData(type, tick) || changed;
+                });
+                if (changed) {
+                    console.log("last_tape:", this.last_tape);
                     event.sender.send("stream", {
-                        error: err.error.message,
+                        symbol: contract.symbol as string,
+                        content: this.last_tape as Tape,
+                        bar: this.last_bar as Bar,
                     });
-                },
-            });
-
-        }).catch((err: IBApiNextError) => {
-            // Can't get contract details
-            // cancel all subscriptions
-            this.subscription_tape?.unsubscribe();
-            // send error report to frontend
-            console.log(`getContractDetails failed with '${err.error.message}'`);
-            event.sender.send("market-depth", {
-                error: err.error.message,
-            });
-            event.sender.send("stream", {
-                error: err.error.message,
-            });
+                    // console.log("incomplete bar:", this.last_bar);
+                }
+            },
+            error: (err: IBApiNextError) => {
+                this.subscription_tape?.unsubscribe();
+                console.log(`getMarketData failed with '${err.error.message}'`);
+                event.sender.send("stream", {
+                    error: err.error.message,
+                });
+            },
         });
     }
 
     public onData(event: IpcMainEvent, data: any): void {
-        if (data.type == "selected-asset") {
-            this.subscribeMarketData(event, data.content as string);
-            this.subscribeTimeAndSales(event, data.content as string);
+        if ((data.type == "selected-asset") && data.content) {
+            this.findContract(data.content as string)
+                .then((contract: Contract) => {
+                    this.subscribeMarketData(event, contract);
+                    this.subscribeTimeAndSales(event, contract);
+                })
+                .catch((err: IBApiNextError) => {
+                    // Can't get contract details
+                    // cancel all subscriptions
+                    this.subscription_mkd?.unsubscribe();
+                    this.subscription_tape?.unsubscribe();
+                    // send error report to frontend
+                    console.log(`findContract failed with '${err.error.message}'`);
+                    console.log(data.content);
+                    event.sender.send("market-depth", {
+                        error: err.error.message,
+                    });
+                    event.sender.send("stream", {
+                        error: err.error.message,
+                    });
+                });
         }
     }
 
@@ -443,8 +426,8 @@ export default class IbWrapper extends EventEmitter {
         if (barSize == "1 month") return Math.ceil(months) + " M";
         else if (barSize == "1 week") return Math.ceil(weeks) + " W";
         else if (barSize == "1 day") {
-            if (days < 365 ) return Math.ceil(days) + " D";
-            return Math.ceil(days/365) + " Y"
+            if (days < 365) return Math.ceil(days) + " D";
+            return Math.ceil(days / 365) + " Y"
         }
         else if (barSize.endsWith("hour") || barSize.endsWith("hours")) return Math.ceil(days) + " D";
         else if (days > 3) return Math.ceil(days) + " D";
