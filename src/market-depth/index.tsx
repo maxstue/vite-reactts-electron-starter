@@ -2,7 +2,8 @@ import React from "react";
 import { useGlobal } from "reactn";
 
 
-  import DetailedMarketDepth from "./detailed"
+import DetailedMarketDepth from "./detailed"
+
 
 const MarketDepth = (props: any) => {
 
@@ -24,7 +25,9 @@ const MarketDepth = (props: any) => {
     }, [selectedAsset]);
 
     React.useEffect(() => {
+
         window.Main.on("market-depth", data => handleMarketDepth(data));
+
 
     }, [handleMarketDepth]);
 
@@ -34,7 +37,9 @@ const MarketDepth = (props: any) => {
     if (typeof marketDepthTable == "string") {
         return (<p>Error: {marketDepthTable}</p>);
     } else if (selectedAsset) {
+
         return <DetailedMarketDepth marketDepthTable={marketDepthTable} />
+
     } else {
         return (<p>Market depth will be displayed here, select an asset to start.</p>);
     }

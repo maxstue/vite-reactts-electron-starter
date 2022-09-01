@@ -309,4 +309,15 @@ ipcMain.on('data', (event: IpcMainEvent, data: any) => {
 
 }
 
+
+);
+
+ipcMain.handle("chart-history-data-req", async (event : IpcMainInvokeEvent, symbol:string, timeframe : string, from : number, to : number, firstDataRequest: boolean) => {
+  if (firstDataRequest) return await ibWrapper.getHistoryByTicker(symbol, timeframe, from);
+  return await ibWrapper.getHistoryByTicker(symbol, timeframe, from, to);
+});
+
+ipcMain.handle("chart-symbolInfo", async (event : IpcMainInvokeEvent, ticker:string) => {
+  return await ibWrapper.getSymbolInfo(ticker);
+
 });

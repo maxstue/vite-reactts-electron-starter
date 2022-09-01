@@ -2,10 +2,10 @@ const schedule = require("node-schedule");
 import pythonPromise from "../common/python-promise";
 const quick = require("quick.db");
 const uuid = require("uuid").v4;
+import { ibWrapper } from "../ib/wrapper";
 
-//Perioidcally hydrate indicator levels for provided symbols
+//Periodically hydrate indicator levels for provided symbols
 const pollIndicatorLevels = async function (socket) {
-
     await schedule.gracefulShutdown();
     // close previously scheduled levels job(s) to prevent double booking
     const jobs = schedule.scheduledJobs;
@@ -13,44 +13,59 @@ const pollIndicatorLevels = async function (socket) {
         const assets = quick.get("watchlist");
         const symbols = assets.map(item => item.symbol);
         schedule.scheduleJob("levels", "*/1 * * * *", async (time) => {
-            //console.log("fetching levels at time: ", time)
+            console.log("publishing levels at time:", time);
             hydrateCandlesAndIndicators(symbols, socket);
         });
     }
 };
 
+/**
+ * Fetch last historical data from IB and store candles and indicators in DB and send them to Frontend
+ * @param {string[]} symbols List os symbols to process
+ * @param socket IPC socket used to send back data to Frontend
+ */
 function hydrateCandlesAndIndicators(symbols, socket) {
-    let clientId = 15;
+    // let clientId = 15;
     symbols.map((symbol) => {
-        clientId++;
-        pythonPromise("fetch/main.py", symbol, "15 mins", clientId)
-            .then(result => {
-                const candles = JSON.parse(result);
+        // clientId++;
+        // pythonPromise("fetch/main.py", symbol, "15 mins", clientId)
+        ibWrapper.fetch_main(symbol, "15 mins")
+            .then((candles) => {
+                // const candles = JSON.parse(result);
                 hydrateCandles(symbol, candles, socket);
                 const levels = candles[ candles.length - 2 ];
                 hydrateIndicatorLevels(symbol, levels, socket);
+                // console.log(symbol, levels);
             })
             .catch(error => console.log(error, "for", symbol));
     });
 }
 
+/**
+ * Store symbol's candles in DB and send them to Frontend
+ * @param {string} symbol Stock symbol
+ * @param {Bar[]} candles Candles to store
+ * @param socket IPC socket used to send back data to Frontend
+ */
 const hydrateCandles = function (symbol, candles, socket) {
     quick.set(symbol + ".candles", candles);
-    // socket.io.emit("candles", {symbol, candles})
-    // socket.io.emit(symbol+".candles", candles)
     socket.send("data", {
         type: "candles",
         content: { symbol: symbol, candles: candles }
     });
 };
 
-const hydrateIndicatorLevels = async function (symbol, levels, socket) {
+/**
+ * Update DB with new indicators levels and send them to Frontend
+ * @param {string} symbol Stock symbol
+ * @param {Bar} levels New indicators values
+ * @param socket IPC socket used to send back data to Frontend
+ */
+const hydrateIndicatorLevels = function (symbol, levels, socket) {
     const indicators = [ "close", "EMA_5", "EMA_9", "EMA_20", "SMA_50", "SMA_200", "VWAP_D" ];
     const keys = Object.keys(levels);
-    // const values = Object.values(levels)
     const levelsChannel = symbol + ".levels";
     let oldLevels = quick.get(levelsChannel) || [];
-
     keys.map(key => {
         if (indicators.includes(key)) {
             const data = {
@@ -71,28 +86,24 @@ const hydrateIndicatorLevels = async function (symbol, levels, socket) {
             oldLevels.push(data);
         }
     });
-
-    //console.log("Indicator Levels hydrated at:", new Date().toISOString())
-
     quick.set(levelsChannel, oldLevels); //TODO: confusing nomenclature
-    const newLevels = quick.get(levelsChannel);
-
+    // const newLevels = quick.get(levelsChannel);
     socket.send("data", {
         type: "levels",
-        content: { symbol: symbol, levels: newLevels }
+        content: { symbol: symbol, levels: oldLevels }
     });
-
 };
 
+/**
+ * Publish symbols' level to Frontend, from current values stored in DB
+ * @param {string[]} symbols List of symbols to publish
+ * @param {*} pipe IPC pipe used to send data to Frontend
+ */
 const publishLevels = function (symbols, pipe) {
     // Get levels from DB
     const symbolLevels = symbols.map(symbol => {
-        const channel = `${ symbol }.levels`;
+        const channel = `${symbol}.levels`;
         const data = quick.get(channel);
-        // if (data && pipe) {
-        //     pipe.emit("levels", {symbol: symbol, levels: data})
-        // }
-
         if (data) {
             pipe.send("data", {
                 type: "levels",
@@ -106,16 +117,7 @@ const initLevels = function (ipc) {
     const assets = quick.get("watchlist");
     const symbols = assets.map(item => item.symbol);
     // ipc.send ("data", {type: "test", content: "now we are just testing from inside the initLevels inside levels/publish.js"})
-
-    publishLevels(symbols, ipc);
-
-
-    // const levels = publishLevels(symbols)
-    // ipc.send("data", {
-    //     type: "levels", 
-    //     content: levels
-    // })
-
+    // publishLevels(symbols, ipc); Not needed, we would send obsolete values
     hydrateCandlesAndIndicators(symbols, ipc);
 };
 

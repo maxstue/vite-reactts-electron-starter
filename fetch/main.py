@@ -6,7 +6,7 @@ import pandas as pd
 import pandas_ta as ta
 
 ib = IB()
-ib.connect('127.0.0.1', 4001, clientId=sys.argv[3])
+ib.connect('127.0.0.1', 4002, clientId=sys.argv[3])
 
 def fetch(symbol, timeframe):
     try: 
