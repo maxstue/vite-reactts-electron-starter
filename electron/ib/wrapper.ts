@@ -331,6 +331,7 @@ export default class IbWrapper extends EventEmitter {
                         event.sender.send("stream", {
                             symbol: contract.symbol as string,
                             content: this.last_tape as Tape,
+                            bar: this.last_bar as Bar,
                         });
                         // console.log("incomplete bar:", this.last_bar);
                     }
