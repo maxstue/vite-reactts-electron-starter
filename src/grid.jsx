@@ -156,7 +156,7 @@ export default class ResponsiveGrid extends React.PureComponent {
                   <span className="dragHandle cursor-move font-semibold"><DragHandleIcon /> </span>
                   <span className="font-semibold pl-2">Market Depth</span>
                 </div>
-                <div><span className="cursor-pointer font-semibold mr-2"><SettingsIcon /></span></div>
+                {/* <div><span className="cursor-pointer font-semibold mr-2"><SettingsIcon /></span></div> */}
               </div>
               <div className="p-2">
                   <MarketDepth />

@@ -1,5 +1,8 @@
 import React from "react";
 import { useGlobal } from "reactn";
+import { SettingsIcon } from "@chakra-ui/icons"
+import { useDisclosure } from "@chakra-ui/react"
+import MarketDepthConfig from "./config"
 
 import {
     Table,
@@ -14,6 +17,8 @@ const DetailedMarketDepth = function (props) {
 
     const { marketDepthTable } = props
     const [ selectedAsset ] = useGlobal("selectedAsset")
+
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     const rowColor = function (rowSize) {
         if (rowSize > 50 ) {
@@ -52,7 +57,11 @@ const DetailedMarketDepth = function (props) {
 
     return (
         <>
-            <div>Market Depth for {selectedAsset}</div>
+            <div className="flex justify-between">
+                <div>Market Depth for {selectedAsset}</div>
+                <div onClick={onOpen} className="cursor-pointer"><SettingsIcon /></div>
+                <MarketDepthConfig isOpen={isOpen} onClose={onClose} />
+            </div>
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <span className="p-1 mb-1">Bid Count: {bidCount}</span>
