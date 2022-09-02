@@ -246,7 +246,6 @@ export default class IbWrapper extends EventEmitter {
     }
 
     public subscribeMarketData(event: IpcMainEvent, contract: Contract): void {
-        console.log("subscribeMarketData", contract);
         // Send market depth data to frontend
         this.last_mkd_data = 0;
         this.subscription_mkd?.unsubscribe();
@@ -290,7 +289,6 @@ export default class IbWrapper extends EventEmitter {
     }
 
     public subscribeTimeAndSales(event: IpcMainEvent, contract: Contract): void {
-        console.log("subscribeTimeAndSales", contract);
         // Send time and price data to frontend
         this.last_tape = { ingressTm: 0 };
         this.last_bar = { time: Date.now(), volume: 0 };
@@ -306,7 +304,7 @@ export default class IbWrapper extends EventEmitter {
                     changed = this.processMarketData(type, tick) || changed;
                 });
                 if (changed) {
-                    console.log("last_tape:", this.last_tape);
+                    // console.log("last_tape:", this.last_tape);
                     event.sender.send("stream", {
                         symbol: contract.symbol as string,
                         content: this.last_tape as Tape,
@@ -380,9 +378,7 @@ export default class IbWrapper extends EventEmitter {
         const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: "SMART" };
         return this.api?.getContractDetails(contract).then((details) => {
             // console.log(details);
-            const liquidHours: string[] = details[0].liquidHours ? details[0].liquidHours.split(";") : [];
-            // console.log(liquidHours);
-            // console.log(liquidHours.filter((item) => item.endsWith(":CLOSED")));
+            const liquidHours: string[] = details[0].tradingHours ? details[0].tradingHours.split(";") : [];
             const next_session: string = liquidHours.filter((item) => !item.endsWith(":CLOSED")).pop() as string;
             const session: string = next_session.substring(9, 13) + next_session.substring(22);
             const session_holidays: number[] = liquidHours.filter((item) => item.endsWith(":CLOSED")).map((item) => parseInt(item.substring(0, 8)));
@@ -394,7 +390,8 @@ export default class IbWrapper extends EventEmitter {
                 description: details[0].longName as string,
                 pricescale: 1 / (details[0].minTick || 0.01),
                 ticker,
-                session: session, session_holidays,
+                session,
+                session_holidays,
                 timezone: details[0].timeZoneId as string,
                 has_intraday: true, has_seconds: true,
                 has_no_volume: false, volume_precision: -2,
@@ -491,7 +488,7 @@ export default class IbWrapper extends EventEmitter {
     public fetch_main(ticker: string, timeframe: string): Promise<Bar[]> {
         var d = new Date();
         return this.findContract(ticker)
-            .then((contract) => this.getHistory(contract, timeframe, d.setDate(d.getDate() - 9), Date.now(), true)
+            .then((contract) => this.getHistory(contract, timeframe, d.setDate(d.getDate() - 5), Date.now(), true)
                 .then((values: Bar[]) => {
                     // compute trading indicators
                     let offset: number;
@@ -539,8 +536,13 @@ export default class IbWrapper extends EventEmitter {
                         values[i].TD_SEQ_UPa = v.sellSetupIndex;
                         values[i].TD_SEQ_DNa = v.buySetupIndex;
                     });
-                    // return result as JSON. TODO: return as Bar[]
-                    return values.slice(values.length - 9);
+                    if (ticker == "AAPL") {
+                        console.log(ticker, values[values.length - 1].time,
+                            values[values.length - 1].close,
+                            values[values.length - 1].VWAP_D,
+                            values[values.length - 1].TD_SEQ_UPa, values[values.length - 1].TD_SEQ_DNa);
+                    }
+                    return values.slice(values.length - 3);
                 }));
     }
 
