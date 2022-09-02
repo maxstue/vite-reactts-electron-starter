@@ -327,7 +327,7 @@ export default class IbWrapper extends EventEmitter {
                         changed = this.processMarketData(type, tick) || changed;
                     });
                     if (changed) {
-                        console.log("last_tape:", this.last_tape);
+                        // console.log("last_tape:", this.last_tape);
                         event.sender.send("stream", {
                             symbol: contract.symbol as string,
                             content: this.last_tape as Tape,
