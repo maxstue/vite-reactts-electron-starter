@@ -13,7 +13,7 @@ const pollIndicatorLevels = async function (socket) {
         const assets = quick.get("watchlist");
         const symbols = assets.map(item => item.symbol);
         schedule.scheduleJob("levels", "*/1 * * * *", async (time) => {
-            console.log("publishing levels at time:", time);
+            //console.log("publishing levels at time:", time);
             hydrateCandlesAndIndicators(symbols, socket);
         });
     }

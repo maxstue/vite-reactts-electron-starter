@@ -62,7 +62,7 @@ const TimeAndSales = (props) => {
         setData(prices);
     }
     if (typeof prices == "string") {
-        return (<p>Error: { prices }</p>);
+        return (<p>Error: shit just happened { prices }</p>);
     } else if (selectedAsset) {
         return (
             <Table size="sm" colorScheme="gray">
