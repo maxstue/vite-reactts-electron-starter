@@ -33,7 +33,7 @@ function hydrateCandlesAndIndicators(symbols, socket) {
             .then((candles) => {
                 // const candles = JSON.parse(result);
                 hydrateCandles(symbol, candles, socket);
-                const levels = candles[ candles.length - 2 ];
+                const levels = candles[candles.length - 1]; // RYL: was -2, to check with Idris
                 hydrateIndicatorLevels(symbol, levels, socket);
                 // console.log(symbol, levels);
             })
@@ -48,11 +48,13 @@ function hydrateCandlesAndIndicators(symbols, socket) {
  * @param socket IPC socket used to send back data to Frontend
  */
 const hydrateCandles = function (symbol, candles, socket) {
+    // if (symbol == "AAPL") console.log(candles);
     quick.set(symbol + ".candles", candles);
     socket.send("data", {
         type: "candles",
         content: { symbol: symbol, candles: candles }
     });
+    quick.set(symbol + ".updatedAt", (new Date()).toISOString());
 };
 
 /**
@@ -92,6 +94,7 @@ const hydrateIndicatorLevels = function (symbol, levels, socket) {
         type: "levels",
         content: { symbol: symbol, levels: oldLevels }
     });
+    quick.set(symbol + ".updatedAt", (new Date()).toISOString());
 };
 
 /**
