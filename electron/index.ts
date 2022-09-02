@@ -94,19 +94,15 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  app.whenReady().then(() => {
-    installExtension(REACT_DEVELOPER_TOOLS)
-      .then((name) => console.log(`Added Extension:  ${name}`))
-      .catch((err) => console.log('An error occurred: ', err));
-  });
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err));
 
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -121,7 +117,7 @@ app.on('window-all-closed', () => {
 
 // const aggs = require("./aggs")
 prodStream.on("connect", () => {
-  console.log("connected to prod stream?", prodStream.connected)
+  console.log("connected to remote alpaca real-time data stream?", prodStream.connected)
   const executeRules = require("./rules/execute")
 
   prodStream.on("alpaca-T", data => {
@@ -136,70 +132,9 @@ prodStream.on("connect", () => {
       ipcStream.send("second-stream", data) // @ts-ignore
     }
   })
-
-
-  // const params = {
-  //   pipeIn: prodStream,
-  //   pipeInChannel: "alpaca-T",
-  //   pipeOut: ipcStream,
-  //   pipeOutChannel: "second-stream", 
-  //   interval: 60 * 1000,
-  //   dataMapping: {
-  //       price: "p", 
-  //       size: "s",
-  //       date: "t", 
-  //       symbol: "S",
-  //   }
-  // }
-  // aggs(params)
-
 })
 
-
-
-// console.log(account.getConnection())
-
-// ipcMain.on("document-ready", (event: IpcMainEvent, message: string) => {
-//   console.log(message)
-//   const { initLevels } = require("./levels/publish")
-//   initLevels(event.sender)
-//   event.sender.send("Main process just initialized hydration")
-// })
-
-// listen the channel `message` and resend the received message to the renderer process
-ipcMain.on('message', (event: IpcMainEvent, message: any) => {
-
-  console.log("latest message from renderer:", message);
-
-  if (message == "fetch-watchlist-symbols") {
-    event.sender.send("data", {
-      type: "watchlist-data",
-      content: [{ symbol: "AAPL", lastPrice: "165" }, { symbol: "TWTR", lastPrice: "54" }]
-    })
-  }
-
-
-  // event.sender.send("message", "this message was sent by Idris")
-  // setTimeout(() => event.sender.send('message', 'hi from electron'), 1000);
-  // setTimeout(() => event.sender.send('message', 'this message was sent by Idris'), 3000);
-
-
-  // prodStream.on("alpaca-T", function(data: any) {
-  //     //event.sender.send("message", data.S)
-  //     // io.emit("trades-"+data.S, data)
-  //     // event.emit("alpaca-T", data)
-
-  //     if (data.S == "NVDA") {
-  //         event.sender.send("message", "NVDA " + data.p)
-  //         //console.log(data.p)
-  //     }
-
-  // })
-
-});
-
 ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
-
   let response = null
   const resource = require("./" + data.route)
   try {
@@ -221,6 +156,13 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
   ibWrapper.onData(event, data);
-}
+});
 
-);
+ipcMain.handle("chart-history-data-req", async (event : IpcMainInvokeEvent, symbol:string, timeframe : string, from : number, to : number, firstDataRequest: boolean) => {
+  if (firstDataRequest) return await ibWrapper.getHistoryByTicker(symbol, timeframe, from);
+  return await ibWrapper.getHistoryByTicker(symbol, timeframe, from, to);
+});
+
+ipcMain.handle("chart-symbolInfo", async (event : IpcMainInvokeEvent, ticker:string) => {
+  return await ibWrapper.getSymbolInfo(ticker);
+});
