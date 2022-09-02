@@ -5,11 +5,13 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "airbnb",
-        "plugin:prettier/recommended",
-        "prettier"
+        "plugin:react/recommended",
+        "plugin:react/jsx-runtime"
+        // "airbnb",
+        // "plugin:prettier/recommended"
+        // "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -17,20 +19,26 @@
             "jsx": true
         },
         "ecmaVersion": 12,
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": [
+            "tsconfig.json"
+        ]
     },
     "plugins": [
         "react",
         "@typescript-eslint",
-        "prettier"
+        "rxjs"
+        // "prettier"
     ],
     "rules": {
         // Prettier
-        "prettier/prettier": "error",
+        // "prettier/prettier": "error",
         // Typescript
         "no-use-before-define": "off",
         "import/prefer-default-export": "warn",
-        "@typescript-eslint/no-use-before-define": ["error"],
+        "@typescript-eslint/no-use-before-define": [
+            "error"
+        ],
         "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/no-var-requires": "warn",
@@ -39,26 +47,63 @@
         "react/button-has-type": 0,
         "react/no-children-prop": 0,
         "react/jsx-props-no-spreading": 0,
-        "react/function-component-definition": ["warn", {
-            "namedComponents": "function-declaration",
-            "unnamedComponents": "function-expression"
-        }],
+        "react/function-component-definition": [
+            "warn",
+            {
+                "namedComponents": "function-declaration",
+                "unnamedComponents": "function-expression"
+            }
+        ],
         "react/jsx-filename-extension": [
             2,
             {
-                "extensions": [".js",".jsx",".ts",".tsx"]
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
             }
         ],
+        // rxjs
+        "rxjs/no-async-subscribe": "error",
+        "rxjs/no-ignored-observable": "error",
+        "rxjs/no-ignored-subscription": "error",
+        "rxjs/no-unbound-methods": "error",
+        "rxjs/throw-error": "error",
         // Import
         "import/extensions": 0
     },
     "settings": {
-        "import/resolver": {
-          "node": {
-            "extensions": [".js", ".jsx", ".ts", ".tsx"]
-          }
+        "react": {
+            "createClass": "createReactClass", // Regex for Component Factory to use,
+            // default to "createReactClass"
+            "pragma": "React", // Pragma to use, default to "React"
+            "fragment": "Fragment", // Fragment to use (may be a property of <pragma>), default to "Fragment"
+            "version": "detect", // React version. "detect" automatically picks the version you have installed.
+            // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+            // It will default to "latest" and warn if missing, and to "detect" in the future
+            "flowVersion": "0.53" // Flow version
         },
-        "import/core-modules": [ "electron", "electron-is-dev" ]
+        "import/resolver": {
+            "node": {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        },
+        "import/core-modules": [
+            "electron",
+            "electron-is-dev"
+        ]
     },
-    "ignorePatterns": ["node_modules/", "dist/", "main/"]
+    "ignorePatterns": [
+        "node_modules/",
+        "dist/",
+        "main/",
+        "src/out"
+    ]
 }
