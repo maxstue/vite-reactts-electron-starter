@@ -27,6 +27,7 @@ import {
 import { IpcMainEvent } from "electron";
 import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
 var TDSequential = require("tdsequential");
+import { Bar, Tape, MarketDephRow, SymbolInfo, GtpApi } from "../connector/gtpApi";
 
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
@@ -38,45 +39,8 @@ const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;       
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
 const barSize: number = parseInt(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
-/** Type that describes the data returned to frontend for Time and Sales panel. */
-export type Tape = { ingressTm?: number, price?: number, size?: number };
-
-/** Type that describes a bar/candle data used by methods and returned to frontend. */
-export type Bar = {
-    time?: number,
-    open?: number,
-    close?: number,
-    high?: number,
-    low?: number,
-    volume: number,
-    // Additional data for levels. TODO: define a specific type?
-    SMA_50?: number,
-    SMA_200?: number,
-    EMA_5?: number,
-    EMA_9?: number,
-    EMA_20?: number,
-    VWAP_D?: number,
-    TD_SEQ_UPa?: number,
-    TD_SEQ_DNa?: number,
-};
-
-/** Type that describes the data return by getSymbolInfo method. */
-export type SymbolInfo = {
-    id: number, symbol: string, exchange: string, type: string, description: string,
-    pricescale: number, ticker: string, session: string, session_holidays?: number[],
-    timezone: string, has_intraday: boolean, has_seconds: boolean,
-    has_no_volume: boolean, volume_precision: number, data_status: string
-};
-
-/** Type that describes market depth rows returned to frontend for Market depth panel. */
-export type MarketDephRow = {
-    i: number,
-    bidMMID: string, bidSize: number, bidPrice: number,
-    askPrice: number, askSize: number, askMMID: string
-};
-
 /** IbWrapper is the class that hides IB API details and complexity for use in Gurilla Trading Platform. */
-export default class IbWrapper extends EventEmitter {
+export default class IbWrapper extends EventEmitter implements GtpApi {
 
     /** The [[IBApiNext]] instance. */
     private api: IBApiNext;
