@@ -2,7 +2,6 @@
  * Wrapper for Interactive Broker API.
  * @author Ronan-Yann Lorin <rylorin@gmail.com>
  */
-import { EventEmitter } from "events";
 import { Subscription } from "rxjs";
 import {
     IBApiNext,
@@ -27,7 +26,7 @@ import {
 import { IpcMainEvent } from "electron";
 import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
 var TDSequential = require("tdsequential");
-import { Bar, Tape, MarketDephRow, SymbolInfo, GtpApi } from "../connector/gtpApi";
+import { Bar, Tape, MarketDephRow, SymbolInfo, GenericApi } from "../connector/generic.api";
 
 // connection settings
 const reconnectInterval: number = parseInt(process.env.IB_RECONNECT_INTERVAL as string) || 5000;  // API reconnect retry interval
@@ -37,10 +36,10 @@ const port: number = parseInt(process.env.IB_TWS_PORT as string) || 4001;       
 // Some configurable parameters
 const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
-const barSize: number = parseInt(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
+const barSize: number = parseInt(process.env.IB_BAR_SIZE as string) || 10;                        // bar/candle size in secs
 
 /** IbWrapper is the class that hides IB API details and complexity for use in Gurilla Trading Platform. */
-export default class IbWrapper extends EventEmitter implements GtpApi {
+export class IbWrapper extends GenericApi {
 
     /** The [[IBApiNext]] instance. */
     private api: IBApiNext;
@@ -95,7 +94,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
      * @param value string to be converted
      * @returns Date from string value
      */
-    protected static stringToDate(value: string): Date {
+    private static stringToDate(value: string): Date {
         // convert YYYYMMDD HH:MM:SS to Date
         // console.log(value);
         let hours = 0;
@@ -122,7 +121,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
      * @param value Date to convert
      * @returns Date converted as a string
      */
-    protected static dateToString(value: Date): string {
+    private static dateToString(value: Date): string {
         // convert Date to YYYYMMDD HH:MM:SS
         const day: number = value.getDate();
         const month: number = value.getMonth() + 1;
@@ -135,7 +134,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
         return date + " " + time;
     }
 
-    protected emitCandle(): void {
+    private emitCandle(): void {
         if (this.subscription_tape) {
             // console.log("emitCandle", this.last_bar);
             this.last_bar = {
@@ -150,7 +149,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
         setTimeout(() => this.emit("emitCandle"), barSize * 1000);
     }
 
-    protected processMarketData(type: TickType, tick: MarketDataTick): boolean {
+    private processMarketData(type: TickType, tick: MarketDataTick): boolean {
         let changed: boolean = false;
         if ((type == IBApiTickType.LAST) || (type == IBApiTickType.LAST_SIZE)) {
             // console.log("processMarketData", type, IBApiTickType[type], tick);
@@ -184,32 +183,22 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
     }
 
     /**
-     * find IB contract
+     * find a contract
      * @param ticker: string can be either a symbol or a combinaison of Exchange:Symbol.
      * Valid examples are "AAPL", ":AAPL", "NASDAQ:AAPL".
      * @param exchange: optional exchange. Ignored if an exchange is provided in ticker.
      * @returns Promise<Contract> that will resolve as an IB contrat.
      */
-    public findContract(ticker: string, exchange?: string): Promise<Contract> {
-        let symbol: string;
-        const t = ticker.split(":");
-        if (t.length == 1) {
-            symbol = ticker
-        } else if (t.length == 2) {
-            exchange = t[0] || exchange;
-            symbol = t[1];
-        } else {
-            // Error !
-            throw (`findContract called with invalid parameters: ${ticker} ${exchange}`)
-        }
-        if (!exchange) exchange = "SMART";
-        else if (exchange == "NASDAQ") exchange = "ISLAND"; // depending on IB API version
-        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange };
+    private findContract(ticker: string, exchange?: string): Promise<Contract> {
+        let [symbol, ibexchange] = this.explodeTicker(ticker, exchange);
+        if (!ibexchange) ibexchange = "SMART";
+        else if (ibexchange == "NASDAQ") ibexchange = "ISLAND"; // depending on IB API version
+        const contract: Contract = { secType: SecType.STK, currency: "USD", symbol, exchange: ibexchange };
         return this.api?.getContractDetails(contract)
             .then((details) => details[0].contract);
     }
 
-    public subscribeMarketData(event: IpcMainEvent, contract: Contract): void {
+    private subscribeMarketData(event: IpcMainEvent, contract: Contract): void {
         // Send market depth data to frontend
         this.last_mkd_data = 0;
         this.subscription_mkd?.unsubscribe();
@@ -252,7 +241,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
         });
     }
 
-    public subscribeTimeAndSales(event: IpcMainEvent, contract: Contract): void {
+    private subscribeTimeAndSales(event: IpcMainEvent, contract: Contract): void {
         // Send time and price data to frontend
         this.last_tape = { ingressTm: 0 };
         this.last_bar = { time: Date.now(), volume: 0 };
@@ -312,7 +301,8 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
         }
     }
 
-    public subscribeOrders(event: IpcMainEvent): void {
+    // TODO: private?
+    protected subscribeOrders(event: IpcMainEvent): void {
         console.log("subscribeOrders");
         this.ordersSubscription$ = this.api
             .getOpenOrders()
@@ -378,7 +368,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
      * @param to date to
      * @return string
      */
-    protected static makeDuration(barSize: string, from: number, to: number): string {
+    private static makeDuration(barSize: string, from: number, to: number): string {
         const secs = (to - from) / 1000;
         const days = secs / 3600 / 24;
         const weeks = days / 7;
@@ -404,11 +394,11 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
      * @param outRTH include candles/bar outside RTH (Regular Trading Hours)
      * @return Historical Bar Data as Bar[].
      */
-    public getHistory(contract: Contract, barSize: string, from: number, to?: number, outRTH?: boolean): Promise<Bar[]> {
-        if (!to) to = Date.now();
-        const duration = IbWrapper.makeDuration(barSize, from, to);
+    private getHistory(contract: Contract, barSize: string, from: number, to?: number, outRTH?: boolean): Promise<Bar[]> {
+        // if (!to) to = Date.now();
+        const duration = IbWrapper.makeDuration(barSize, from, (to ? to : Date.now()));
         // console.log(IbWrapper.dateToString(new Date(to)), duration, barSize);
-        return this.api?.getHistoricalData(contract, IbWrapper.dateToString(new Date(to)), duration, barSize as BarSizeSetting, "TRADES", outRTH ? 0 : 1, 1)
+        return this.api?.getHistoricalData(contract, (to ? IbWrapper.dateToString(new Date(to)) : ""), duration, barSize as BarSizeSetting, "TRADES", outRTH ? 0 : 1, 1)
             .then((bars) => {
                 return bars.map((ibbar: IbBar) => {
                     return {
@@ -510,7 +500,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
                 }));
     }
 
-    public createOrder(ticker: string, action: string, quantity: number) {
+    public createOrder(ticker: string, action: string, quantity: number): Promise<number> {
         const order: Order = {
             action: action as OrderAction,
             orderType: OrderType.MKT,
@@ -525,6 +515,9 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
         return this.api.cancelOrder(id);
     }
 
+    /**
+     * disconnect from server stop the Api
+     */
     public stop(): void {
         this.subscription_tape?.unsubscribe();
         this.subscription_mkd?.unsubscribe();
@@ -536,7 +529,7 @@ export default class IbWrapper extends EventEmitter implements GtpApi {
 }
 
 /** Singleton instance of IbWrapper */
-export const ibWrapper: IbWrapper = new IbWrapper();
+// export const ibWrapper: IbWrapper = new IbWrapper();
 
 // This stuff for testing
 // const ticker = "NASDAQ:AAPL";

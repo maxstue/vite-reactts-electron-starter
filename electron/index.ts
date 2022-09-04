@@ -4,7 +4,7 @@ import { join } from 'path';
 import { io } from "socket.io-client";
 const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
-import { ibWrapper } from "./ib/wrapper";
+import { currentApi } from "./connector";
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
@@ -155,14 +155,14 @@ ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
 
 // listen the channel `data` and resend the received message to the renderer process
 ipcMain.on('data', (event: IpcMainEvent, data: any) => {
-  ibWrapper.onData(event, data);
+  currentApi.onData(event, data);
 });
 
-ipcMain.handle("chart-history-data-req", async (event : IpcMainInvokeEvent, symbol:string, timeframe : string, from : number, to : number, firstDataRequest: boolean) => {
-  if (firstDataRequest) return await ibWrapper.getHistoryByTicker(symbol, timeframe, from);
-  return await ibWrapper.getHistoryByTicker(symbol, timeframe, from, to);
+ipcMain.handle("chart-history-data-req", async (event: IpcMainInvokeEvent, symbol: string, timeframe: string, from: number, to: number, firstDataRequest: boolean) => {
+  if (firstDataRequest) return await currentApi.getHistoryByTicker(symbol, timeframe, from);
+  return await currentApi.getHistoryByTicker(symbol, timeframe, from, to);
 });
 
-ipcMain.handle("chart-symbolInfo", async (event : IpcMainInvokeEvent, ticker:string) => {
-  return await ibWrapper.getSymbolInfo(ticker);
+ipcMain.handle("chart-symbolInfo", async (event: IpcMainInvokeEvent, ticker: string) => {
+  return await currentApi.getSymbolInfo(ticker);
 });
