@@ -36,7 +36,7 @@ const port: number = parseInt(process.env.IB_TWS_PORT as string) || 4001;       
 // Some configurable parameters
 const rows: number = parseInt(process.env.IB_MARKET_ROWS as string) || 7;                         // Number of rows to return
 const refreshing: number = parseFloat(process.env.IB_MARKET_REFRESH as string) || 0.5;            // Threshold frequency limit for sending refreshing data to frontend in secs
-const barSize: number = parseFloat(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
+const barSize: number = parseInt(process.env.IB_BAR_SIZE as string) || 10;                      // bar/candle size in secs
 
 /** Type that describes the data returned to frontend for Time and Sales panel. */
 export type Tape = { ingressTm?: number, price?: number, size?: number };
@@ -251,7 +251,7 @@ export default class IbWrapper extends EventEmitter {
         this.subscription_mkd?.unsubscribe();
         this.subscription_mkd = this.api?.getMarketDepth(contract, rows, true).subscribe({
             next: (orderBookUpdate: OrderBookUpdate) => {
-                // console.log("orderBookUpdate");
+                console.log("orderBookUpdate");
                 const now: number = Date.now();
                 if ((now - this.last_mkd_data) > refreshing * 1000) {  // limit to refresh rate to every x seconds
                     this.last_mkd_data = now;
