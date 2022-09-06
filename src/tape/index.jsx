@@ -36,7 +36,7 @@ const TimeAndSales = (props) => {
                 // prices[0].price = tape.price;
                 // prices[0].size = tape.size;
 
-                prices?.push(data.content);
+                prices?.push(tape);
                 // if (prices?.length > rows) prices?.shift();
                 // let newPrices = [];
                 // newPrices.push(tape);

@@ -2,7 +2,7 @@
 // @ts-nocheck
 import { join } from 'path';
 import { io } from "socket.io-client";
-const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
+//const prodStream = io("https://nelson-z9ub6.ondigitalocean.app", { transports: ["websocket"] })
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { ibWrapper } from "./ib/wrapper";
 
@@ -20,7 +20,7 @@ function createWindow() {
     width,
     height,
     //  change to false to use AppBar
-    frame: false,
+    frame: true,
     title: "Guerilla",
     show: true,
     resizable: true,
@@ -116,23 +116,23 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // const aggs = require("./aggs")
-prodStream.on("connect", () => {
-  console.log("connected to remote alpaca real-time data stream?", prodStream.connected)
-  const executeRules = require("./rules/execute")
+//prodStream.on("connect", () => {
+  // console.log("connected to remote alpaca real-time data stream?", prodStream.connected)
+  // const executeRules = require("./rules/execute")
 
-  prodStream.on("alpaca-T", data => {
-    if (ipcStream) { // @ts-ignore
-      ipcStream.send("stream", data) // @ts-ignore
-      executeRules(ipcStream, data)
-    }
-  })
+  // prodStream.on("alpaca-T", data => {
+  //   if (ipcStream) { // @ts-ignore
+  //     ipcStream.send("stream", data) // @ts-ignore
+  //     executeRules(ipcStream, data)
+  //   }
+  // })
 
-  prodStream.on("alpaca-AM", data => {
-    if (ipcStream) {
-      ipcStream.send("second-stream", data) // @ts-ignore
-    }
-  })
-})
+  // prodStream.on("alpaca-AM", data => {
+  //   if (ipcStream) {
+  //     ipcStream.send("second-stream", data) // @ts-ignore
+  //   }
+  // })
+//})
 
 ipcMain.handle("data", async (event: IpcMainInvokeEvent, data: any) => {
   let response = null

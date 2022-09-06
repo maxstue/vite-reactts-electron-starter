@@ -130,7 +130,7 @@ export default class ResponsiveGrid extends React.PureComponent {
                 {/* <Orders /> */}
             </div>
           </div>
-          <div key="6" className="border" data-grid={{ w: 4, h: 12, x: 0, y: 3, minW: 4, minH: 8, isResizable:true }}>
+          <div key="6" className="border scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300" data-grid={{ w: 4, h: 12, x: 0, y: 3, minW: 4, minH: 8, isResizable:true }}>
               <div className="flex items-center mb-2 bg-gray-400">
                   <span className="dragHandle cursor-move font-semibold"><DragHandleIcon /> </span>
                   <span className="font-semibold pl-2">Levels</span>
@@ -141,7 +141,7 @@ export default class ResponsiveGrid extends React.PureComponent {
                   </div>
               </div>
           </div>
-          <div key="7" className="border" data-grid={{ w: 4, h: 10, x: 4, y: 3, minW: 4, minH: 3, isResizable:true }}>
+          <div key="7" className="border scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300" data-grid={{ w: 4, h: 10, x: 4, y: 3, minW: 4, minH: 3, isResizable:true }}>
              <div className="flex items-center mb-2 bg-gray-400">
                   <span className="dragHandle cursor-move font-semibold"><DragHandleIcon /> </span>
                   <span className="font-semibold pl-2">Rules</span>
@@ -156,7 +156,7 @@ export default class ResponsiveGrid extends React.PureComponent {
                   <span className="font-semibold pl-2">Time And Sales</span>
               </div>
               <div className="p-2">
-                  <TimeAndSales />
+                  {/* <Rules /> */}
                 </div>
           </div>
           <div 
