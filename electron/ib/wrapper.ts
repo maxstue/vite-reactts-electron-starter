@@ -1,6 +1,6 @@
 /**
  * Wrapper for Interactive Broker API.
- * @author Ronan-Yann Lorin <rylorin@gmail.com>
+ * @author Guerilla team
  */
 import { Subscription } from "rxjs";
 import {

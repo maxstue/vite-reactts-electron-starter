@@ -13,7 +13,7 @@ By default, the React framework is used for the interface, but you can easily us
 ## Installation
 
 Clone this repo and install all dependencies  
-`yarn` or `npm install --legacy-peer-deps`
+`yarn` or `npm install --legacy-peer-deps --ignore-engines`
 then, as Node and Electron use different ABI version id, you will rebuild native modules (as better-sqlite3) using:
 `./node_modules/.bin/electron-rebuild`
 

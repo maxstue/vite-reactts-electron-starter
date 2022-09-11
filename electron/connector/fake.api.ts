@@ -1,5 +1,6 @@
 /**
  * A fake broker Api usefull to simulate data flow when no connection or no data available.
+ * @author Guerilla team
  */
 import { IpcMainEvent } from "electron";
 import { Bar, SymbolInfo, GenericApi, Tape, MarketDephRow } from "./generic.api";
@@ -229,7 +230,10 @@ export class FakeApi extends GenericApi {
      */
     public fetch_main(ticker: string, timeframe: string): Promise<Bar[]> {
         var d = new Date();
-        return this.getHistoryByTicker(ticker, timeframe, d.setDate(d.getDate() - 5), Date.now());
+        return this.getHistoryByTicker(ticker, timeframe, d.setDate(d.getDate() - 5), Date.now())
+            .then((values: Bar[]) => {
+                return this.computeLevels(values);
+            });
     }
 
     public createOrder(_ticker: string, _action: string, _quantity: number): Promise<number> {
