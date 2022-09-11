@@ -10,9 +10,15 @@ const pollIndicatorLevels = async function (socket: any) {
     const jobs = schedule.scheduledJobs;
     if (!jobs["levels"]) {
         const assets = quick.get("watchlist");
+<<<<<<< HEAD:electron/levels/publish.ts
         const symbols = assets.map((item: any) => item.symbol);
         schedule.scheduleJob("levels", "*/1 * * * *", async (time: any) => {
             console.log("publishing levels at time:", time);
+=======
+        const symbols = assets.map(item => item.symbol);
+        schedule.scheduleJob("levels", "*/1 * * * *", async (time) => {
+            //console.log("publishing levels at time:", time);
+>>>>>>> d49057f1537eea6bd349be0976ea64fb2bcb9589:electron/levels/publish.js
             hydrateCandlesAndIndicators(symbols, socket);
         });
     }

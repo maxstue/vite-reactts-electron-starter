@@ -93,7 +93,7 @@ const DetailedMarketDepth = function (props) {
                     {
                         marketDepthTable ? marketDepthTable.map((row, index) => {
                             return (
-                                <Tr key={row.bidMMID + row.bidPrice + row.askMMID + row.askPrice}>
+                                <Tr key={index}>
                                     <Td>{index+1}</Td>
                                     <Td>{row.bidMMID != "DRCTEDGE" ? row.bidMMID : "EDGE"}</Td>
                                     <Td><span className={rowColor(row.bidSize)}>{row.bidSize}</span></Td>
