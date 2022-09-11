@@ -24,8 +24,6 @@ import {
     OpenOrdersUpdate,
 } from "@stoqey/ib";
 import { IpcMainEvent } from "electron";
-import { SMA, EMA, VWAP } from "@nenjotsu/technicalindicators";
-var TDSequential = require("tdsequential");
 import { Bar, Tape, MarketDephRow, SymbolInfo, GenericApi } from "../connector/generic.api";
 
 // connection settings
@@ -210,7 +208,7 @@ export class IbWrapper extends GenericApi {
                     this.last_mkd_data = now;
                     const bids: OrderBookRows = orderBookUpdate.all.bids;
                     const asks: OrderBookRows = orderBookUpdate.all.asks;
-                    const content: { i: number; bidMMID: string; bidSize: number; bidPrice: number; askPrice: number; askSize: number; askMMID: string }[] = [];
+                    const content: MarketDephRow[] = [];
                     for (let i = 0; i < Math.max(bids.size, asks.size); i++) {
                         const bid: OrderBookRow | undefined = bids.get(i);
                         const ask: OrderBookRow | undefined = asks.get(i);
@@ -221,7 +219,7 @@ export class IbWrapper extends GenericApi {
                             const askPrice: number = ask?.price as number;
                             const askSize: number = ask?.size as number;
                             const askMMID: string = ask?.marketMaker as string;
-                            content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID } as MarketDephRow);
+                            content.push({ i, bidMMID, bidSize, bidPrice, askPrice, askSize, askMMID });
                         }
                     }
                     // console.log("content:", content);
@@ -444,59 +442,7 @@ export class IbWrapper extends GenericApi {
         return this.findContract(ticker)
             .then((contract) => this.getHistory(contract, timeframe, d.setDate(d.getDate() - 5), Date.now(), true)
                 .then((values: Bar[]) => {
-                    // compute trading indicators
-                    let offset: number;
-                    let computed: number[];
-                    // VWAP
-                    const vwap = new VWAP({
-                        high: [] as number[],
-                        low: [] as number[],
-                        close: [] as number[],
-                        volume: [] as number[],
-                    });
-                    values.forEach((value, i) => {
-                        const result = vwap.nextValue({
-                            open: value.open,
-                            high: value.high,
-                            low: value.low,
-                            close: value.close,
-                            volume: value.volume,
-                        });
-                        values[i].VWAP_D = result;
-                    });
-                    // SMA 50
-                    computed = SMA.calculate({ period: 50, values: values.map((i) => (i.close as number)) });
-                    offset = values.length - computed.length;
-                    computed.map((value, index) => values[index + offset].SMA_50 = value);
-                    // SMA 200
-                    computed = SMA.calculate({ period: 200, values: values.map((i) => (i.close as number)) });
-                    offset = values.length - computed.length;
-                    computed.map((value, index) => values[index + offset].SMA_200 = value);
-                    // EMA 5
-                    computed = EMA.calculate({ period: 5, values: values.map((i) => (i.close as number)) });
-                    offset = values.length - computed.length;
-                    computed.map((value, index) => values[index + offset].EMA_5 = value);
-                    // EMA 9
-                    computed = EMA.calculate({ period: 9, values: values.map((i) => (i.close as number)) });
-                    offset = values.length - computed.length;
-                    computed.map((value, index) => values[index + offset].EMA_9 = value);
-                    // EMA 20
-                    computed = EMA.calculate({ period: 20, values: values.map((i) => (i.close as number)) });
-                    offset = values.length - computed.length;
-                    computed.map((value, index) => values[index + offset].EMA_20 = value);
-                    // TD_SEQ TODO: check results
-                    const result = TDSequential(values);
-                    result.forEach((v: { buySetupIndex: number, sellSetupIndex: number }, i: number) => {
-                        values[i].TD_SEQ_UPa = v.sellSetupIndex;
-                        values[i].TD_SEQ_DNa = v.buySetupIndex;
-                    });
-                    if (ticker == "AAPL") {
-                        console.log(ticker, values[values.length - 1].time,
-                            values[values.length - 1].close,
-                            values[values.length - 1].VWAP_D,
-                            values[values.length - 1].TD_SEQ_UPa, values[values.length - 1].TD_SEQ_DNa);
-                    }
-                    return values.slice(values.length - 3);
+                    return this.computeLevels(values);
                 }));
     }
 
