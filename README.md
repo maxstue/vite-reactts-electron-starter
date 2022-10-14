@@ -2,7 +2,7 @@
 
 ![Vite + React + Typescript + Tailwind + Electron Starter](Screenshot.jpg)
 
-> It is a simple starter tempalte without unnecessary packages.
+> It is a simple starter template without unnecessary packages.
 
 This very simple Starter template, utilizes [Vite](https://github.com/vitejs/vite), [Tailwind](https://tailwindcss.com/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
 
