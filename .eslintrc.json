@@ -60,5 +60,5 @@
         },
         "import/core-modules": [ "electron", "electron-is-dev" ]
     },
-    "ignorePatterns": ["node_modules/", "dist/", "main/"]
+    "ignorePatterns": ["node_modules/", "dist/", "main/", "src/out/"]
 }
