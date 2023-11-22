@@ -3,6 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+$color-bgc:#f8f8f8;
+
+:root {
+  background-color: $color-bgc;
+}
+
 /* For AppBar */
 .draggable {
   -webkit-user-select: none;
@@ -11,4 +17,16 @@
 
 .undraggable {
   -webkit-app-region: no-drag;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.flex-3 {
+  flex: 3;
 }

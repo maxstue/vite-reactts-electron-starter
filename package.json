@@ -32,7 +32,9 @@
     "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^1.2.0",
+    "@ant-design/icons": "^5.2.6",
+    "@vitejs/plugin-react": "^4.2.0",
+    "ahooks": "^3.7.8",
     "antd": "^5.11.2",
     "electron-is-dev": "^2.0.0",
     "framer-motion": "^10.16.5",
