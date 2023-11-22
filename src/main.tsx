@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './index.scss';
 import App from './App';
+import { HoxRoot } from 'hox';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <HoxRoot>
+      <App />
+    </HoxRoot>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -9,5 +9,8 @@ module.exports = {
       sans: ['Inter', 'ui-sans-serif', 'system-ui']
     }
   },
+  corePlugins: {
+    preflight: false
+  },
   plugins: []
 };

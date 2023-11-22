@@ -35,9 +35,13 @@
     "@vitejs/plugin-react": "^1.2.0",
     "antd": "^5.11.2",
     "electron-is-dev": "^2.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "vite": "^2.8.6"
+    "framer-motion": "^10.16.5",
+    "hox": "^2.1.1",
+    "react": "latest",
+    "react-dom": "latest",
+    "sass": "^1.69.5",
+    "vite": "latest",
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/node": "^17.0.22",
