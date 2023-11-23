@@ -1,20 +1,27 @@
 import React from 'react';
 import AppBar from './AppBar';
-import { Header } from 'antd/es/layout/layout';
+import Header from './components/Header/Index';
+import Sidebar from './components/Sidebar/Index';
+import Body from './components/Body/Index';
 
 function App() {
   console.log(window.ipcRenderer);
 
   return (
     <>
-      {/* Bar顶部 */}
-      {window.Main && (
-        <div className="flex-none">
-          <AppBar />
+      <div id="win">
+        {/* Bar顶部 */}
+        {window.Main && <AppBar />}
+        {/* 头部 */}
+        <Header></Header>
+        {/* 侧边栏 */}
+        <div style={{ width: '300px', backgroundColor: '#fff' }}>
+          <Sidebar></Sidebar>
         </div>
-      )}
-      {/* 头部 */}
-      <Header></Header>
+
+        {/* 内容 */}
+        <Body></Body>
+      </div>
     </>
   );
 }

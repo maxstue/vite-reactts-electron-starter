@@ -3,10 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
-$color-bgc:#f8f8f8;
+$color-bgc: #f8f8f8;
 
 :root {
-  background-color: $color-bgc;
+  // background-color: $color-bgc;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  /**设置body背景也是透明的*/
+  background-color: rgba(0, 0, 0, 0);
+  /**内边距做个20像素，为了显示阴影的模糊状态*/
+  padding: 11px;
+}
+
+/*win就是真正要被显示出来的窗口了*/
+#win {
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  /*设置窗口背景为白色*/
+  background-color: #fff;
+  /*圆角*/
+  border-radius: 20px;
+  /*阴影*/
+  box-shadow: 1px 1px 10px grey;
 }
 
 /* For AppBar */

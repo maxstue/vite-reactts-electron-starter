@@ -5,8 +5,8 @@ import { join } from 'path';
 import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
 
-const height = 600;
-const width = 800;
+const height = 750;
+const width = 750;
 
 function createWindow() {
   // Create the browser window.
@@ -15,6 +15,8 @@ function createWindow() {
     height,
     //  change to false to use AppBar
     frame: false,
+    transparent: true,
+    backgroundColor: '#00000000', //设置背景色为全透明
     show: true,
     resizable: true,
     fullscreenable: true,
