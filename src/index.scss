@@ -3,7 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+// 默认背景颜色
 $color-bgc: #f8f8f8;
+// 默认内边距
+
 
 :root {
   // background-color: $color-bgc;
@@ -27,7 +30,7 @@ body {
 /*win就是真正要被显示出来的窗口了*/
 #win {
   width: 100%;
-  height: 50%;
+  height: calc(100% - 22px);
   overflow: hidden;
   /*设置窗口背景为白色*/
   background-color: #fff;
