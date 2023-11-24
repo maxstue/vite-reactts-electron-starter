@@ -46,7 +46,8 @@ export default function Index() {
   return (
     <Menu
       onClick={onClick}
-      style={{ width: '20vw' }}
+      className='user-select-none'
+      style={{ width: '20vw', height: '100%' }}
       defaultSelectedKeys={['1']}
       defaultOpenKeys={['sub1']}
       mode="inline"

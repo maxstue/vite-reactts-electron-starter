@@ -9,7 +9,7 @@ const { Search } = Input;
 export default function Index() {
   return (
     <>
-      <div className="flex items-center p-2">
+      <div className="flex items-center p-2 user-select-none">
         <Space size={'middle'}>
           {/* logo和标题 */}
           <div className="left flex-center">

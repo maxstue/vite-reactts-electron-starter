@@ -30,7 +30,7 @@ body {
 /*win就是真正要被显示出来的窗口了*/
 #win {
   width: 100%;
-  height: calc(100% - 22px);
+  height: calc(100vh - 22px);
   overflow: hidden;
   /*设置窗口背景为白色*/
   background-color: #fff;
@@ -48,6 +48,13 @@ body {
 
 .undraggable {
   -webkit-app-region: no-drag;
+}
+// 文字不可选中
+.user-select-none {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 .flex-center {
