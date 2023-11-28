@@ -14,6 +14,17 @@ export default ({ command }: ConfigEnv): UserConfig => {
       resolve: {
         alias: {
           '@': srcRoot
+        },
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      },
+      css: {
+        preprocessorOptions: {
+          scss: {
+            additionalData: `@import "@/common/styles/variables.scss";`
+          }
+        },
+        modules: {
+          generateScopedName: "[name]__[local]__[hash:base64:5]"
         }
       },
       build: {
@@ -37,7 +48,8 @@ export default ({ command }: ConfigEnv): UserConfig => {
     resolve: {
       alias: {
         '@': srcRoot
-      }
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     },
     build: {
       outDir: join(srcRoot, '/out'),

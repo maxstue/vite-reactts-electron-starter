@@ -41,15 +41,15 @@
     "framer-motion": "^10.16.5",
     "hox": "^2.1.1",
     "react": "latest",
-    "react-dom": "latest",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
     "sass": "^1.69.5",
-    "vite": "latest",
-    "zustand": "^4.4.6"
+    "vite": "latest"
   },
   "devDependencies": {
     "@types/node": "^17.0.22",
-    "@types/react": "^17.0.41",
-    "@types/react-dom": "^17.0.14",
+    "@types/react": "latest",
+    "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "5.16.0",
     "@typescript-eslint/parser": "5.16.0",
     "autoprefixer": "^10.4.4",

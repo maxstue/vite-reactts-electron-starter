@@ -16,6 +16,14 @@ $color-bgc: #f8f8f8;
   padding: 0;
   box-sizing: border-box;
 }
+.draggable {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.undraggable {
+  -webkit-app-region: no-drag;
+}
 
 body {
   position: fixed;
@@ -40,15 +48,7 @@ body {
   box-shadow: 1px 1px 10px grey;
 }
 
-/* For AppBar */
-.draggable {
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
-}
 
-.undraggable {
-  -webkit-app-region: no-drag;
-}
 // 文字不可选中
 .user-select-none {
   -webkit-user-select: none; /* Safari */

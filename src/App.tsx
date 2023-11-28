@@ -1,8 +1,11 @@
 import React from 'react';
-import AppBar from './AppBar';
-import Header from './components/Header/Index';
-import Sidebar from './components/Sidebar/Index';
-import Body from './components/Body/Index';
+import AppBar from './components/AppBar';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import Body from './components/Body';
+
+import Login from './pages/Login';
+import Home from './pages/Home';
 
 
 function App() {
@@ -10,18 +13,22 @@ function App() {
 
   return (
     <>
+      {/* <Home></Home>
+      <Login></Login> */}
+      <AppBar></AppBar>
+      <Body></Body>
+    </>
+  );
+
+  return (
+    <>
+      {/* 路由 */}
+      {/* <RouterProvider router={globalRouters}></RouterProvider> */}
       <div id="win">
         {/* Bar顶部 */}
         {window.Main && <AppBar />}
-        {/* 头部 */}
         <Header></Header>
-        {/* 侧边栏 */}
-        <div style={{ width: '300px', backgroundColor: '#fff' }}>
-          <Sidebar></Sidebar>
-        </div>
-
-        {/* 内容 */}
-        <Body></Body>
+        {/* <Login></Login> */}
       </div>
     </>
   );

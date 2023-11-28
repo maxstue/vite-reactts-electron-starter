@@ -1,9 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.scss';
+
+import '@/common/images/Icon-Electron.png';
 import App from './App';
 import { HoxRoot } from 'hox';
 import { ConfigProvider } from 'antd';
+
+// import { BrowserRouter } from 'react-router-dom';
+import AppBar from '@/components/AppBar';
+import Login from '@/pages/Login';
+import './index.scss';
 
 ReactDOM.render(
   <React.StrictMode>

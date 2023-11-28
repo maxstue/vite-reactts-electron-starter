@@ -1,6 +1,6 @@
 import React from 'react';
 import './Index.scss';
-import Logo from '@/assets/icons/Icon-Electron.png';
+import Logo from '@/common/images/Icon-Electron.png';
 import { Divider, Input, Space } from 'antd';
 import { AudioOutlined } from '@ant-design/icons';
 
