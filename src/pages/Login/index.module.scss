@@ -1,0 +1,43 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    background-color: #b5dadc;
+  }
+  
+  .left {
+    position: relative;
+    flex: 1;
+    background-color: #b5dadc;
+    color: green;
+  
+    .logo {
+      position: absolute;
+      top: 40px;
+      left: 30px;
+      width: 35px;
+      height: auto;
+    }
+  
+    .title {
+      position: absolute;
+      left: 30px;
+      top: 80px;
+      color: #fff;
+    }
+  
+    .Abstraction {
+      position: absolute;
+      bottom: 0;
+      width: 32rem;
+      height: auto;
+      transform: rotate(-8deg);
+    }
+  }
+  
+  .right {
+    flex: 2;
+    background-color: #fffefe;
+    border-radius: 61px 0 0 61px;
+  }
+  
