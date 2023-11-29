@@ -1,0 +1,9 @@
+/* For AppBar */
+.draggable {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.undraggable {
+  -webkit-app-region: no-drag;
+}

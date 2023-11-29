@@ -1,7 +1,7 @@
 import React from 'react';
 import Logo from '@/common/images/Icon-Electron.png';
 import Abstraction from '@/common/images/Abstraction.png';
-import styles from './index.scss';
+import styles from './index.module.scss';
 
 export default function Index() {
   return(

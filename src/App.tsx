@@ -6,24 +6,26 @@ import Body from './components/Body';
 
 import Login from './pages/Login';
 import Home from './pages/Home';
+import { globalRouters } from './router';
+import { RouterProvider } from 'react-router-dom';
 
 
 function App() {
   console.log(window.ipcRenderer);
 
-  return (
-    <>
-      {/* <Home></Home>
-      <Login></Login> */}
-      <AppBar></AppBar>
-      <Body></Body>
-    </>
-  );
+  // return (
+  //   <>
+  //     {/* <Home></Home>
+  //     <Login></Login> */}
+  //     <AppBar></AppBar>
+  //     <Body></Body>
+  //   </>
+  // );
 
   return (
     <>
       {/* 路由 */}
-      {/* <RouterProvider router={globalRouters}></RouterProvider> */}
+      <RouterProvider router={globalRouters}></RouterProvider>
       <div id="win">
         {/* Bar顶部 */}
         {window.Main && <AppBar />}

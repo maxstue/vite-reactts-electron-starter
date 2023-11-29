@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
+import styles from './index.module.scss';
 
 function AppBar() {
   const [isMaximize, setMaximize] = useState(false);
@@ -15,18 +16,10 @@ function AppBar() {
 
   return (
     <>
-      <div className="left">AppBar components</div>
-    </>
-  )
-
-  return (
-    <>
       <div className="flex draggable bg-white w-full">
-        <div className="left flex flex-auto">
-          123
-        </div>
+        <div className={`${styles.left} flex flex-auto`}></div>
         <div className="right flex w-24 undraggable">
-          {/* <Button onClick={window.Main.Minimize} className="w-8 flex-center" type="text">
+          <Button onClick={window.Main.Minimize} className="w-8 flex-center" type="text">
             &#8211;
           </Button>
           <Button onClick={handleToggle} className="w-8 flex-center" type="text">
@@ -34,7 +27,7 @@ function AppBar() {
           </Button>
           <Button onClick={window.Main.Close} className="w-8 flex-center" type="text">
             &#10005;
-          </Button> */}
+          </Button>
         </div>
       </div>
     </>

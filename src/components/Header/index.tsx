@@ -1,5 +1,5 @@
 import React from 'react';
-import './Index.scss';
+import './index.module.scss';
 import Logo from '@/common/images/Icon-Electron.png';
 import { Divider, Input, Space } from 'antd';
 import { AudioOutlined } from '@ant-design/icons';
