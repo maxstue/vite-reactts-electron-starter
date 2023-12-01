@@ -1,0 +1,36 @@
+.container {
+  @apply user-select-none;
+  @apply flex items-center w-full;
+  height: 60px;
+}
+
+.box {
+  height: 100%;
+  width: calc(100% - $side-width);
+}
+
+.left {
+  height: 100%;
+  width: $side-width;
+}
+
+.middle {
+  @apply flex items-center;
+  height: 100%;
+  margin-left: $padding-body;
+}
+
+.right {
+  @apply flex items-center justify-end;
+  padding-right: $padding-body;
+}
+
+.btnBox {
+    @apply flex justify-around;
+    width: 120px;
+    margin-right: $padding-body;
+}
+
+.input {
+    width: 20px;
+}

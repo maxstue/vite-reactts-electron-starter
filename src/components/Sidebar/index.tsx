@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './index.module.scss';
 import { AppstoreOutlined, MailOutlined, SettingOutlined, TeamOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
@@ -36,7 +37,6 @@ const items: MenuProps['items'] = [
     getItem('Option 6', '6'),
     getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')])
   ]),
-  
 
   getItem('Setting', 'sub4', <SettingOutlined />, [
     getItem('Option 9', '9'),
@@ -64,8 +64,7 @@ export default function Index() {
   return (
     <Menu
       onClick={onClick}
-      className='user-select-none'
-      style={{ width: '20vw', height: '100%' }}
+      className={`user-select-none ${styles.menu}`}
       defaultSelectedKeys={['1']}
       defaultOpenKeys={['sub1']}
       mode="inline"

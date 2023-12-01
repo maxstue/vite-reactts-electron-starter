@@ -1,4 +1,20 @@
 $color-bg1: #b5dadc;
+$color-h1: #0D062D;
+$color-h2: #787486;
+$fontSize-h1: 16px;
+$fontSize-h2: 14px;
+// 侧边栏的宽度
+$side-width: 20vw;
+// 边距
+$padding-body: 30px;
+
+// 文字不可选中
+.user-select-none {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
 
 .flex-center {
   @apply flex items-center justify-center;
@@ -11,3 +27,14 @@ $color-bg1: #b5dadc;
 .flex-3 {
   flex: 3;
 }
+
+.h1 {
+  color: $color-h1;
+  font-size: $fontSize-h1;
+}
+
+.h2 {
+  color: $color-h2;
+  font-size: $fontSize-h2;
+}
+

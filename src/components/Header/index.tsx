@@ -1,43 +1,67 @@
 import React from 'react';
-import './index.module.scss';
+import styles from './index.module.scss';
 import Logo from '@/common/images/Icon-Electron.png';
-import { Divider, Input, Space, Avatar } from 'antd';
-import { UserOutlined, DownOutlined } from '@ant-design/icons';
-import { CheckOne } from '@icon-park/react';
-
-const { Search } = Input;
+import { Button, Divider, Input, Avatar, ConfigProvider } from 'antd';
+import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+import { Remind, Helpcenter, Schedule } from '@icon-park/react';
 
 export default function Index() {
+  const customColor = styles.colorH2
   return (
     <>
-      <div className="flex items-center p-2 user-select-none">
-        <Space size={'middle'}>
-          {/* logo和标题 */}
-          <div className="left flex-center">
-            <img className="w-12 h-auto" src={Logo} alt="" />
-            <div className="title">Electron</div>
-          </div>
-          {/* 搜索框 */}
-          <div className="middle flex-center">
-            {/* <Search></Search> */}
-            <CheckOne theme='filled' size="32" fill="#17bd08"></CheckOne>
-          </div>
-        </Space>
+      <div className={styles.container}>
+        {/* left: logo和标题 */}
+        <div className={`${styles.left} flex items-center`}>
+          <img className="w-12 h-auto" src={Logo} alt="" />
+          <div className="title">Electron</div>
+        </div>
 
-        {/* 按钮和个人信息 */}
-        <div className="right flex flex-center">
-          <div className="flex flex-col justify-end text-right">
-            <div className="username">用户名</div>
-            <div className="company">阿里巴巴集团</div>
+        {/* <Divider type="vertical" style={{ height: '100%', margin: 0 }}></Divider> */}
+
+        {/* middle + right */}
+        <div className={`flex ${styles.box}`}>
+          {/* 搜索框 */}
+          <div className={`${styles.middle} flex-1`}>
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorBgContainer: '#f5f5f5',
+                  colorBorder: '#f5f5f5',
+                  colorTextPlaceholder: '$color-h2'
+                }
+              }}
+            >
+              <Input
+                placeholder="搜索"
+                prefix={<SearchOutlined />}
+                styles={{ affixWrapper: { width: '300px' } }}
+              ></Input>
+            </ConfigProvider>
           </div>
-          <Avatar icon={<UserOutlined />}></Avatar>
-          <DownOutlined />
+          {/* 搜索框end */}
+
+          {/* 按钮和个人信息 */}
+          <div className={`${styles.right} flex-1`}>
+            {/* 按钮 */}
+            <div className={styles.btnBox}>
+              <Button icon={<Schedule theme="outline" size="20" fill="#787486" />} type='text'></Button>
+              <Button icon={<Helpcenter theme="outline" size="20" fill="#787486" />} type='text'></Button>
+              <Button icon={<Remind theme="outline" size="20" fill='#787486' />} type='text'></Button>
+            </div>
+            {/* 个人信息和头像 */}
+            <div className="flex flex-col justify-end text-right mr-2">
+              <div className="h1">用户名</div>
+              <div className="h2">阿里巴巴有限公司</div>
+            </div>
+            <Avatar icon={<UserOutlined />}></Avatar>
+          </div>
+          {/* 按钮和个人信息end */}
         </div>
       </div>
 
       {/* 分割线 */}
       <Divider style={{ margin: 0 }}></Divider>
-      <Divider type="vertical" style={{ margin: 0, left: '20vw', position: 'absolute' }}></Divider>
+      {/* <Divider type="vertical" style={{ margin: 0, left: '20vw', position: 'absolute' }}></Divider> */}
     </>
   );
 }
