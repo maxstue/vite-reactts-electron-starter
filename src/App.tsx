@@ -13,24 +13,15 @@ import { RouterProvider } from 'react-router-dom';
 function App() {
   console.log(window.ipcRenderer);
 
-  // return (
-  //   <>
-  //     {/* <Home></Home>
-  //     <Login></Login> */}
-  //     <AppBar></AppBar>
-  //     <Body></Body>
-  //   </>
-  // );
-
   return (
     <>
       {/* 路由 */}
-      <RouterProvider router={globalRouters}></RouterProvider>
+      {/* <RouterProvider router={globalRouters}></RouterProvider> */}
       <div id="win">
         {/* Bar顶部 */}
         {window.Main && <AppBar />}
         <Header></Header>
-        {/* <Login></Login> */}
+        <Sidebar></Sidebar>
       </div>
     </>
   );

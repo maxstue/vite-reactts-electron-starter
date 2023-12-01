@@ -4,11 +4,7 @@ import Abstraction from '@/common/images/Abstraction.png';
 import styles from './index.module.scss';
 
 export default function Index() {
-  return(
-    <>
-        <div className={styles.left}>login</div>
-    </>
-  )
+
   return (
     <div className="container">
       {/* 左侧 */}

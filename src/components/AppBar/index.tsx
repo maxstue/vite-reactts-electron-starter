@@ -16,9 +16,9 @@ function AppBar() {
 
   return (
     <>
-      <div className="flex draggable bg-white w-full">
+      <div className={`flex ${styles.draggable} bg-white w-full`}>
         <div className={`${styles.left} flex flex-auto`}></div>
-        <div className="right flex w-24 undraggable">
+        <div className={`right flex w-24 ${styles.undraggable}`}>
           <Button onClick={window.Main.Minimize} className="w-8 flex-center" type="text">
             &#8211;
           </Button>

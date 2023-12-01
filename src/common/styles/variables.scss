@@ -1,1 +1,13 @@
 $color-bg1: #b5dadc;
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.flex-3 {
+  flex: 3;
+}
