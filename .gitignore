@@ -3,11 +3,13 @@ node_modules
 dist
 dist-ssr
 *.local
+.junk
 
 # production
 /main
 /dist
 /src/out
+/.junk/*
 
 # debug
 npm-debug.log*
