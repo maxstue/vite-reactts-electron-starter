@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import AppBar from './AppBar';
 import { DarkModeProvider, DarkModeContext } from './context/DarkModeContext'; // Import DarkModeProvider
 import { AuthProvider } from './context/AuthContext';
 
@@ -8,6 +7,8 @@ import 'typeface-poppins';
 import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Dashboard from './Dashboard';
+import AppBar from './AppBar';
+import Employees from './EmployeesList';
 
 const App: React.FC = () => {
   console.log(window.ipcRenderer);
@@ -26,7 +27,7 @@ const App: React.FC = () => {
                 <Route path="/forgot" element={<ForgotPassword />} />
                 <Route path="/dashboard" element={<Dashboard username="" />} />
                 <Route path="/recruitment" element={<Dashboard username="" />} />
-                <Route path="/employee" element={<Dashboard username="" />} />
+                <Route path="/employee" element={<Employees username="" />} />
                 <Route path="/account" element={<Dashboard username="" />} />
               </Routes>
             </Router>

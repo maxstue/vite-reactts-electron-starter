@@ -58,7 +58,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div
+    <section
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
       <div className="absolute top-16 right-10">
         <ToggleDarkMode />
       </div>
-    </div>
+    </section>
   );
 };
 

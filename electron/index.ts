@@ -5,15 +5,15 @@ import { join } from 'path';
 import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
 
-const height = 450;
-const width = 800;
+const height = 760;
+const width = 1360;
 
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
     width,
     height,
-    fullscreen: true,
+    fullscreen: false,
     //  change to false to use AppBar
     frame: false,
     show: true,
