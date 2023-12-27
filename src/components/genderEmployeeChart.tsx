@@ -14,12 +14,12 @@ const PieChart: React.FC = () => {
       {
         data: [65, 35], // Ganti dengan data jumlah orang berdasarkan jenis kelamin
         backgroundColor: [
-          darkMode ? 'rgba(160, 216, 230, 0.9)' : 'rgba(175, 23, 99, 0.9)',
-          darkMode ? 'rgba(150, 150, 200, 0.9)' : 'rgba(255, 99, 132, 0.9)'
+          darkMode ? 'rgba(152, 124, 255, 0.9)' : 'rgba(89, 50, 234, 0.9)',
+          darkMode ? 'rgba(255,123,82, 0.9)' : 'rgba(255, 99, 132, 0.9)'
         ],
         borderColor: [
-          darkMode ? 'rgba(160, 216, 230, 0.9)' : 'rgba(175, 23, 99, 0.9)',
-          darkMode ? 'rgba(150, 150, 200, 0.9)' : 'rgba(255, 99, 132, 0.9)'
+          darkMode ? 'rgba(152, 124, 255, 0.9)' : 'rgba(89, 50, 234, 0.9)',
+          darkMode ? 'rgba(255,123,82, 0.9)' : 'rgba(255, 99, 132, 0.9)'
         ],
         borderWidth: 1
       }

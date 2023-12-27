@@ -19,7 +19,7 @@ const Dashboard: React.FC<{ username: string }> = ({ username }) => {
       <main className="flex-1 flex flex-col">
         <Header username={username} />
         <article className="flex-1 p-4 overflow-auto">
-          <h1 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {username}</h1>
+          <h2 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {username}</h2>
           <div className="grid grid-cols-2 gap-4 mb-8 px-4">
             <section
               className={`p-4 rounded-lg shadow-md ${

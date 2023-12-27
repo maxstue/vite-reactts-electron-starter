@@ -15,8 +15,8 @@ const BarChart: React.FC = () => {
         label: '# of Employee(s)',
         data: [12, 19, 3, 5],
         borderWidth: 1,
-        backgroundColor: darkMode ? 'rgba(160, 216, 230, 0.9)' : 'rgba(175, 23, 99, 0.9)',
-        borderColor: darkMode ? 'rgba(173, 216, 230, 1)' : 'rgba(175, 23, 99, 0.9)',
+        backgroundColor: darkMode ? 'rgba(152, 124, 255, 0.9)' : 'rgba(89, 50, 234, 0.9)',
+        borderColor: darkMode ? 'rgba(152, 124, 255, 1)' : 'rgba(89, 50, 234, 0.9)',
         textColor: darkMode ? '#fff' : '#000', // Menyesuaikan warna teks judul dengan Dark Mode
         borderRadius: 10,
         labelColor: darkMode ? '#fff' : '#000' // Set tick color
