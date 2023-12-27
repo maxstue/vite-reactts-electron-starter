@@ -1,10 +1,12 @@
 import { DarkModeContext } from './context/DarkModeContext';
+import { FaPlusCircle } from 'react-icons/fa';
 
 import React, { useContext } from 'react';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import Search from './components/searchBar';
 import ListModeView from './components/listModeView';
+import DropdownComponent from './components/dropdownList';
 
 const Employees: React.FC<{ username: string }> = ({ username }) => {
   const { darkMode } = useContext(DarkModeContext);
@@ -18,12 +20,27 @@ const Employees: React.FC<{ username: string }> = ({ username }) => {
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header username={username} />
-        <article className="flex-1 p-4 overflow-auto">
-          <h1 className="font-extrabold text-3xl mt-2 mb-6 px-4">Search Employee(s)</h1>
-          <Search />
-          <button type="button" className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
+        <article className="relative flex-1 ml-2 p-4 overflow-auto">
+          <button
+            type="button"
+            className="absolute right-16 top-20 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md inline-flex items-center gap-2"
+          >
+            <FaPlusCircle />
             Add Employee
           </button>
+          <h2 className="font-extrabold text-2xl mt-2 mb-6">Search Employee(s)</h2>
+          <span className="flex flex-row mb-10 mt-2 gap-8 h-auto">
+            <section className="flex flex-col gap-4">
+              <h3 className="font-bold text-xl">Employee(s)</h3>
+              <Search className="" placeholder="Search" />
+            </section>
+            <section className="flex flex-col gap-4">
+              <h3 className="font-bold text-xl">Department</h3>
+              <DropdownComponent />
+            </section>
+          </span>
+          <h2 className="font-extrabold text-2xl mt-2 mb-6">Advanced Filter</h2>
+          <Search className="mb-10" placeholder="Search by Name or ID" />
           <ListModeView />
         </article>
       </main>
