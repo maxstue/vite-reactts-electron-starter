@@ -50,13 +50,19 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
         <input type="file" id="imageInput" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
         {preview ? (
           <div style={{ position: 'relative', display: 'inline-block' }}>
-            <img
-              src={preview}
-              alt="Preview"
-              style={{ maxWidth: '200px', maxHeight: '100%', borderRadius: '50%', overflow: 'hidden' }}
-            />
+            <div
+              style={{
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                position: 'relative'
+              }}
+            >
+              <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
             {image && (
-              <div style={{ top: 0, right: 0 }}>
+              <div className="translate-y-12" style={{ marginTop: '8px' }}>
                 <button onClick={handleRemove}>Remove</button>
               </div>
             )}
@@ -85,13 +91,7 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
             />
           </label>
         )}
-        {image && !isUploading && (
-          <div>
-            <button onClick={handleSave}>Save</button>
-          </div>
-        )}
       </label>
-      {isUploading && <p>Uploading...</p>}
     </div>
   );
 };

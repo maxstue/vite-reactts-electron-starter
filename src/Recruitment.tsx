@@ -1,6 +1,6 @@
 import { DarkModeContext } from './context/DarkModeContext';
 
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import Search from './components/searchBar';
@@ -8,10 +8,19 @@ import ProfileImageUploader from './components/photoUploader';
 
 const Recruitment: React.FC<{ username: string }> = ({ username }) => {
   const { darkMode } = useContext(DarkModeContext);
+  const [profileImage, setProfileImage] = useState<string>(''); // State untuk menyimpan URL gambar profil
 
   const handleSaveProfileImage = (image: string) => {
-    // Lakukan sesuatu dengan URL gambar, misalnya kirim ke server atau simpan ke state
-    console.log('Saved profile image:', image);
+    // Simpan URL gambar profil ke dalam state
+    setProfileImage(image);
+  };
+
+  const handleSave = () => {
+    // Lakukan operasi penyimpanan sesuai kebutuhan aplikasi
+    console.log('Saved profile image:', profileImage);
+
+    // Reset state setelah disimpan (jika perlu)
+    // setProfileImage('');
   };
 
   return (
@@ -48,7 +57,7 @@ const Recruitment: React.FC<{ username: string }> = ({ username }) => {
               <span className="flex">
                 <fieldset defaultValue={'Male'} className="flex gap-4 text-lg">
                   <label htmlFor="gender1" className="flex gap-2">
-                    <input name="gender" type="radio" value="Male" id="Male" checked />
+                    <input name="gender" type="radio" value="Male" id="Male" defaultChecked />
                     Male
                   </label>
                   <label htmlFor="gender2" className="flex gap-2">
@@ -66,7 +75,10 @@ const Recruitment: React.FC<{ username: string }> = ({ username }) => {
             </section>
           </div>
           <div className="mt-6 mr-4 flex flex-row-reverse gap-4">
-            <button className="flex w-20 rounded-lg text-white justify-center bg-blue-500 hover:bg-blue-600 px-4 py-2">
+            <button
+              onClick={handleSave}
+              className="flex w-20 rounded-lg text-white justify-center bg-blue-500 hover:bg-blue-600 px-4 py-2"
+            >
               Save
             </button>
             <button className="flex w-20 rounded-lg text-gray-800 justify-center bg-gray-400 hover:bg-gray-500 px-4 py-2">

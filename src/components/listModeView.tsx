@@ -58,6 +58,7 @@ const ListModeView: React.FC = () => {
   const [selectedMode, setSelectedMode] = useState('list');
   const [sortColumn, setSortColumn] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [gridSortOrder, setGridSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleModeChange = (mode: string) => {
     setSelectedMode(mode);
@@ -74,7 +75,11 @@ const ListModeView: React.FC = () => {
     }
   };
 
-  const sortPeople = () => {
+  const handleGridSortToggle = () => {
+    setGridSortOrder((prevSortOrder) => (prevSortOrder === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const sortListPeople = () => {
     return [...people].slice().sort((a, b) => {
       const aValue = a[sortColumn as keyof typeof a];
       const bValue = b[sortColumn as keyof typeof b];
@@ -86,6 +91,19 @@ const ListModeView: React.FC = () => {
       if (aString < bString) return sortOrder === 'asc' ? -1 : 1;
       if (aString > bString) return sortOrder === 'asc' ? 1 : -1;
       return 0;
+    });
+  };
+
+  const sortGridPeople = () => {
+    return [...people].slice().sort((a, b) => {
+      const aValue = a['name'].toLowerCase();
+      const bValue = b['name'].toLowerCase();
+
+      if (gridSortOrder === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
     });
   };
 
@@ -128,7 +146,7 @@ const ListModeView: React.FC = () => {
 
   const CardView: React.FC<{ person: any }> = ({ person }) => (
     <div
-      className={`cursor-pointer flex w-fit rounded-3xl overflow-hidden object-cover shadow-lg mb-4 ${
+      className={`cursor-pointer flex max-w-lg rounded-3xl overflow-hidden object-cover shadow-lg mb-4 ${
         darkMode ? 'bg-gray-800 hover:bg-gray-500 text-gray-100' : 'bg-white hover:bg-gray-400 text-gray-800'
       }`}
     >
@@ -211,7 +229,7 @@ const ListModeView: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {sortPeople().map((person, index) => (
+                      {sortListPeople().map((person, index) => (
                         <tr key={index}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -248,7 +266,10 @@ const ListModeView: React.FC = () => {
                             {person.role}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="#" className="border border-gray-300 bg-white hover:bg-gray-300 px-3 py-1 rounded text-indigo-600 hover:text-indigo-900">
+                            <a
+                              href="#"
+                              className="border border-gray-300 bg-white hover:bg-gray-300 px-3 py-1 rounded text-indigo-600 hover:text-indigo-900"
+                            >
                               Edit
                             </a>
                           </td>
@@ -262,8 +283,34 @@ const ListModeView: React.FC = () => {
           </div>
         </article>
       ) : (
-        <article id="gridView" className="w-full flex mt-4 flex-wrap gap-4 justify-center">
-          {people.map((person, index) => (
+        <article id="gridView" className="relative w-full flex mt-4 flex-wrap gap-4 justify-center">
+          <div className="absolute left-20 -translate-y-16 inline-flex gap-2 items-center shadow-lg px-4 py-2 rounded">
+            <span className="font-bold text-sm mr-2">Sort by Name:</span>
+            <button onClick={handleGridSortToggle} className="flex items-center p-2 rounded-full focus:outline-none">
+              {gridSortOrder === 'asc' ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              )}
+            </button>
+          </div>
+          {sortGridPeople().map((person, index) => (
             <CardView key={index} person={person} />
           ))}
         </article>
