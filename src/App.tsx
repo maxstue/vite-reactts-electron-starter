@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { DarkModeProvider, DarkModeContext } from './context/DarkModeContext'; // Import DarkModeProvider
 import { AuthProvider } from './context/AuthContext';
@@ -15,6 +15,7 @@ import Settings from './Settings';
 const App: React.FC = () => {
   console.log(window.ipcRenderer);
   const { darkMode } = useContext(DarkModeContext);
+  const [appUsername, setAppUsername] = useState('AdminHR');
 
   return (
     <DarkModeProvider>
@@ -27,10 +28,13 @@ const App: React.FC = () => {
                 <Route path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot" element={<ForgotPassword />} />
-                <Route path="/dashboard" element={<Dashboard username="" />} />
-                <Route path="/recruitment" element={<Recruitment username="" />} />
-                <Route path="/employee" element={<Employees username="" />} />
-                <Route path="/settings" element={<Settings username="" />} />
+                <Route path="/dashboard" element={<Dashboard initialUsername={appUsername} />} />
+                <Route path="/recruitment" element={<Recruitment initialUsername={appUsername} />} />
+                <Route path="/employee" element={<Employees initialUsername={appUsername} />} />
+                <Route
+                  path="/settings"
+                  element={<Settings initialUsernameProp={appUsername} onUpdateUsername={setAppUsername} />}
+                />
               </Routes>
             </Router>
           </div>

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import ToggleDarkMode from './toggleDarkMode';
 import { DarkModeContext } from '../context/DarkModeContext';
 
-const Header: React.FC<{ username: string }> = ({ username }) => {
+const Header: React.FC<{ initialUsername?: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
   return (
     <header
@@ -11,7 +11,7 @@ const Header: React.FC<{ username: string }> = ({ username }) => {
       }`}
     >
       <ToggleDarkMode />
-      <p>Hello, {username}</p>
+      <p>Hello, {initialUsername}</p>
     </header>
   );
 };

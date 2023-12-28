@@ -7,7 +7,7 @@ import InputText from './components/inputTextField';
 import ProfileImageUploader from './components/photoUploader';
 import SliderChoice from './components/sliderChoice';
 
-const Recruitment: React.FC<{ username: string }> = ({ username }) => {
+const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
   const [profileImage, setProfileImage] = useState<string>(''); // State untuk menyimpan URL gambar profil
   const [, setSelectedGender] = useState<string>('Male');
@@ -46,7 +46,7 @@ const Recruitment: React.FC<{ username: string }> = ({ username }) => {
     >
       <Sidebar />
       <main className="flex-1 flex flex-col">
-        <Header username={username} />
+        <Header initialUsername={initialUsername} />
         <article className="flex-1 p-4 overflow-auto">
           <h2 className="font-extrabold text-2xl mt-2 mb-6 px-4">Add Employee</h2>
           <div

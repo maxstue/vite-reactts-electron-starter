@@ -6,7 +6,7 @@ import Sidebar from './components/sidebar';
 import BarChart from './components/employeeDistributionChart';
 import PieChart from './components/genderEmployeeChart';
 
-const Dashboard: React.FC<{ username: string }> = ({ username }) => {
+const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
 
   return (
@@ -17,9 +17,9 @@ const Dashboard: React.FC<{ username: string }> = ({ username }) => {
     >
       <Sidebar />
       <main className="flex-1 flex flex-col">
-        <Header username={username} />
+        <Header initialUsername={initialUsername} />
         <article className="flex-1 p-4 overflow-auto">
-          <h2 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {username}</h2>
+          <h2 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {initialUsername}</h2>
           <div className="grid grid-cols-2 gap-4 mb-8 px-4">
             <section
               className={`p-4 rounded-lg shadow-md ${

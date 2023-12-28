@@ -11,7 +11,7 @@ import DropdownComponent from './components/dropdownList';
 // Import file JSON
 import departmentsData from './assets/departmentList.json';
 
-const Employees: React.FC<{ username: string }> = ({ username }) => {
+const Employees: React.FC<{ initialUsername: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
   const [departments, setDepartments] = useState<string[]>([]);
   
@@ -28,7 +28,7 @@ const Employees: React.FC<{ username: string }> = ({ username }) => {
     >
       <Sidebar />
       <main className="flex-1 flex flex-col">
-        <Header username={username} />
+        <Header initialUsername={initialUsername} />
         <article className="relative flex-1 ml-2 p-4 overflow-auto">
           <button
             type="button"

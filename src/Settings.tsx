@@ -6,9 +6,13 @@ import Sidebar from './components/sidebar';
 
 import InputText from './components/inputTextField';
 
-const Settings: React.FC<{ username: string }> = ({ username }) => {
+const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newUsername: string) => void }> = ({
+  initialUsernameProp,
+  onUpdateUsername
+}) => {
   const { darkMode } = useContext(DarkModeContext);
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState(initialUsernameProp || 'AdminHR');
 
   const handleSaveData = () => {
     // Logika untuk menyimpan data ke dalam file xlsx
@@ -23,7 +27,7 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
     >
       <Sidebar />
       <main className="flex-1 flex flex-col">
-        <Header username={username} />
+        <Header initialUsername={initialUsernameProp} />
         <article className="relative flex-1 ml-2 p-4 overflow-auto">
           {/* Pengaturan Akun User */}
           <section className={`shadow py-4 px-6 mb-8 rounded-lg ${darkMode ? 'shadow-white' : 'shadow-black'}`}>
@@ -33,7 +37,7 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
               <label htmlFor="displayName" className="block text-lg font-medium pl-1 mb-1">
                 Display Name
               </label>
-              <InputText placeholder="Display Name" type="text" className="mb-4" />
+              <InputText placeholder="Display Name" type="text" className="mb-4" onUsernameChange={setUsername} />
             </div>
             {/* Email */}
             <div className="mb-4">
@@ -69,6 +73,10 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md inline-flex items-center gap-2"
+              onClick={() => {
+                onUpdateUsername(username);
+                // ... (Tambahkan logika lain jika diperlukan)
+              }}
             >
               Save Account Settings
             </button>

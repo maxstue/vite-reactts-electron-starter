@@ -3,11 +3,14 @@ import { DarkModeContext } from '../context/DarkModeContext';
 
 import countryPhoneData from '../assets/countryPhoneNumber.json';
 
-const InputText: React.FC<{ className?: string; placeholder?: string; type?: string }> = ({
-  className,
-  placeholder,
-  type
-}) => {
+interface InputTextProps {
+  className?: string;
+  placeholder?: string;
+  type?: string;
+  onUsernameChange?: (username: string) => void; // Tambahkan prop untuk callback perubahan username
+}
+
+const InputText: React.FC<InputTextProps> = ({ className, placeholder, type, onUsernameChange }) => {
   const { darkMode } = useContext(DarkModeContext);
   const [phoneNumberPrefix, setPhoneNumberPrefix] = useState('+62'); // Default prefix
   const [phoneLength, setPhoneLength] = useState<number | undefined>(12); // Default phone length, adjust based on your needs
@@ -25,9 +28,9 @@ const InputText: React.FC<{ className?: string; placeholder?: string; type?: str
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Handle input change logic
-    // const inputValue = e.target.value;
-    // Add your logic here based on the input value
+    if (onUsernameChange) {
+      onUsernameChange(e.target.value); // Panggil callback ketika nilai username berubah
+    }
   };
 
   return (
