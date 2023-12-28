@@ -26,7 +26,7 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
         <Header username={username} />
         <article className="relative flex-1 ml-2 p-4 overflow-auto">
           {/* Pengaturan Akun User */}
-          <section className={`shadow py-4 px-6 mb-8 ${darkMode ? 'shadow-white' : 'shadow-black'}`}>
+          <section className={`shadow py-4 px-6 mb-8 rounded-lg ${darkMode ? 'shadow-white' : 'shadow-black'}`}>
             <h2 className="font-extrabold text-2xl mb-6">Account Settings</h2>
             {/* Nama Display */}
             <div className="mb-4">
@@ -60,7 +60,7 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="px-4 py-2 rounded text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer mb-2"
+                className="px-4 py-2 rounded text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer mb-2 text-white"
               >
                 {showPassword ? 'Hide Password' : 'Show Password'}
               </button>
@@ -75,15 +75,26 @@ const Settings: React.FC<{ username: string }> = ({ username }) => {
           </section>
 
           {/* Tombol untuk Menyimpan Data ke Excel (xlsx) */}
-          <section>
+          <section className={`shadow py-4 px-6 mb-8 rounded-lg ${darkMode ? 'shadow-white' : 'shadow-black'}`}>
             <h2 className="font-extrabold text-2xl mb-6">Export Data</h2>
             <button
               type="button"
-              className="bg-green-500 hover:bg-green-600 py-2 px-4 rounded-md inline-flex items-center gap-2"
+              className="bg-green-500 hover:bg-green-600 py-2 px-4 rounded-md inline-flex items-center gap-2 text-white"
               onClick={handleSaveData}
             >
               <FaSave />
               Export to Excel
+            </button>
+          </section>
+          <section className={`shadow py-4 px-6 mb-8 rounded-lg ${darkMode ? 'shadow-white' : 'shadow-black'}`}>
+            <h2 className="font-extrabold text-2xl mb-6">Logout</h2>
+            <p className="mb-2">You need to logout?</p>
+            <button
+              type="button"
+              className="bg-red-500 hover:bg-red-700 py-2 px-4 rounded-md inline-flex items-center gap-2 text-white"
+              onClick={handleSaveData}
+            >
+              Logout
             </button>
           </section>
         </article>
