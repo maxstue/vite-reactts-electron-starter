@@ -10,6 +10,7 @@ import Dashboard from './Dashboard';
 import AppBar from './AppBar';
 import Employees from './EmployeesList';
 import Recruitment from './Recruitment';
+import Settings from './Settings';
 
 const App: React.FC = () => {
   console.log(window.ipcRenderer);
@@ -29,7 +30,7 @@ const App: React.FC = () => {
                 <Route path="/dashboard" element={<Dashboard username="" />} />
                 <Route path="/recruitment" element={<Recruitment username="" />} />
                 <Route path="/employee" element={<Employees username="" />} />
-                <Route path="/account" element={<Dashboard username="" />} />
+                <Route path="/settings" element={<Settings username="" />} />
               </Routes>
             </Router>
           </div>

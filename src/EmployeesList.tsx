@@ -1,15 +1,24 @@
 import { DarkModeContext } from './context/DarkModeContext';
 import { FaPlusCircle } from 'react-icons/fa';
 
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import Search from './components/searchBar';
 import ListModeView from './components/listModeView';
 import DropdownComponent from './components/dropdownList';
 
+// Import file JSON
+import departmentsData from './assets/departmentList.json';
+
 const Employees: React.FC<{ username: string }> = ({ username }) => {
   const { darkMode } = useContext(DarkModeContext);
+  const [departments, setDepartments] = useState<string[]>([]);
+  
+  useEffect(() => {
+    // Ambil data departemen dari file JSON
+    setDepartments(departmentsData.map((item) => item.department));
+  }, []); // Gunakan array kosong sebagai dependencies untuk memastikan useEffect hanya dijalankan sekali setelah mounting
 
   return (
     <div
@@ -36,7 +45,7 @@ const Employees: React.FC<{ username: string }> = ({ username }) => {
             </section>
             <section className="flex flex-col gap-4">
               <h3 className="font-bold text-xl">Department</h3>
-              <DropdownComponent />
+              <DropdownComponent options={departments} />
             </section>
           </span>
           <h2 className="font-extrabold text-2xl mt-2 mb-6">Advanced Filter</h2>

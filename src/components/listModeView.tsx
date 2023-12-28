@@ -310,9 +310,11 @@ const ListModeView: React.FC = () => {
               )}
             </button>
           </div>
-          {sortGridPeople().map((person, index) => (
-            <CardView key={index} person={person} />
-          ))}
+          <div className='grid grid-cols-3 gap-3'>
+            {sortGridPeople().map((person, index) => (
+              <CardView key={index} person={person} />
+            ))}
+          </div>
         </article>
       )}
     </section>
