@@ -16,8 +16,8 @@ const Sidebar: React.FC = () => {
 
   return (
     <nav
-      className={`w-48 p-4 shadow-md shadow-[rgba(0, 0, 15, 0.5)_10px_5px_4px_0px] inset-20 z-10 ${
-        darkMode ? 'bg-gray-800 text-white shadow-white' : 'bg-gray-200 text-gray-800'
+      className={`w-48 p-4 border-r-[1px] z-10 ${
+        darkMode ? 'bg-gray-800 text-white border-white' : 'bg-gray-200 text-gray-800 border-gray-800'
       }
 
       `}
@@ -29,11 +29,14 @@ const Sidebar: React.FC = () => {
           <button
             onClick={() => navigate('/dashboard')}
             style={{
-              color: activePage === '/dashboard' ? '#AF1763' : darkMode ? 'white' : 'black',
+              backgroundColor: activePage === '/dashboard' ? '#3b82f6' : '',
+              color: activePage === '/dashboard' ? 'white' : '',
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              gap: '5px'
+              gap: '5px',
+              padding: '4px 6px 4px 6px',
+              borderRadius: '4px'
             }}
           >
             <svg viewBox="0 0 120 120" width="20" height="20" fill="currentColor">
@@ -49,11 +52,14 @@ const Sidebar: React.FC = () => {
           <button
             onClick={() => navigate('/recruitment')}
             style={{
-              color: activePage === '/recruitment' ? '#AF1763' : darkMode ? 'white' : 'black',
+              backgroundColor: activePage === '/recruitment' ? '#3b82f6' : '',
+              color: activePage === '/recruitment' ? 'white' : '',
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              gap: '5px'
+              gap: '5px',
+              padding: '4px 6px 4px 6px',
+              borderRadius: '4px'
             }}
           >
             <svg
@@ -78,11 +84,14 @@ const Sidebar: React.FC = () => {
           <button
             onClick={() => navigate('/employee')}
             style={{
-              color: activePage === '/employee' ? '#AF1763' : darkMode ? 'white' : 'black',
+              backgroundColor: activePage === '/employee' ? '#3b82f6' : '',
+              color: activePage === '/employee' ? 'white' : '',
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              gap: '5px'
+              gap: '5px',
+              padding: '4px 6px 4px 6px',
+              borderRadius: '4px'
             }}
           >
             <svg
@@ -109,11 +118,14 @@ const Sidebar: React.FC = () => {
           <button
             onClick={() => navigate('/settings')}
             style={{
-              color: activePage === '/settings' ? '#AF1763' : darkMode ? 'white' : 'black',
+              backgroundColor: activePage === '/settings' ? '#3b82f6' : '',
+              color: activePage === '/settings' ? 'white' : '',
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              gap: '5px'
+              gap: '5px',
+              padding: '4px 6px 4px 6px',
+              borderRadius: '4px'
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">

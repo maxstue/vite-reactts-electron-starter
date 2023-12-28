@@ -10,8 +10,8 @@ function AppBar() {
   return (
     <>
       <div
-        className={`py-1 flex justify-between draggable fixed top-0 left-0 right-0 z-20 shadow-md ${
-          darkMode ? 'text-gray-200 shadow-gray-300' : 'text-gray-800'
+        className={`py-1 flex justify-between draggable fixed top-0 left-0 right-0 z-20 border-b-[1px] ${
+          darkMode ? 'text-gray-200 border-white' : 'text-gray-800 border-gray-800'
         }`}
       >
         <div className="inline-flex ml-4 gap-2">

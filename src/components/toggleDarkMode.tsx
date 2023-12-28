@@ -12,8 +12,8 @@ const ToggleDarkMode: React.FC = () => {
 
   return (
     <button
-      className={`rounded-lg px-4 py-2 shadow-xl duration-100 ${
-        darkMode ? 'text-gray-200 hover:text-gray-400 bg-gray-700 hover:bg-gray-900 shadow-white' : 'text-gray-800 hover:text-gray-600 bg-gray-100 hover:bg-gray-300'
+      className={`rounded-lg px-4 py-2 border-2 duration-100 ${
+        darkMode ? 'text-gray-200 hover:text-gray-400 bg-gray-700 hover:bg-gray-900 border-white' : 'text-gray-800 hover:text-gray-600 bg-gray-100 hover:bg-gray-300 border-gray-800'
       }`}
       onClick={toggleDarkMode}
       style={{ display: 'flex', alignItems: 'center' }}

@@ -69,7 +69,7 @@ const BarChart: React.FC = () => {
 
   return (
     <section
-      className={`w-2/3 shadow-md ${darkMode ? 'bg-gray-900 shadow-white' : 'bg-white'}
+      className={`w-2/3 border-2 ${darkMode ? 'bg-gray-900 border-white' : 'bg-white border-gray-800'}
         p-4 rounded-lg shadow`}
     >
       <Bar data={data} options={options} />

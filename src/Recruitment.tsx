@@ -40,8 +40,8 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
 
   return (
     <div
-      className={`flex pt-10 h-screen overflow-hidden ${
-        darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
+      className={`flex pt-8 h-screen overflow-hidden ${
+        darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
       }`}
     >
       <Sidebar />
@@ -50,8 +50,8 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
         <article className="flex-1 p-4 overflow-auto">
           <h2 className="font-extrabold text-2xl mt-2 mb-6 px-4">Add Employee</h2>
           <div
-            className={`grid grid-cols-2 gap-8 rounded max-w-full mx-4 px-8 py-4 shadow-lg ${
-              darkMode ? 'bg-gray-800 text-gray-200 shadow-white' : 'bg-white text-gray-800'
+            className={`grid grid-cols-2 gap-8 rounded max-w-full mx-4 px-8 py-8 border-2 ${
+              darkMode ? 'bg-gray-800 text-white border-white' : 'bg-white text-gray-800 border-gray-800'
             }`}
           >
             <section id="left" className="flex flex-col">
@@ -93,11 +93,11 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
           <div className="mt-6 mr-4 flex flex-row-reverse gap-4">
             <button
               onClick={handleSave}
-              className="flex w-20 rounded-lg text-white justify-center bg-blue-500 hover:bg-blue-600 px-4 py-2"
+              className="flex w-20 rounded-lg text-white justify-center bg-blue-500 hover:bg-blue-600 px-4 py-2 border border-blue-600"
             >
               Save
             </button>
-            <button className="flex w-20 rounded-lg text-gray-800 justify-center bg-gray-400 hover:bg-gray-500 px-4 py-2">
+            <button className="flex w-20 rounded-lg text-gray-800 justify-center bg-gray-300 hover:bg-gray-500 px-4 py-2 border border-gray-800">
               Cancel
             </button>
           </div>

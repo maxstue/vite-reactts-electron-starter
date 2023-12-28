@@ -53,7 +53,7 @@ const PieChart: React.FC = () => {
 
   return (
     <section
-      className={`h-fit w-1/4 shadow-md ${darkMode ? 'bg-gray-900 shadow-white' : 'bg-white'}
+      className={`h-fit w-1/4 border-2 ${darkMode ? 'bg-gray-900 border-white' : 'bg-white border-gray-800'}
         p-4 rounded-lg shadow`}
     >
       <Pie data={data} options={options} />

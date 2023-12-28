@@ -62,7 +62,7 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
               <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             {image && (
-              <div className="translate-y-12" style={{ marginTop: '8px' }}>
+              <div className="absolute -left-20">
                 <button onClick={handleRemove}>Remove</button>
               </div>
             )}

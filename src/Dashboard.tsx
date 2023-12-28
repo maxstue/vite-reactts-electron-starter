@@ -11,8 +11,8 @@ const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) 
 
   return (
     <div
-      className={`flex pt-10 h-screen overflow-hidden ${
-        darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
+      className={`flex pt-8 h-screen overflow-hidden ${
+        darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
       }`}
     >
       <Sidebar />
@@ -22,8 +22,8 @@ const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) 
           <h2 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {initialUsername}</h2>
           <div className="grid grid-cols-2 gap-4 mb-8 px-4">
             <section
-              className={`p-4 rounded-lg shadow-md ${
-                darkMode ? 'bg-gray-900 text-gray-200 shadow-white' : 'bg-white text-gray-800'
+              className={`p-4 rounded-lg border-2 ${
+                darkMode ? 'bg-gray-900 text-white border-white' : 'bg-white text-gray-800 border-gray-800'
               }`}
             >
               <h2 className="text-lg font-semibold mb-4">Total Employees</h2>
@@ -31,8 +31,8 @@ const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) 
               <h3 className="text-sm">Employee(s)</h3>
             </section>
             <section
-              className={`p-4 rounded-lg shadow-md ${
-                darkMode ? 'bg-gray-900 text-gray-200 shadow-white' : 'bg-white text-gray-800'
+              className={`p-4 rounded-lg border-2 ${
+                darkMode ? 'bg-gray-900 text-white border-white' : 'bg-white text-gray-800 border-gray-800'
               }`}
             >
               <h2 className="text-lg font-semibold mb-4">Total Departments</h2>

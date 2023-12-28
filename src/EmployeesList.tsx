@@ -22,8 +22,8 @@ const Employees: React.FC<{ initialUsername: string }> = ({ initialUsername }) =
 
   return (
     <div
-      className={`flex pt-10 h-screen overflow-hidden ${
-        darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'
+      className={`flex pt-8 h-screen overflow-hidden ${
+        darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
       }`}
     >
       <Sidebar />

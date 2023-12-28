@@ -3,6 +3,7 @@ import ToggleDarkMode from './components/toggleDarkMode';
 import { DarkModeContext } from './context/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import FlashMessage from './components/flashMessage';
 
 const authenticateUser = async (email: string, password: string) => {
   // Lakukan panggilan API atau autentikasi sesuai kebutuhan
@@ -105,7 +106,7 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <FlashMessage type="error" message="Your Email or Password is incorrect." />}
 
           <button className="w-full mt-6 rounded-lg text-white bg-blue-500 hover:bg-blue-600 px-4 py-2" type="submit">
             Login
