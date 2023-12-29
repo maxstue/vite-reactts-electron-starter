@@ -1,10 +1,10 @@
-import { DarkModeContext } from './context/DarkModeContext';
+import { DarkModeContext } from '../context/DarkModeContext';
 
 import React, { useContext } from 'react';
-import Header from './components/header';
-import Sidebar from './components/sidebar';
-import BarChart from './components/employeeDistributionChart';
-import PieChart from './components/genderEmployeeChart';
+import Header from '../components/header';
+import Sidebar from '../components/sidebar';
+import BarChart from '../components/employeeDistributionChart';
+import PieChart from '../components/genderEmployeeChart';
 
 const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
@@ -18,7 +18,13 @@ const Dashboard: React.FC<{ initialUsername?: string }> = ({ initialUsername }) 
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header initialUsername={initialUsername} />
-        <article className="flex-1 p-4 overflow-auto">
+        <article
+          className={`flex-1 p-4 overflow-auto scrollbar ${
+            darkMode
+              ? 'scrollbar-thumb-gray-900 scrollbar-track-gray-300'
+              : 'scrollbar-thumb-gray-400 scrollbar-track-gray-100'
+          }`}
+        >
           <h2 className="font-extrabold text-3xl mt-2 mb-6 px-4">Hello, {initialUsername}</h2>
           <div className="grid grid-cols-2 gap-4 mb-8 px-4">
             <section

@@ -1,11 +1,11 @@
-import { DarkModeContext } from './context/DarkModeContext';
+import { DarkModeContext } from '../context/DarkModeContext';
 
 import React, { useState, useContext } from 'react';
-import Header from './components/header';
-import Sidebar from './components/sidebar';
-import InputText from './components/inputTextField';
-import ProfileImageUploader from './components/photoUploader';
-import SliderChoice from './components/sliderChoice';
+import Header from '../components/header';
+import Sidebar from '../components/sidebar';
+import InputText from '../components/inputTextField';
+import ProfileImageUploader from '../components/photoUploader';
+import SliderChoice from '../components/sliderChoice';
 
 const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
@@ -47,7 +47,13 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header initialUsername={initialUsername} />
-        <article className="flex-1 p-4 overflow-auto">
+        <article
+          className={`flex-1 p-4 overflow-auto scrollbar ${
+            darkMode
+              ? 'scrollbar-thumb-gray-900 scrollbar-track-gray-300'
+              : 'scrollbar-thumb-gray-400 scrollbar-track-gray-100'
+          }`}
+        >
           <h2 className="font-extrabold text-2xl mt-2 mb-6 px-4">Add Employee</h2>
           <div
             className={`grid grid-cols-2 gap-8 rounded max-w-full mx-4 px-8 py-8 border-2 ${

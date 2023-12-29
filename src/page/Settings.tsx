@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { DarkModeContext } from './context/DarkModeContext';
+import { DarkModeContext } from '../context/DarkModeContext';
 import { FaSave } from 'react-icons/fa';
-import Header from './components/header';
-import Sidebar from './components/sidebar';
+import Header from '../components/header';
+import Sidebar from '../components/sidebar';
 
-import InputText from './components/inputTextField';
-import ProfileImageUploader from './components/photoUploader';
+import InputText from '../components/inputTextField';
+import ProfileImageUploader from '../components/photoUploader';
 
 const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newUsername: string) => void }> = ({
   initialUsernameProp,
@@ -54,7 +54,13 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header initialUsername={initialUsernameProp} />
-        <article className="relative flex-1 ml-2 p-4 overflow-auto">
+        <article
+          className={`relative flex-1 ml-2 p-4 overflow-auto scrollbar ${
+            darkMode
+              ? 'scrollbar-thumb-gray-900 scrollbar-track-gray-300'
+              : 'scrollbar-thumb-gray-400 scrollbar-track-gray-100'
+          }`}
+        >
           {/* Pengaturan Akun User */}
           <section className={`border-2 py-4 px-6 mb-8 rounded-lg ${darkMode ? 'border-white' : 'border-gray-800'}`}>
             <h2 className="font-extrabold text-2xl mb-6">Account Settings</h2>

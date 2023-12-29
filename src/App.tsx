@@ -4,13 +4,13 @@ import { DarkModeProvider, DarkModeContext } from './context/DarkModeContext'; /
 import { AuthProvider } from './context/AuthContext';
 
 import 'typeface-poppins';
-import Login from './Login';
-import ForgotPassword from './ForgotPassword';
-import Dashboard from './Dashboard';
+import Login from './page/Login';
+import ForgotPassword from './page/ForgotPassword';
+import Dashboard from './page/Dashboard';
 import AppBar from './AppBar';
-import Employees from './EmployeesList';
-import Recruitment from './Recruitment';
-import Settings from './Settings';
+import Employees from './page/EmployeesList';
+import Recruitment from './page/Recruitment';
+import Settings from './page/Settings';
 
 const App: React.FC = () => {
   console.log(window.ipcRenderer);

@@ -1,5 +1,5 @@
 module.exports = {
-  content: ['./src/index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: ['./src/index.html', './src/**/*.{vue,js,ts,jsx,tsx,css}'],
   theme: {
     extend: {
       fontFamily: {
@@ -21,5 +21,5 @@ module.exports = {
       sans: ['Inter', 'ui-sans-serif', 'system-ui']
     }
   },
-  plugins: []
+  plugins: [require('tailwind-scrollbar')]
 };

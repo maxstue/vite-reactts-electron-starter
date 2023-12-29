@@ -56,7 +56,10 @@ const people = [
 
 const ListModeView: React.FC = () => {
   const { darkMode } = useContext(DarkModeContext);
-  const [selectedMode, setSelectedMode] = useState('list');
+  
+  const initialSelectedMode = localStorage.getItem('selectedMode') || 'list';
+  const [selectedMode, setSelectedMode] = useState<string>(initialSelectedMode);
+
   const [sortColumn, setSortColumn] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [gridSortOrder, setGridSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -75,6 +78,8 @@ const ListModeView: React.FC = () => {
 
   const handleModeChange = (mode: string) => {
     setSelectedMode(mode);
+    // Menyimpan nilai selectedMode ke localStorage
+    localStorage.setItem('selectedMode', mode);
   };
 
   const handleSort = (column: string) => {
@@ -176,7 +181,7 @@ const ListModeView: React.FC = () => {
     <section className="flex flex-col justify-between">
       <div id="toggleModeView" className="flex flex-row-reverse mr-4 gap-4">
         <span
-          className={`cursor-pointer p-2 rounded-xl ${
+          className={`cursor-pointer p-2 rounded-xl duration-300 ${
             selectedMode === 'list'
               ? `${darkMode ? 'border-gray-200' : 'border-gray-800'} border-spacing-7 border-2`
               : ''

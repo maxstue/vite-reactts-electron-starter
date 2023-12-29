@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ToggleDarkMode from './components/toggleDarkMode';
-import { DarkModeContext } from './context/DarkModeContext';
+import ToggleDarkMode from '../components/toggleDarkMode';
+import { DarkModeContext } from '../context/DarkModeContext';
 
 const ForgotPassword: React.FC = () => {
   const { darkMode } = useContext(DarkModeContext);

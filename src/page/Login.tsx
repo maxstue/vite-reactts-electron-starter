@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import ToggleDarkMode from './components/toggleDarkMode';
-import { DarkModeContext } from './context/DarkModeContext';
+import ToggleDarkMode from '../components/toggleDarkMode';
+import { DarkModeContext } from '../context/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import FlashMessage from './components/flashMessage';
+import { useAuth } from '../context/AuthContext';
+import FlashMessage from '../components/flashMessage';
 
 const authenticateUser = async (email: string, password: string) => {
   // Lakukan panggilan API atau autentikasi sesuai kebutuhan

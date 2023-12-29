@@ -1,20 +1,20 @@
-import { DarkModeContext } from './context/DarkModeContext';
+import { DarkModeContext } from '../context/DarkModeContext';
 import { FaPlusCircle } from 'react-icons/fa';
 
 import React, { useState, useEffect, useContext } from 'react';
-import Header from './components/header';
-import Sidebar from './components/sidebar';
-import Search from './components/searchBar';
-import ListModeView from './components/listModeView';
-import DropdownComponent from './components/dropdownList';
+import Header from '../components/header';
+import Sidebar from '../components/sidebar';
+import Search from '../components/searchBar';
+import ListModeView from '../components/listModeView';
+import DropdownComponent from '../components/dropdownList';
 
 // Import file JSON
-import departmentsData from './assets/departmentList.json';
+import departmentsData from '../assets/departmentList.json';
 
 const Employees: React.FC<{ initialUsername: string }> = ({ initialUsername }) => {
   const { darkMode } = useContext(DarkModeContext);
   const [departments, setDepartments] = useState<string[]>([]);
-  
+
   useEffect(() => {
     // Ambil data departemen dari file JSON
     setDepartments(departmentsData.map((item) => item.department));
@@ -29,7 +29,13 @@ const Employees: React.FC<{ initialUsername: string }> = ({ initialUsername }) =
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header initialUsername={initialUsername} />
-        <article className="relative flex-1 ml-2 p-4 overflow-auto">
+        <article
+          className={`relative flex-1 ml-2 p-4 overflow-auto scrollbar ${
+            darkMode
+              ? 'scrollbar-thumb-gray-900 scrollbar-track-gray-300'
+              : 'scrollbar-thumb-gray-400 scrollbar-track-gray-100'
+          }`}
+        >
           <button
             type="button"
             className="absolute right-16 top-20 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md inline-flex items-center gap-2"
