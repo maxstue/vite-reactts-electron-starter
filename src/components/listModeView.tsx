@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
+import EmployeeDetailModal from '../modal/EmployeeDetailModal';
 
 const people = [
   {
@@ -59,6 +60,18 @@ const ListModeView: React.FC = () => {
   const [sortColumn, setSortColumn] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [gridSortOrder, setGridSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  const [selectedPerson, setSelectedPerson] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (person: any) => {
+    setSelectedPerson(person);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const handleModeChange = (mode: string) => {
     setSelectedMode(mode);
@@ -144,11 +157,12 @@ const ListModeView: React.FC = () => {
     </th>
   );
 
-  const CardView: React.FC<{ person: any }> = ({ person }) => (
+  const CardView: React.FC<{ person: any; onCardClick: () => void }> = ({ person, onCardClick }) => (
     <div
       className={`cursor-pointer flex max-w-lg rounded-3xl overflow-hidden object-cover shadow-lg mb-4 ${
         darkMode ? 'bg-gray-800 hover:bg-gray-500 text-gray-100' : 'bg-white hover:bg-gray-400 text-gray-800'
       }`}
+      onClick={onCardClick}
     >
       <img className="w-40 h-40 rounded-full object-cover -translate-x-12" src={person.image} alt={person.name} />
       <div className="px-3 py-4 flex flex-col items-center justify-center text-center text-wrap -translate-x-6">
@@ -266,12 +280,12 @@ const ListModeView: React.FC = () => {
                             {person.role}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a
-                              href="#"
+                            <button
+                              onClick={() => openModal(person)}
                               className="border border-gray-300 bg-white hover:bg-gray-300 px-3 py-1 rounded text-indigo-600 hover:text-indigo-900"
                             >
-                              Edit
-                            </a>
+                              Detail
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -310,13 +324,14 @@ const ListModeView: React.FC = () => {
               )}
             </button>
           </div>
-          <div className='grid grid-cols-3 gap-3'>
+          <div className="grid grid-cols-3 gap-3">
             {sortGridPeople().map((person, index) => (
-              <CardView key={index} person={person} />
+              <CardView key={index} person={person} onCardClick={() => openModal(person)} />
             ))}
           </div>
         </article>
       )}
+      {isModalOpen && selectedPerson && <EmployeeDetailModal person={selectedPerson} onClose={closeModal} />}
     </section>
   );
 };

@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
 
       `}
     >
-      <h2 className="flex items-center justify-center font-extrabold text-2xl my-16">K3PCHR</h2>
+      <h2 className="flex items-center justify-center font-extrabold text-2xl my-16 text-center">K3PCHR</h2>
       <ul className="flex flex-col items-start justify-start h-full gap-5 font-bold pl-4">
         <label className="font-semibold text-sm">Main Menu</label>
         <li className="">

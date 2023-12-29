@@ -30,7 +30,7 @@ const SliderChoice: React.FC<SliderProps> = ({ options, initialValue, onChange }
               id={option}
               value={option}
               className="peer hidden"
-              checked={selectedOption === option}
+              defaultChecked={selectedOption === option}
             />
             <label
               htmlFor={option}

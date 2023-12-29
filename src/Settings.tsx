@@ -6,7 +6,6 @@ import Sidebar from './components/sidebar';
 
 import InputText from './components/inputTextField';
 import ProfileImageUploader from './components/photoUploader';
-import FlashMessage from './components/flashMessage';
 
 const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newUsername: string) => void }> = ({
   initialUsernameProp,
@@ -17,7 +16,6 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
   const [username, setUsername] = useState(initialUsernameProp || 'AdminHR');
   const [profileImage, setProfileImage] = useState<string>('');
   const [flashMessage, setFlashMessage] = useState<React.ReactNode | null>(null);
-
 
   const handleSaveData = () => {
     // Logika untuk menyimpan data ke dalam file xlsx
@@ -64,7 +62,12 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
               <label htmlFor="photoProfile" className="block text-lg font-medium pl-1 mb-1">
                 Photo Profile
               </label>
-              <ProfileImageUploader onSave={handleSaveProfileImage} className="" />
+              <ProfileImageUploader
+                onSave={(image) => {
+                  console.log('Berhasil');
+                }}
+                className="flex justify-center mb-4"
+              />
             </div>
             {/* Nama Display */}
             <div className="mb-4">

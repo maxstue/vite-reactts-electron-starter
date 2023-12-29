@@ -2,17 +2,18 @@ import React, { useContext, useState } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 import FlashMessage from './flashMessage';
 
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']; // Jenis gambar yang diizinkan
-const MAX_IMAGE_SIZE = 1024 * 1024 * 2; // Ukuran maksimum gambar (2MB)
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const MAX_IMAGE_SIZE = 1024 * 1024 * 2;
 
-const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; className: string }> = ({
-  onSave,
-  className
-}) => {
+const ProfileImageUploader: React.FC<{
+  onSave: (image: string) => void;
+  className: string;
+}> = ({ onSave, className }) => {
   const { darkMode } = useContext(DarkModeContext);
-  const [image, setImage] = useState<string>(''); // State untuk menyimpan URL gambar
-  const [preview, setPreview] = useState<string>(''); // State untuk menampilkan pratinjau gambar
-  const [flashMessage, setFlashMessage] = useState<string>(''); // State untuk pesan flash
+  const [image, setImage] = useState<string>('');
+  const [preview, setPreview] = useState<string>('');
+  const [flashMessageErrorInput, setFlashMessageErrorInput] = useState<string>('');
+  const [showFlashMessageSuccess, setShowFlashMessageSuccess] = useState<string>('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -31,16 +32,15 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
       } else {
         // Tipe atau ukuran file tidak sesuai
         e.target.value = '';
-        setFlashMessage('Please choose a valid image file (JPEG, PNG, or GIF) with size up to 2MB.');
+        setFlashMessageErrorInput('Please choose a valid image file (JPEG, PNG, or GIF) with size up to 2MB.');
 
         // Setel ulang flashMessage setelah beberapa waktu
         setTimeout(() => {
-          setFlashMessage('');
+          setFlashMessageErrorInput('');
         }, 3000);
       }
     }
   };
-
 
   const handleRemove = () => {
     // Konfirmasi sebelum menghapus
@@ -50,11 +50,18 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
       // Hapus gambar
       setImage('');
       setPreview('');
+      setFlashMessageErrorInput('');
+      setShowFlashMessageSuccess('Penghapusan berhasil');
+
+      // Setel ulang flashMessage success setelah beberapa waktu
+      setTimeout(() => {
+        setShowFlashMessageSuccess('');
+      }, 3000);
     }
   };
 
   return (
-    <div className={`flex flex-col gap-4 items-center ${className}`}>
+    <div className={`flex gap-4 items-center ${className}`}>
       <label htmlFor="imageInput" style={{ position: 'relative', display: 'inline-block' }}>
         <input type="file" id="imageInput" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
         {preview ? (
@@ -124,9 +131,15 @@ const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; classNam
           </button>
         </>
       )}
-      {flashMessage && (
+      {flashMessageErrorInput && (
         <div className="z-10 absolute bottom-4 right-4">
-          <FlashMessage type="warning" color={'#A76607'} message={flashMessage} />
+          <FlashMessage type="warning" color={'#FFC107'} message={flashMessageErrorInput} />
+        </div>
+      )}
+      {/* Menampilkan pesan flash success setelah penghapusan gambar berhasil */}
+      {showFlashMessageSuccess && (
+        <div className="z-10 absolute bottom-4 right-4">
+          <FlashMessage type="success" color={'#00AB66'} message={showFlashMessageSuccess} />
         </div>
       )}
     </div>

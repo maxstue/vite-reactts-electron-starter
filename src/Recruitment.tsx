@@ -57,7 +57,12 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
             <section id="left" className="flex flex-col">
               <h3 className="font-bold text-xl mb-2">General Information</h3>
               <label className="block text-lg font-medium pl-1 mb-1">Image Profile</label>
-              <ProfileImageUploader onSave={handleSaveProfileImage} className="flex justify-center mb-4" />
+              <ProfileImageUploader
+                onSave={(image) => {
+                  console.log('Berhasil');
+                }}
+                className="flex justify-center mb-4"
+              />
               <div id="separator-y" className="flex-grow border-t border-gray-400" />
               <label className="block text-lg font-medium pl-1 mb-1">Name</label>
               <InputText placeholder="Name" type="text" className="mb-4" />

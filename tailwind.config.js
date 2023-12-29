@@ -8,10 +8,10 @@ module.exports = {
       colors: {
         textDark: '#2C2D31',
         bg1Dark: '#1C1B1C',
-        success: '#00A04A',
-        warning: '#FCDC0C',
-        error: '#E01E3E',
-        information: '#1F4399'
+        success: '#00AB66',
+        warning: '#FFC107',
+        error: '#FF0000',
+        information: '#007BFF'
       }
     }
   },
