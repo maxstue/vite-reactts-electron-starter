@@ -28,7 +28,7 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
       style={{ backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)' }}
     >
       <div
-        className={`relative mx-auto max-w-md p-6 rounded-lg border-2 ${
+        className={`relative mx-auto max-w-xl p-6 rounded-lg border-2 ${
           darkMode ? 'text-gray-200 bg-gray-800 border-gray-200' : 'text-gray-800 bg-white border-gray-800'
         }`}
       >
@@ -42,6 +42,7 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
           {/* Tampilkan detail karyawan atau form pengeditan */}
           {isEditing ? (
             <form className="flex flex-col items-start text-gray-800">
+              <p className="mb-4">ID : {person.ID} (Can't be changed)</p>
               {/* Tampilkan form pengeditan di sini */}
               <input
                 type="text"
@@ -50,19 +51,55 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
                 className="mb-4 p-2 border rounded"
               />
               <input
-                type="text"
+                type="email"
                 value={editedPerson.email}
                 onChange={(e) => setEditedPerson({ ...editedPerson, email: e.target.value })}
                 className="mb-4 p-2 border rounded"
               />
-              {/* Tambahkan input untuk detail lainnya sesuai kebutuhan */}
+              <input
+                type="text"
+                value={editedPerson.phoneNumber}
+                onChange={(e) => setEditedPerson({ ...editedPerson, phoneNumber: e.target.value })}
+                className="mb-4 p-2 border rounded"
+              />
+              <input
+                type="text"
+                value={editedPerson.gender}
+                onChange={(e) => setEditedPerson({ ...editedPerson, gender: e.target.value })}
+                className="mb-4 p-2 border rounded"
+              />
+              <input
+                type="text"
+                value={editedPerson.department}
+                onChange={(e) => setEditedPerson({ ...editedPerson, department: e.target.value })}
+                className="mb-4 p-2 border rounded"
+              />
+              <input
+                type="text"
+                value={editedPerson.role}
+                onChange={(e) => setEditedPerson({ ...editedPerson, role: e.target.value })}
+                className="mb-4 p-2 border rounded"
+              />
+              <input
+                type="text"
+                value={editedPerson.status}
+                onChange={(e) => setEditedPerson({ ...editedPerson, status: e.target.value })}
+                className="mb-4 p-2 border rounded"
+              />
             </form>
           ) : (
             <div className="flex flex-col items-center">
               <img className="flex w-40 h-40 rounded-full object-cover mb-8" src={person.image} alt={person.name} />
               <div className="flex flex-col items-start">
-                <h2 className="text-2xl font-bold">{person.name}</h2>
+                <h2 className="text-2xl font-bold">
+                  {person.name} | {person.ID}
+                </h2>
                 <p>Email: {person.email}</p>
+                <p>Phone Number: {person.phoneNumber}</p>
+                <p>Gender: {person.gender}</p>
+                <p>Department: {person.department}</p>
+                <p>Role: {person.role}</p>
+                <p>Retirement Status: {person.status}</p>
               </div>
               {/* Tampilkan detail lainnya sesuai kebutuhan */}
             </div>
@@ -73,13 +110,21 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
             <div className="flex gap-4">
               <button
                 onClick={handleSaveClick}
-                className={`p-2 rounded ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                className={`p-2 rounded border ${
+                  darkMode
+                    ? 'bg-gray-700 hover:bg-gray-900 text-white border-white'
+                    : 'bg-gray-200 hover:bg-gray-100 text-gray-800 border-gray-800'
+                }`}
               >
                 Save
               </button>
               <button
                 onClick={() => setIsEditing(false)}
-                className={`p-2 rounded ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                className={`p-2 rounded border ${
+                  darkMode
+                    ? 'bg-gray-700 hover:bg-gray-900 text-white border-white'
+                    : 'bg-gray-200 hover:bg-gray-100 text-gray-800 border-gray-800'
+                }`}
               >
                 Cancel
               </button>
@@ -88,7 +133,9 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
             <button
               onClick={handleEditClick}
               className={`mt-4 px-4 py-2 rounded border-2 ${
-                darkMode ? 'bg-gray-700 hover:bg-gray-900 text-white border-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-800'
+                darkMode
+                  ? 'bg-gray-700 hover:bg-gray-900 text-white border-gray-200'
+                  : 'bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-800'
               }`}
             >
               Edit

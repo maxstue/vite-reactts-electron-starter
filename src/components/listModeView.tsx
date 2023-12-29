@@ -5,50 +5,68 @@ import EmployeeDetailModal from '../modal/EmployeeDetailModal';
 const people = [
   {
     name: 'Jane Cooper',
-    title: 'Regional Paradigm Technician',
+    ID: 123,
+    email: 'jane.cooper@example.com',
+    phoneNumber: '+1 123-456-7890',
+    gender: 'Female',
     department: 'Optimization',
     role: 'Admin',
-    email: 'jane.cooper@example.com',
+    status: true,
     image: 'https://bit.ly/33HnjK0'
   },
   {
     name: 'John Doe',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: 'Tester',
+    ID: 456,
     email: 'john.doe@example.com',
+    phoneNumber: '+1 234-567-8901',
+    gender: 'Male',
+    department: 'Development',
+    role: 'Tester',
+    status: false,
     image: 'https://bit.ly/3I9nL2D'
   },
   {
     name: 'Veronica Lodge',
-    title: 'Regional Paradigm Technician',
+    ID: 789,
+    email: 'veronica.lodge@example.com',
+    phoneNumber: '+1 345-678-9012',
+    gender: 'Female',
     department: 'Optimization',
     role: 'Software Engineer',
-    email: 'veronica.lodge@example.com',
+    status: true,
     image: 'https://bit.ly/3vaOTe1'
   },
   {
     name: 'Lame Cooper',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
+    ID: 101,
+    email: 'lame.cooper@example.com',
+    phoneNumber: '+1 456-789-0123',
+    gender: 'Male',
+    department: 'Marketing',
     role: 'Admin',
-    email: 'jane.cooper@example.com',
+    status: false,
     image: 'https://bit.ly/33HnjK0'
   },
   {
     name: 'Aphollo Doe',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
+    ID: 202,
+    email: 'aphollo.doe@example.com',
+    phoneNumber: '+1 567-890-1234',
+    gender: 'Male',
+    department: 'Development',
     role: 'Tester',
-    email: 'john.doe@example.com',
+    status: true,
     image: 'https://bit.ly/3I9nL2D'
   },
   {
     name: 'Zero Lodge',
-    title: 'Regional Paradigm Technician',
+    ID: 303,
+    email: 'zero.lodge@example.com',
+    phoneNumber: '+1 678-901-2345',
+    gender: 'Female',
     department: 'Optimization',
     role: 'Software Engineer',
-    email: 'veronica.lodge@example.com',
+    status: false,
     image: 'https://bit.ly/3vaOTe1'
   }
   // More people...
@@ -56,7 +74,7 @@ const people = [
 
 const ListModeView: React.FC = () => {
   const { darkMode } = useContext(DarkModeContext);
-  
+
   const initialSelectedMode = localStorage.getItem('selectedMode') || 'list';
   const [selectedMode, setSelectedMode] = useState<string>(initialSelectedMode);
 
@@ -239,9 +257,9 @@ const ListModeView: React.FC = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <TableHeader column="name" />
-                        <TableHeader column="title" />
-                        <TableHeader column="status" />
                         <TableHeader column="role" />
+                        <TableHeader column="phoneNumber" />
+                        <TableHeader column="status" />
                         <th scope="col" className="relative px-6 py-3">
                           <span className="sr-only">Edit</span>
                         </th>
@@ -258,32 +276,34 @@ const ListModeView: React.FC = () => {
                               <div className="ml-4">
                                 <div className="text-base font-medium">{person.name}</div>
                                 <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {person.email}
+                                  {person.ID} - {person.gender}
                                 </div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-base">{person.title}</div>
+                            <div className="text-base">{person.role}</div>
                             <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               {person.department}
                             </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className="px-2 inline-flex text-xs leading-5
-                      font-semibold rounded-full bg-green-100 text-green-800"
-                            >
-                              Active
-                            </span>
                           </td>
                           <td
                             className={`px-6 py-4 whitespace-nowrap text-sm ${
                               darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`}
                           >
-                            {person.role}
+                            {person.phoneNumber}
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                person.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {person.status ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
                               onClick={() => openModal(person)}
