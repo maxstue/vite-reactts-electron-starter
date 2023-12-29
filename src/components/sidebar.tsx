@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
               flexDirection: 'row',
               alignItems: 'center',
               gap: '5px',
-              padding: '4px 6px 4px 6px',
+              padding: '4px 10px 4px 10px',
               borderRadius: '4px'
             }}
           >
@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
               flexDirection: 'row',
               alignItems: 'center',
               gap: '5px',
-              padding: '4px 6px 4px 6px',
+              padding: '4px 10px 4px 10px',
               borderRadius: '4px'
             }}
           >
@@ -90,7 +90,7 @@ const Sidebar: React.FC = () => {
               flexDirection: 'row',
               alignItems: 'center',
               gap: '5px',
-              padding: '4px 6px 4px 6px',
+              padding: '4px 10px 4px 10px',
               borderRadius: '4px'
             }}
           >
@@ -124,7 +124,7 @@ const Sidebar: React.FC = () => {
               flexDirection: 'row',
               alignItems: 'center',
               gap: '5px',
-              padding: '4px 6px 4px 6px',
+              padding: '4px 10px 4px 10px',
               borderRadius: '4px'
             }}
           >

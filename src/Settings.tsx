@@ -37,15 +37,15 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
     // setProfileImage('');
   };
 
-  const handleErrorFlashMessage = () => {
-    const message = <FlashMessage type="error" message="Salah tuh, bang." />;
-    setFlashMessage(message);
+  // const handleErrorFlashMessage = () => {
+  //   const message = <FlashMessage type="error" color="#EE393A" message="Salah tuh, bang. Yang benar tuh begini." />;
+  //   setFlashMessage(message);
 
-    // Setelah 3 detik, hilangkan Flash Message
-    setTimeout(() => {
-      setFlashMessage(null);
-    }, 3000);
-  };
+  //   // Setelah 3 detik, hilangkan Flash Message
+  //   setTimeout(() => {
+  //     setFlashMessage(null);
+  //   }, 3000);
+  // };
 
   return (
     <div
@@ -74,7 +74,7 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
               <InputText placeholder="Display Name" type="text" className="mb-4" onUsernameChange={setUsername} />
             </div>
             {/* Email */}
-            <div className="mb-4">
+            <div className="mb-24">
               <label htmlFor="email" className="block text-lg font-medium pl-1 mb-1">
                 Email
               </label>
@@ -139,13 +139,13 @@ const Settings: React.FC<{ initialUsernameProp?: string; onUpdateUsername: (newU
             >
               Logout
             </button>
-            <button
+            {/* <button
               type="button"
               className="bg-red-500 hover:bg-red-700 py-2 px-4 rounded-md inline-flex items-center gap-2 text-white"
               onClick={handleErrorFlashMessage}
             >
               False Test
-            </button>
+            </button> */}
           </section>
           {/* Menampilkan Flash Message jika ada */}
           {flashMessage && <div className="z-10 absolute bottom-4 right-4">{flashMessage}</div>}
