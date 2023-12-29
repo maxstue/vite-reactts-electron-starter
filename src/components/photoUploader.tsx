@@ -133,13 +133,13 @@ const ProfileImageUploader: React.FC<{
       )}
       {flashMessageErrorInput && (
         <div className="z-10 absolute bottom-4 right-4">
-          <FlashMessage type="warning" color={'#FFC107'} message={flashMessageErrorInput} />
+          <FlashMessage type="warning" message={flashMessageErrorInput} />
         </div>
       )}
       {/* Menampilkan pesan flash success setelah penghapusan gambar berhasil */}
       {showFlashMessageSuccess && (
         <div className="z-10 absolute bottom-4 right-4">
-          <FlashMessage type="success" color={'#00AB66'} message={showFlashMessageSuccess} />
+          <FlashMessage type="success" message={showFlashMessageSuccess} />
         </div>
       )}
     </div>
