@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:3001';
 const IMGUR_API_ENDPOINT = 'https://api.imgur.com/3/image'; // Update Imgur API endpoint
-const IMGUR_CLIENT_ID = '8aa3d7967da2b18';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 
 export const getAllEmployees = async () => {
   const response = await axios.get(`${BASE_URL}/employees`);
