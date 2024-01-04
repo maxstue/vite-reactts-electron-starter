@@ -1,79 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 import EmployeeDetailModal from '../modal/EmployeeDetailModal';
-
-const people = [
-  {
-    name: 'Jane Cooper',
-    ID: 123,
-    email: 'jane.cooper@example.com',
-    phoneNumber: '+1 123-456-7890',
-    gender: 'Female',
-    department: 'Optimization',
-    role: 'Admin',
-    status: true,
-    image: 'https://bit.ly/33HnjK0'
-  },
-  {
-    name: 'John Doe',
-    ID: 456,
-    email: 'john.doe@example.com',
-    phoneNumber: '+1 234-567-8901',
-    gender: 'Male',
-    department: 'Development',
-    role: 'Tester',
-    status: false,
-    image: 'https://bit.ly/3I9nL2D'
-  },
-  {
-    name: 'Veronica Lodge',
-    ID: 789,
-    email: 'veronica.lodge@example.com',
-    phoneNumber: '+1 345-678-9012',
-    gender: 'Female',
-    department: 'Optimization',
-    role: 'Software Engineer',
-    status: true,
-    image: 'https://bit.ly/3vaOTe1'
-  },
-  {
-    name: 'Lame Cooper',
-    ID: 101,
-    email: 'lame.cooper@example.com',
-    phoneNumber: '+1 456-789-0123',
-    gender: 'Male',
-    department: 'Marketing',
-    role: 'Admin',
-    status: false,
-    image: 'https://bit.ly/33HnjK0'
-  },
-  {
-    name: 'Aphollo Doe',
-    ID: 202,
-    email: 'aphollo.doe@example.com',
-    phoneNumber: '+1 567-890-1234',
-    gender: 'Male',
-    department: 'Development',
-    role: 'Tester',
-    status: true,
-    image: 'https://bit.ly/3I9nL2D'
-  },
-  {
-    name: 'Zero Lodge',
-    ID: 303,
-    email: 'zero.lodge@example.com',
-    phoneNumber: '+1 678-901-2345',
-    gender: 'Female',
-    department: 'Optimization',
-    role: 'Software Engineer',
-    status: false,
-    image: 'https://bit.ly/3vaOTe1'
-  }
-  // More people...
-];
+import { getAllEmployees, addEmployee, updateEmployee, deleteEmployee } from '../db/employeeService';
 
 const ListModeView: React.FC = () => {
   const { darkMode } = useContext(DarkModeContext);
+  const [employees, setEmployees] = useState<any[]>([]);
 
   const initialSelectedMode = localStorage.getItem('selectedMode') || 'list';
   const [selectedMode, setSelectedMode] = useState<string>(initialSelectedMode);
@@ -84,6 +16,19 @@ const ListModeView: React.FC = () => {
 
   const [selectedPerson, setSelectedPerson] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllEmployees();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const openModal = (person: any) => {
     setSelectedPerson(person);
@@ -115,12 +60,11 @@ const ListModeView: React.FC = () => {
     setGridSortOrder((prevSortOrder) => (prevSortOrder === 'asc' ? 'desc' : 'asc'));
   };
 
-  const sortListPeople = () => {
-    return [...people].slice().sort((a, b) => {
+  const sortedEmployees = useMemo(() => {
+    return [...employees].slice().sort((a, b) => {
       const aValue = a[sortColumn as keyof typeof a];
       const bValue = b[sortColumn as keyof typeof b];
 
-      // Menggunakan toLowerCase agar perbandingan case-insensitive
       const aString = String(aValue).toLowerCase();
       const bString = String(bValue).toLowerCase();
 
@@ -128,10 +72,10 @@ const ListModeView: React.FC = () => {
       if (aString > bString) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-  };
+  }, [employees, sortColumn, sortOrder]);
 
-  const sortGridPeople = () => {
-    return [...people].slice().sort((a, b) => {
+  const sortedGridEmployees = useMemo(() => {
+    return [...employees].slice().sort((a, b) => {
       const aValue = a['name'].toLowerCase();
       const bValue = b['name'].toLowerCase();
 
@@ -141,6 +85,36 @@ const ListModeView: React.FC = () => {
         return bValue.localeCompare(aValue);
       }
     });
+  }, [employees, gridSortOrder]);
+
+  const handleAddEmployee = async (employeeData: any) => {
+    try {
+      await addEmployee(employeeData);
+      const updatedData = await getAllEmployees();
+      setEmployees(updatedData);
+    } catch (error) {
+      console.error('Error adding employee:', error);
+    }
+  };
+
+  const handleUpdateEmployee = async (id: number, employeeData: any) => {
+    try {
+      await updateEmployee(id, employeeData);
+      const updatedData = await getAllEmployees();
+      setEmployees(updatedData);
+    } catch (error) {
+      console.error('Error updating employee:', error);
+    }
+  };
+
+  const handleDeleteEmployee = async (id: number) => {
+    try {
+      await deleteEmployee(id);
+      const updatedData = await getAllEmployees();
+      setEmployees(updatedData);
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+    }
   };
 
   const TableHeader: React.FC<{ column: string }> = ({ column }) => (
@@ -258,7 +232,7 @@ const ListModeView: React.FC = () => {
                       <tr>
                         <TableHeader column="name" />
                         <TableHeader column="role" />
-                        <TableHeader column="phoneNumber" />
+                        <TableHeader column="phone number" /> {/* Mengganti "phoneNumber" dengan "phone number" */}
                         <TableHeader column="status" />
                         <th scope="col" className="relative px-6 py-3">
                           <span className="sr-only">Edit</span>
@@ -266,7 +240,7 @@ const ListModeView: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {sortListPeople().map((person, index) => (
+                      {sortedEmployees.map((person, index) => (
                         <tr key={index}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -276,7 +250,7 @@ const ListModeView: React.FC = () => {
                               <div className="ml-4">
                                 <div className="text-base font-medium">{person.name}</div>
                                 <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {person.ID} - {person.gender}
+                                  {person.id} - {person.gender === 1 ? 'Male' : 'Female'}
                                 </div>
                               </div>
                             </div>
@@ -292,18 +266,17 @@ const ListModeView: React.FC = () => {
                               darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`}
                           >
-                            {person.phoneNumber}
+                            {person['phone number']} {/* Mengganti "phoneNumber" dengan "phone number" */}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                person.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                person.retirementStatus ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                               }`}
                             >
-                              {person.status ? 'Active' : 'Inactive'}
+                              {person.retirementStatus ? 'Active' : 'Inactive'}
                             </span>
                           </td>
-
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
                               onClick={() => openModal(person)}
@@ -350,7 +323,7 @@ const ListModeView: React.FC = () => {
             </button>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            {sortGridPeople().map((person, index) => (
+            {sortedGridEmployees.map((person, index) => (
               <CardView key={index} person={person} onCardClick={() => openModal(person)} />
             ))}
           </div>

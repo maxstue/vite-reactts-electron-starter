@@ -2,13 +2,13 @@ import React, { useContext, useState } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 import FlashMessage from './flashMessage';
 
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
 const MAX_IMAGE_SIZE = 1024 * 1024 * 2;
 
-const ProfileImageUploader: React.FC<{
-  onSave: (image: string) => void;
-  className: string;
-}> = ({ onSave, className }) => {
+const ProfileImageUploader: React.FC<{ onSave: (image: string) => void; className: string }> = ({
+  onSave,
+  className
+}) => {
   const { darkMode } = useContext(DarkModeContext);
   const [image, setImage] = useState<string>('');
   const [preview, setPreview] = useState<string>('');
@@ -24,15 +24,15 @@ const ProfileImageUploader: React.FC<{
         const reader = new FileReader();
 
         reader.onloadend = () => {
-          setImage(reader.result as string);
           setPreview(reader.result as string);
+          onSave(reader.result as string);
         };
 
         reader.readAsDataURL(file);
       } else {
         // Tipe atau ukuran file tidak sesuai
         e.target.value = '';
-        setFlashMessageErrorInput('Please choose a valid image file (JPEG, PNG, or GIF) with size up to 2MB.');
+        setFlashMessageErrorInput('Please choose a valid image file (JPEG or PNG) with size up to 2MB.');
 
         // Setel ulang flashMessage setelah beberapa waktu
         setTimeout(() => {
@@ -51,6 +51,7 @@ const ProfileImageUploader: React.FC<{
       setImage('');
       setPreview('');
       setFlashMessageErrorInput('');
+      onSave('');
       setShowFlashMessageSuccess('Penghapusan berhasil');
 
       // Setel ulang flashMessage success setelah beberapa waktu

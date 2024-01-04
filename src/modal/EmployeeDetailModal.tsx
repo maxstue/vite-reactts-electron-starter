@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 
 interface EmployeeDetailModalProps {
@@ -24,7 +24,7 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
 
   return (
     <div
-      className={`fixed inset-0 overflow-y-auto flex items-center justify-center z-50`}
+      className={`fixed inset-0 overflow-y-auto flex items-center justify-center z-50 backdrop-blur-xl duration-300`}
       style={{ backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)' }}
     >
       <div
@@ -42,7 +42,9 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
           {/* Tampilkan detail karyawan atau form pengeditan */}
           {isEditing ? (
             <form className="flex flex-col items-start text-gray-800">
-              <p className="mb-4">ID : {person.ID} (Can't be changed)</p>
+              <p className={`mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                ID : {person.id} (Can't be changed)
+              </p>
               {/* Tampilkan form pengeditan di sini */}
               <input
                 type="text"
@@ -58,7 +60,7 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
               />
               <input
                 type="text"
-                value={editedPerson.phoneNumber}
+                value={editedPerson['phone number']}
                 onChange={(e) => setEditedPerson({ ...editedPerson, phoneNumber: e.target.value })}
                 className="mb-4 p-2 border rounded"
               />
@@ -82,8 +84,8 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
               />
               <input
                 type="text"
-                value={editedPerson.status}
-                onChange={(e) => setEditedPerson({ ...editedPerson, status: e.target.value })}
+                value={editedPerson.retirementStatus}
+                onChange={(e) => setEditedPerson({ ...editedPerson, retirementStatus: e.target.value })}
                 className="mb-4 p-2 border rounded"
               />
             </form>
@@ -92,14 +94,14 @@ const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({ person, onClo
               <img className="flex w-40 h-40 rounded-full object-cover mb-8" src={person.image} alt={person.name} />
               <div className="flex flex-col items-start">
                 <h2 className="text-2xl font-bold">
-                  {person.name} | {person.ID}
+                  {person.name} | {person.id}
                 </h2>
                 <p>Email: {person.email}</p>
-                <p>Phone Number: {person.phoneNumber}</p>
-                <p>Gender: {person.gender}</p>
+                <p>Phone Number: {person['phone number']}</p>
+                <p>Gender: {person.gender === 1 ? 'Male' : 'Female'}</p>
                 <p>Department: {person.department}</p>
                 <p>Role: {person.role}</p>
-                <p>Retirement Status: {person.status}</p>
+                <p>Retirement Status: {person.retirementStatus === 1 ? 'Active' : 'Inactive'}</p>
               </div>
               {/* Tampilkan detail lainnya sesuai kebutuhan */}
             </div>

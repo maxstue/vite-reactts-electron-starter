@@ -7,10 +7,10 @@ interface InputTextProps {
   className?: string;
   placeholder?: string;
   type?: string;
-  onUsernameChange?: (username: string) => void; // Tambahkan prop untuk callback perubahan username
+  onInputChange?: (value: string) => void; // Tambahkan prop untuk callback perubahan nilai input
 }
 
-const InputText: React.FC<InputTextProps> = ({ className, placeholder, type, onUsernameChange }) => {
+const InputText: React.FC<InputTextProps> = ({ className, placeholder, type, onInputChange }) => {
   const { darkMode } = useContext(DarkModeContext);
   const [phoneNumberPrefix, setPhoneNumberPrefix] = useState('+62'); // Default prefix
   const [phoneLength, setPhoneLength] = useState<number | undefined>(12); // Default phone length, adjust based on your needs
@@ -28,8 +28,8 @@ const InputText: React.FC<InputTextProps> = ({ className, placeholder, type, onU
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onUsernameChange) {
-      onUsernameChange(e.target.value); // Panggil callback ketika nilai username berubah
+    if (onInputChange) {
+      onInputChange(e.target.value); // Panggil callback ketika nilai input berubah
     }
   };
 

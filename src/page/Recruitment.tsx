@@ -1,4 +1,5 @@
 import { DarkModeContext } from '../context/DarkModeContext';
+import { addEmployee } from '../db/employeeService';
 
 import React, { useState, useContext } from 'react';
 import Header from '../components/header';
@@ -12,6 +13,21 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
   const [profileImage, setProfileImage] = useState<string>(''); // State untuk menyimpan URL gambar profil
   const [, setSelectedGender] = useState<string>('Male');
   const [, setSelectedRetirement] = useState<string>('Yes, already');
+
+  const [employeeData, setEmployeeData] = useState({
+    // ... (data karyawan yang lain)
+    name: '',
+    email: '',
+    phoneNumber: ''
+    // ... (data karyawan lainnya)
+  });
+
+  const handleInputChange = (inputType: string, value: string) => {
+    setEmployeeData((prevData) => ({
+      ...prevData,
+      [inputType]: value
+    }));
+  };
 
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
@@ -30,12 +46,26 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
     setProfileImage(image);
   };
 
-  const handleSave = () => {
-    // Lakukan operasi penyimpanan sesuai kebutuhan aplikasi
-    console.log('Saved profile image:', profileImage);
+  const handleSave = async () => {
+    try {
+      // Lakukan operasi penyimpanan sesuai kebutuhan aplikasi
+      console.log('Saved profile image:', profileImage);
+
+      // Upload data karyawan ke MySQL
+      const employeeData = {
+        // ... data karyawan yang lain,
+        image: profileImage
+      };
+
+      const savedEmployee = await addEmployee(employeeData);
+
+      console.log('Employee saved:', savedEmployee);
+    } catch (error) {
+      console.error('Error saving employee:', error);
+    }
 
     // Reset state setelah disimpan (jika perlu)
-    // setProfileImage('');
+    setProfileImage('');
   };
 
   return (
@@ -63,21 +93,31 @@ const Recruitment: React.FC<{ initialUsername?: string }> = ({ initialUsername }
             <section id="left" className="flex flex-col">
               <h3 className="font-bold text-xl mb-2">General Information</h3>
               <label className="block text-lg font-medium pl-1 mb-1">Image Profile</label>
-              <ProfileImageUploader
-                onSave={(image) => {
-                  console.log('Berhasil');
-                }}
-                className="flex justify-center mb-4"
-              />
+              <ProfileImageUploader onSave={handleSaveProfileImage} className="flex justify-center mb-4" />
               <div id="separator-y" className="flex-grow border-t border-gray-400" />
               <label className="block text-lg font-medium pl-1 mb-1">Name</label>
-              <InputText placeholder="Name" type="text" className="mb-4" />
+              <InputText
+                placeholder="Name"
+                type="text"
+                className="mb-4"
+                onInputChange={(value) => handleInputChange('name', value)}
+              />
               <div id="separator-y" className="flex-grow border-t border-gray-400" />
               <label className="block text-lg font-medium pl-1 mb-1">Email</label>
-              <InputText placeholder="Email" type="text" className="mb-4" />
+              <InputText
+                placeholder="Email"
+                type="text"
+                className="mb-4"
+                onInputChange={(value) => handleInputChange('email', value)}
+              />
               <div id="separator-y" className="flex-grow border-t border-gray-400" />
               <label className="block text-lg font-medium pl-1 mb-1">Phone Number</label>
-              <InputText placeholder="Phone Number" type="text" className="mb-4" />
+              <InputText
+                placeholder="Phone Number"
+                type="text"
+                className="mb-4"
+                onInputChange={(value) => handleInputChange('phoneNumber', value)}
+              />
               <div id="separator-y" className="flex-grow border-t border-gray-400" />
               <label className="block text-lg font-medium pl-1 mb-1">Gender</label>
               <SliderChoice options={['Male', 'Female']} initialValue="Male" onChange={handleGenderChange} />
