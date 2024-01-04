@@ -88,7 +88,8 @@
     "asar": true,
     "files": [
       "main",
-      "src/out"
+      "src/out",
+      "src/db"
     ],
     "directories": {
       "buildResources": "resources"
