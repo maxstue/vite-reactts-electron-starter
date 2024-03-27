@@ -2,8 +2,20 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
-import isDev from 'electron-is-dev';
+import electron, { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
+
+function checkDev() {
+  if (typeof electron === 'string') {
+    throw new TypeError('Not running in an Electron environment!');
+  }
+
+  const { env } = process;
+  const isEnvSet = 'ELECTRON_IS_DEV' in env;
+  const getFromEnv = Number.parseInt(env?.ELECTRON_IS_DEV || '', 10) === 1;
+  return isEnvSet ? getFromEnv : !electron.app.isPackaged;
+}
+
+const isDev = checkDev();
 
 const height = 600;
 const width = 800;
