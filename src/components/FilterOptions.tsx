@@ -77,7 +77,7 @@ const FilterOptions: FC<FilterOptionsProps> = ({
         <h4 className="text-sm md:text-base text-slate-500 my-1">Ratings</h4>
         <label className="flex justify-between my-4 cursor-pointer" htmlFor="checkbox1">
           <div className="flex">
-            <img src="/images/star.png" className="w-5 h-5" alt="star" />
+            <img src="../public/images/star.png" className="w-5 h-5" alt="star" />
             <h3 className="ml-2">5 Stars</h3>
           </div>
           <input
@@ -92,7 +92,7 @@ const FilterOptions: FC<FilterOptionsProps> = ({
         </label>
         <label className="flex justify-between my-4 cursor-pointer" htmlFor="checkbox2">
           <div className="flex">
-            <img src="/images/star.png" className="w-5 h-5" alt="star" />
+            <img src="../public/images/star.png" className="w-5 h-5" alt="star" />
             <h3 className="ml-2">4+ Stars</h3>
           </div>
           <input
@@ -107,7 +107,7 @@ const FilterOptions: FC<FilterOptionsProps> = ({
         </label>
         <label className="flex justify-between my-4 cursor-pointer" htmlFor="checkbox3">
           <div className="flex">
-            <img src="/images/star.png" className="w-5 h-5" alt="star" />
+            <img src="../public/images/star.png" className="w-5 h-5" alt="star" />
             <h3 className="ml-2">3+ Stars</h3>
           </div>
           <input
@@ -122,7 +122,7 @@ const FilterOptions: FC<FilterOptionsProps> = ({
         </label>
         <label className="flex justify-between my-4 cursor-pointer" htmlFor="checkbox4">
           <div className="flex">
-            <img src="/images/star.png" className="w-5 h-5" alt="star" />
+            <img src="../public/images/star.png" className="w-5 h-5" alt="star" />
             <h3 className="ml-2">2+ Stars</h3>
           </div>
           <input
@@ -137,7 +137,7 @@ const FilterOptions: FC<FilterOptionsProps> = ({
         </label>
         <label className="flex justify-between my-4 cursor-pointer" htmlFor="checkbox5">
           <div className="flex">
-            <img src="/images/star.png" className="w-5 h-5" alt="star" />
+            <img src="../public/images/star.png" className="w-5 h-5" alt="star" />
             <h3 className="ml-2">1+ Stars</h3>
           </div>
           <input

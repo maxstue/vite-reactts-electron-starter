@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import image1 from '/images/Text.png';
-import image2 from '/images/profile_1.png';
+import image1 from '../public/images/Text.png';
+import image2 from '../public/images/profile_1.png';
 import TransactionSpeedSlider from './TransactionSpeedSlider';
 
 interface TokenApprovalProps {

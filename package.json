@@ -1,7 +1,7 @@
 {
   "name": "Dapphub",
   "icon": "src/Dapphub.ico",
-  "version": "0.5.2",
+  "version": "0.1.0",
   "license": "UNLICENSED",
   "main": "main/index.js",
   "author": {

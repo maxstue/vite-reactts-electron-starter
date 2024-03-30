@@ -83,7 +83,7 @@ const DapphubAccount: FC<DapphubAccountProps> = ({
   return (
     <div className="pt-12 pb-6 xl:pb-8 xl:pt-24 mx-auto w-full md:max-w-sm xl:max-w-full xl:w-1/3 px-5 xl:px-10">
       <div className="flex gap-3 text-lg font-semibold relative">
-        <img src="/images/logo-img.png" alt="logo-img" />
+        <img src="../public/images/logo-img.png" alt="logo-img" />
         <h2 className="cursor-pointer">Dapphub</h2>
         {/* <ul className="absolute top-full bg-white rounded-sm left-10">
           {nameList.map(name => (

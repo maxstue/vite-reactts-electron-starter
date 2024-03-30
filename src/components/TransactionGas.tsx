@@ -1,8 +1,8 @@
 /* eslint-disable react/function-component-definition */
 import React, { useState, FC, ChangeEvent, useEffect } from 'react';
-import profile from '/images/avatar.png';
-import arrow from '/images/downarrow.png';
-import cross from '/images/cross2.png';
+import profile from '../public/images/avatar.png';
+import arrow from '../public/images/downarrow.png';
+import cross from '../public/images/cross2.png';
 import TransactionSpeedSlider from './TransactionSpeedSlider';
 import axios from 'axios';
 
@@ -120,7 +120,7 @@ const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon })
             {/* Payment source details */}
             <div className="border-[1.5px] border-solid rounded-10 border-secondary-color border-opacity-20 px-2 py-4 md:p-4 relative bottom-1.5 flex justify-between shadow-md">
               <div className="flex items-center gap-1 md:gap-3">
-                <img src="/images/avatar.png" className="w-10 h-10 rounded-full" />
+                <img src="../public/images/avatar.png" className="w-10 h-10 rounded-full" />
                 <div>
                   <h4 className="text-sm lg:text-base font-medium">Main Wallet</h4>
                   <p className="text-secondary text-xs">Network: {network}</p>

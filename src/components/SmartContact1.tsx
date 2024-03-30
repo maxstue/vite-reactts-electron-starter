@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import image1 from '../../public/images/Text.png';
-import image2 from '../../public/images/profile_1.png';
+import image1 from '../public/images/Text.png';
+import image2 from '../public/images/profile_1.png';
 import ReactSlider from 'react-slider';
 
 const SmartContact1: React.FC = () => {

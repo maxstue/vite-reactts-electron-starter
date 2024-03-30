@@ -173,7 +173,7 @@ const Profile: FC = () => {
         <>
           <div className="border-[1.5px] outline-dashed outline-yellow-color rounded-14 bg-yellow-color bg-opacity-10 w-[282px] h-[198px] px-6 py-7 mt-12 flex flex-col items-center text-center mx-auto sm:ml-0">
             <button onClick={handleNavigation}>
-              <img src="/images/plus.png" alt="plus" />
+              <img src="../public/images/plus.png" alt="plus" />
             </button>
             <h1 className="text-primary-color text-xl md:text-2xl font-medium capitalize">Welcome</h1>
             <p className="text-primary-color opacity-60 text-base font-medium capitalize">
@@ -347,7 +347,7 @@ const Profile: FC = () => {
               {walletUnlocked !== true ? (
                 <div className="pt-12 pb-6 xl:pb-8 xl:pt-24 mx-auto w-full md:max-w-sm xl:max-w-full xl:w-1/3 px-5 xl:px-10">
                   <div className="flex gap-3 text-lg font-semibold relative">
-                    <img src="/images/logo-img.png" alt="logo-img" />
+                    <img src="../public/images/logo-img.png" alt="logo-img" />
                     <h2 className="cursor-pointer">Dapphub</h2>
                     {/* <ul className="absolute top-full bg-white rounded-sm left-10">
                     {nameList.map(name => (

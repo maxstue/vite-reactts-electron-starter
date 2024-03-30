@@ -91,7 +91,7 @@ const Header: FC = () => {
       {authUser !== null ? (
         <header className="container max-w-1440 mx-auto py-5 px-4 lg:pl-12 lg:pr-7 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/images/logo-img.png" alt="dapphub" />
+            <img src="../public/images/logo-img.png" alt="dapphub" />
             <span className="font-medium text-base lg:text-lg">Dapphub</span>
           </Link>
           <div className="flex justify-between items-center">
@@ -167,7 +167,7 @@ const Header: FC = () => {
               <path opacity="0.1" d="M1 0L0.999999 22" stroke="#1A1C1E" />
             </svg>
             <div className="flex items-center relative cursor-pointer" onClick={() => setShow((prev) => !prev)}>
-              <img src="/images/avatar.png" className="w-7 h-7 rounded-full" alt="profile" />
+              <img src="../public/images/avatar.png" className="w-7 h-7 rounded-full" alt="profile" />
               <p className="text-[#1A1C1E] text-base leading-none font-medium ml-2 mr-3">{authUser.email}</p>
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path

@@ -41,7 +41,7 @@ const LoginSlider: FC = () => {
         {sliderList.map((slider, index) => {
           return (
             <SwiperSlide key={index}>
-              <div className="max-w-full lg:max-w-2xl xl:max-w-full w-full min-h-[40vh] md:min-h-[60vh] lg:min-h-screen bg-[url(/images/b-g.png)] bg-no-repeat bg-cover flex justify-center items-end">
+              <div className="max-w-full lg:max-w-2xl xl:max-w-full w-full min-h-[40vh] md:min-h-[60vh] lg:min-h-screen bg-[url(../public/images/b-g.png)] bg-no-repeat bg-cover flex justify-center items-end">
                 <div className="pb-16 text-white text-center px-4">
                   <h2 className="text-2xl md:text-3xl">{slider.title}</h2>
                   <p className="text-base md:text-lg">{slider.description}</p>

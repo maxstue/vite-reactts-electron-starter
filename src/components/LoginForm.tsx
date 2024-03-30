@@ -201,7 +201,7 @@ const LoginForm: FC<LoginFormProps> = ({
   return (
     <div className="pt-12 pb-6 xl:pb-8 xl:pt-24 mx-auto w-full md:max-w-sm xl:max-w-full xl:w-1/3 px-5 xl:px-10">
       <div className="flex gap-3 text-lg font-semibold relative">
-        <img src="/images/logo-img.png" alt="logo-img" />
+        <img src="../public/images/logo-img.png" alt="logo-img" />
         <h2 className="cursor-pointer">Dapphub</h2>
         {/* <ul className="absolute top-full bg-white rounded-sm left-10">
           {nameList.map(name => (
@@ -277,7 +277,7 @@ const LoginForm: FC<LoginFormProps> = ({
           className="text-base font-medium text-primary-button border border-black border-opacity-10 rounded-10 px-10 py-3 flex justify-center gap-2.5 hover:text-opacity-90"
           onClick={googleSignIn}
         >
-          <img src="/images/google-img.png" alt="google-img" /> Continue with Google
+          <img src="../public/images/google-img.png" alt="google-img" /> Continue with Google
         </button>
       </div>
       <p className="text-sm font-medium text-center mt-6">

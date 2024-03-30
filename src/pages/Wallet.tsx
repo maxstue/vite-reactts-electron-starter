@@ -184,7 +184,6 @@ const Wallet: FC = () => {
             </button>
             <button
               onClick={() => {
-                sendToken(1);
                 copyToClipboard();
               }}
               className="border py-2 px-6 rounded-10 hover:bg-black hover:text-white transition-all duration-300 flex-1"

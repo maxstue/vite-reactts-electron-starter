@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import check from '/images/check.png';
+import check from '../public/images/check.png';
 
 interface PaymentCompleteProps {
   setStep: (step: number) => void;
