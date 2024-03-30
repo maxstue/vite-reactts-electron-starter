@@ -47,6 +47,8 @@ const LoginForm: FC<LoginFormProps> = ({
   //   setShow(false);
   // }
   const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [passError, setPassError] = useState('');
 
   const signUp = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -81,7 +83,7 @@ const LoginForm: FC<LoginFormProps> = ({
         console.log(error);
         const errorMessage = error.code.split('auth/')[1];
         if (errorMessage === 'email-already-in-use') {
-          emailError = 'Email already registered';
+          setError('Email already registered');
         } else if (errorMessage === 'invalid-email') {
           emailError = 'Email is not valid';
         } else if (errorMessage === 'weak-password') {
@@ -165,7 +167,6 @@ const LoginForm: FC<LoginFormProps> = ({
           let userWalletName;
 
           walletData.forEach((doc) => {
-
             if (doc.data().wAddress) {
               userAddress = doc.data().wAddress;
               userPKey = doc.data().wPKey;
@@ -184,17 +185,14 @@ const LoginForm: FC<LoginFormProps> = ({
         }
       })
       .catch((error) => {
-        // let errorMessage = e.code.split("auth/")[1];
-        // if (errorMessage === "user-not-found"){
-        //   window.alert("That email is not in our system. Please Sign up");
-        //   navigate("/signup");
-
-        // } else if (errorMessage === "invalid-email"){
-        //   setError("Email is not valid");
-
-        // } else if (errorMessage === "wrong-password"){
-        //   setError("Incorrect Password");
-        // }
+        let errorMessage = error.code.split('auth/')[1];
+        if (errorMessage === 'user-not-found') {
+          setError('That email is not in our system. Please Sign up');
+        } else if (errorMessage === 'invalid-email') {
+          setError('Email is not valid');
+        } else if (errorMessage === 'wrong-password') {
+          setPassError('Incorrect Password');
+        }
 
         console.log(error.code.split('auth/')[1]);
       });
@@ -235,7 +233,7 @@ const LoginForm: FC<LoginFormProps> = ({
             id="email"
             placeholder="Your email"
           />
-          <span className="error text-red-600">{emailError}</span>
+          <span className="error text-red-600">{emailError ? emailError : error}</span>
         </div>
         <div className="relative">
           <label
@@ -254,7 +252,7 @@ const LoginForm: FC<LoginFormProps> = ({
             id="password"
             placeholder="Your password"
           />
-          <span className="error text-red-600">{passwordError}</span>
+          <span className="error text-red-600">{passwordError ? passwordError : passError}</span>
         </div>
         {text === 'Login' ? (
           <button

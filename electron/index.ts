@@ -4,6 +4,7 @@ import { join } from 'path';
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, BrowserView } from 'electron';
 import isDev from 'electron-is-dev';
+import { autoUpdater } from 'electron-updater';
 
 const height = 800;
 const width = 1000;
@@ -24,6 +25,7 @@ function createWindow() {
   });
 
   let isBrowserViewVisible = false; // Initial state
+  autoUpdater.checkForUpdatesAndNotify();
 
   // Initialize BrowserView
   ipcMain.on('load-url', (_, url) => {
@@ -55,6 +57,15 @@ function createWindow() {
   }
   // Open the DevTools.
   // window.webContents.openDevTools();
+
+  autoUpdater.on('update-available', () => {
+    // Notify the user that an update is available and will be downloaded
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    // Notify the user that the update is downloaded and ready to be installed
+    autoUpdater.quitAndInstall();
+  });
 
   // When toggling the view, update this state
   ipcMain.on('toggle-view', () => {

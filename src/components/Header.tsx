@@ -17,7 +17,7 @@ const Header: FC = () => {
   const [show, setShow] = useState<boolean>(false); // State for dropdown visibility
   const [showProfile, setShowProfile] = useState<boolean>(false); // State for profile dropdown visibility
   const [authUser, setAuthUser] = useState(null);
-  let isDappLanched;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const Header: FC = () => {
       if (user) {
         setAuthUser(user);
       } else {
-        navigate("/register");
+        navigate('/register');
         setAuthUser(null);
       }
     });
