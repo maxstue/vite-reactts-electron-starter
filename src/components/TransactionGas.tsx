@@ -5,7 +5,6 @@ import arrow from '/images/downarrow.png';
 import cross from '/images/cross2.png';
 import TransactionSpeedSlider from './TransactionSpeedSlider';
 import axios from 'axios';
-import { ethers } from 'ethers';
 
 interface SendTokenProps {
   setStep: (step: number) => void;
@@ -21,7 +20,7 @@ const gasApis = {
   polygon: `https://api.polygonscan.com/api?module=gastracker&action=gasoracle&apikey=${polygonscanApiKey}`
 };
 
-const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon, PKey }) => {
+const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon }) => {
   const [show, setShow] = useState<boolean>(false); // State for dropdown visibility
   const networkList: string[] = [`Eth`, `Base`, `Matic`]; // List of balance options
   const [amount, setAmount] = useState('');
@@ -35,46 +34,14 @@ const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon, P
   const [gasPrices, setGasPrices] = useState({ slow: 0, standard: 0, fast: 0 });
   const [selectGasPrice, setSelectGasPrice] = useState(0);
   const [currencyPriceInUSD, setCurrencyPriceInUSD] = useState(0);
+
   const fetchCurrencyPrice = async () => {
     try {
       const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
       setCurrencyPriceInUSD(response.data.ethereum.usd);
     } catch (error) {
-      console.error('Failed to fetch currency price:', error);
+      console.error("Failed to fetch currency price:", error);
     }
-  };
-
-  const sendTransaction = async () => {
-    let chainId = '1';
-    if (network === 'Base') {
-      chainId = '8435';
-    } else if (network === 'Matic') {
-      chainId = '137';
-    }
-    const api = axios.create({
-      //  baseURL: 'https://dapphub-backend-apis.fly.dev',
-      // baseURL: 'http://localhost:8080',
-      baseURL: 'https://dapphub-account-provider.fly.dev',
-      withCredentials: true
-    });
-    const obj = {
-      decryptedPrivateKey: PKey,
-      transaction: {
-        to: recipient,
-        value: ethers.parseUnits(amount.toString(), "ether").toString(),
-        gasLimit: '21000',
-        gasPrice: ethers.parseUnits(selectGasPrice.toString(), "gwei").toString()
-      },
-      chainId: '137'
-    };
-
-    await api.post('/sendTransaction', obj).then((response) => {
-      if (response.status === 200) {
-        setStep((prev) => prev + 1);
-      } else {
-        console.log("Something went wrong");
-      }
-    });
   };
 
   const fetchGasPrices = async (network: string) => {
@@ -232,7 +199,7 @@ const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon, P
             {/* transaction cost */}
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-base font-medium leading-none">Transaction Speed</h2>
-              <p className="text-base font-medium leading-none">Fee: ${userGasFee.toFixed(4)}</p>
+              <p className="text-base font-medium leading-none">Fee: ${userGasFee}</p>
             </div>
             <div className="w-full bg-[#D9D9D9] h-1.5 cursor-pointer">
               {/* Transaction Slider */}
@@ -246,7 +213,7 @@ const SendToken: FC<SendTokenProps> = ({ setStep, address, eth, base, polygon, P
             </p>
             <button
               className="w-[115px] h-[40px] bg-yellow-color text-xs md:text-sm font-medium border rounded-10"
-              onClick={() => sendTransaction()}
+              onClick={() => setStep((prev) => prev + 1)}
             >
               Confirm
             </button>

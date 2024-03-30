@@ -2,12 +2,12 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, BrowserView } from 'electron';
 import isDev from 'electron-is-dev';
 
-const height = 600;
-const width = 800;
-
+const height = 800;
+const width = 1000;
+let view: BrowserView | null = null;
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
@@ -23,8 +23,29 @@ function createWindow() {
     }
   });
 
+  let isBrowserViewVisible = false; // Initial state
+
+  // Initialize BrowserView
+  ipcMain.on('load-url', (_, url) => {
+    if (!view) {
+      view = new BrowserView({
+        webPreferences: {
+          preload: join(__dirname, 'preload.js') // Specify preload here for consistency
+        }
+      });
+      window.setBrowserView(view);
+    }
+    view.webContents.loadURL(url);
+    view.setBounds({ x: 0, y: 80, width: window.getBounds().width - 250, height: window.getBounds().height * 0.8 });
+    view.setAutoResize({ width: true, height: true });
+    isBrowserViewVisible = true;
+  });
+
   const port = process.env.PORT || 3000;
   const url = isDev ? `http://localhost:${port}` : join(__dirname, '../src/out/index.html');
+
+  let Address: string;
+  let PrivateKey: string;
 
   // and load the index.html of the app.
   if (isDev) {
@@ -35,6 +56,27 @@ function createWindow() {
   // Open the DevTools.
   // window.webContents.openDevTools();
 
+  // When toggling the view, update this state
+  ipcMain.on('toggle-view', () => {
+    if (view && window.getBrowserView() === view) {
+      window.removeBrowserView(view);
+      isBrowserViewVisible = false;
+    } else if (view) {
+      window.setBrowserView(view);
+      isBrowserViewVisible = true;
+    }
+    // Send an update to all renderer processes about the change
+    window.webContents.send('update-view-visibility', isBrowserViewVisible);
+  });
+
+  ipcMain.handle('query-view-visibility', () => isBrowserViewVisible);
+
+  window.on('resize', () => {
+    // Update BrowserView bounds on window resize
+    if (view !== null) {
+      view.setBounds({ x: 0, y: 80, width: window.getBounds().width - 100, height: window.getBounds().height * 0.8 });
+    }
+  });
   // For AppBar
   ipcMain.on('minimize', () => {
     // eslint-disable-next-line no-unused-expressions
@@ -48,6 +90,43 @@ function createWindow() {
 
   ipcMain.on('close', () => {
     window.close();
+  });
+
+  ipcMain.on('send-user-data', (event, { userAddress, privateKey }) => {
+    // Store userAddress and privateKey securely and make them available to preload script
+    console.log(event.NONE);
+    Address = userAddress;
+    PrivateKey = privateKey;
+  });
+
+  ipcMain.handle('get-user-data', (event) => {
+    // Optional: Decrypt userData here
+    console.log(event.NONE);
+    return { Address, PrivateKey };
+  });
+
+  ipcMain.on('open-url', (event, url) => {
+    if (window) {
+      console.log(url);
+      setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
+    } else {
+      console.log('Dapphub is not open. Event called:', event);
+    }
+    // console.log(event);
+    // const urlWindow = new BrowserWindow({
+    //   width: 800,
+    //   height: 600,
+    //   webPreferences: {
+    //     preload: join(__dirname, 'preload.js'),
+    //     nodeIntegration: false
+    //   }
+    // });
+    // urlWindow.loadURL(url);
+    // if (window) {
+    //   window.webContents.loadURL(url);
+    // } else {
+    //   console.error('The main window is not available.', event);
+    // }
   });
 }
 
@@ -77,5 +156,5 @@ app.on('window-all-closed', () => {
 // listen the channel `message` and resend the received message to the renderer process
 ipcMain.on('message', (event: IpcMainEvent, message: any) => {
   console.log(message);
-  setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
+  setTimeout(() => event.sender.send('message', message), 500);
 });

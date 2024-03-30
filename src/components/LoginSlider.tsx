@@ -13,16 +13,16 @@ interface SliderItem {
 const LoginSlider: FC = () => {
   const sliderList: SliderItem[] = [
     {
-      title: 'Donec mole condimentum',
-      description: 'Proin nec justo tempus, tincidunt mauris eu, accumsan odio. Sed lobortis urna nisl, quis tristique dolor'
+      title: 'Welcome to Dapphub',
+      description: 'Dapphub is an application built towards a more empowered and equitable digital future in OnChain technology.'
     },
     {
-      title: 'Donec mole condimentum 2',
-      description: 'Proin nec justo tempus, tincidunt mauris eu, accumsan odio. Sed lobortis urna nisl, quis tristique dolor'
+      title: 'Designed for Everyone',
+      description: 'Whether you’re a seasoned OnChain explorer or just packing for your first trip, you’ll find it easy to use our app'
     },
     {
-      title: 'Donec mole condimentum 3',
-      description: 'Proin nec justo tempus, tincidunt mauris eu, accumsan odio. Sed lobortis urna nisl, quis tristique dolor'
+      title: 'Security and Privacy',
+      description: 'Browse through different OnChain apps without the threat of you information or privacy being stolen'
     }
   ];
 

@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+/* eslint-disable react/function-component-definition */
+import React, { FC, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import './App.css';

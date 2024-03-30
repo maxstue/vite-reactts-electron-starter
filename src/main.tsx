@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
@@ -15,6 +15,8 @@ import ExploreDapps from './pages/ExploreDapps';
 import BlurProfile from './pages/BlurProfile';
 import Profile from './pages/Profile';
 import Wallet from './pages/Wallet';
+import CreateDA from './pages/createDapphubAccount';
+import UnlockWallet from './components/UnlockWallet';
 
 const router = createBrowserRouter([
   {
@@ -26,7 +28,7 @@ const router = createBrowserRouter([
         path: '/',
         element: (
           <PrivateRoute>
-            <Home />
+            <Profile />
           </PrivateRoute>
         )
       },
@@ -61,6 +63,14 @@ const router = createBrowserRouter([
             <BlurProfile />
           </PrivateRoute>
         )
+      },
+      {
+        path: '/unlockWallet',
+        element: (
+          <PrivateRoute>
+            <UnlockWallet />
+          </PrivateRoute>
+        )
       }
     ]
   },
@@ -71,6 +81,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register />
+  },
+  {
+    path: '/create-DA',
+    element: <CreateDA />
   }
 ]);
 

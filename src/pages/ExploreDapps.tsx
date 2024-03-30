@@ -1,5 +1,9 @@
-import React, { FC, useState, ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+/* eslint-disable react/function-component-definition */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { FC, useState, ChangeEvent, useEffect } from 'react';
+import { db } from '../firebase';
+import { Link, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
+import { getDocs, collection, addDoc, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import FilterOptions from '../components/FilterOptions';
 
 interface Item {
@@ -11,78 +15,40 @@ interface Item {
 }
 
 const ExploreDapps: FC = () => {
-  const items: Item[] = [
-    {
-      id: 1,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp1.png',
-      rating: 4.9
-    },
-    {
-      id: 2,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp2.png',
-      rating: 4.9
-    },
-    {
-      id: 3,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp3.png',
-      rating: 4.9
-    },
-    {
-      id: 4,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp4.png',
-      rating: 4.9
-    },
-    {
-      id: 5,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp5.png',
-      rating: 4.9
-    },
-    {
-      id: 6,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp6.png',
-      rating: 4.9
-    },
-    {
-      id: 7,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp7.png',
-      rating: 4.9
-    },
-    {
-      id: 8,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp8.png',
-      rating: 4.9
-    },
-    {
-      id: 9,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp9.png',
-      rating: 4.9
-    },
-    {
-      id: 10,
-      title: 'Blurr.p',
-      category: 'Category Goes Here',
-      cover: '/images/dapp10.png',
-      rating: 4.9
+  const [dapps, setDapps] = useState([]);
+  const [added, setAdded] = useState([]);
+  const [addedIds, setAddedIds] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const userEmail = searchParams.get('userEmail');
+
+  const navigate = useNavigate();
+  // Get All dApps from the dAppStore and the user's dApps
+  const getDapps = async (): Promise<void> => {
+    const dappsAval = await getDocs(collection(db, `Dapps`));
+    // const userDappsAval = await getDocs(collection(db, `Users/${userEmail}/dapps`));
+    const dapps: any[] = [];
+    const userDapps: string[] = [];
+    const userDappsIds: any[] = [];
+    dappsAval.forEach((doc: any) => {
+      dapps.push(doc.data());
+    });
+    // userDappsAval.forEach((doc: any) => {
+    //   userDapps.push(doc.data().name);
+    //   userDappsIds.push(doc.data());
+    // });
+    setAdded(userDapps);
+    setDapps(dapps);
+    setAddedIds(userDappsIds);
+    const topDapp: any[] = [];
+    for (let i = 0; i < 7; i++) {
+      topDapp.push(dapps[i]);
     }
-  ];
+  };
+
+  useEffect(() => {
+    getDapps();
+  }, [loading]);
 
   const [checkedValues, setCheckedValues] = useState<number[]>([]);
   const [searchInputValue, setSearchInputValue] = useState<string>('');
@@ -110,6 +76,17 @@ const ExploreDapps: FC = () => {
     setCategorySort(e.target.value);
   };
 
+  const handleNavigation = (dappInfo): void => {
+    navigate({
+      pathname: `/blur-profile/${dappInfo.docId}`,
+      search: createSearchParams({
+        userEmail: userEmail || '',
+        dappInfo: encodeURIComponent(JSON.stringify(dappInfo))
+      }).toString()
+    });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clearAll = () => {
     setCheckedValues([]);
     setCategorySort('');
@@ -149,15 +126,19 @@ const ExploreDapps: FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-6">
-            {items.map((item) => {
+            {dapps.map((dapp) => {
               return (
-                <div className="bg-white rounded-xl border-black border border-opacity-10" key={item.id}>
-                  <Link to={`/blur-profile/${item.id}`}>
-                    <img className="w-full" src={item.cover} alt="black-jack" />
-                  </Link>
+                <div className="bg-white rounded-xl border-black border border-opacity-10" key={dapp.docId}>
+                  <button onClick={() => handleNavigation(dapp)}>
+                    <img
+                      style={{ width: '200px', height: 'auto', objectFit: 'cover' }}
+                      src={dapp.logo}
+                      alt={`${dapp.name}'s logo`}
+                    />
+                  </button>
                   <div className="px-4 pt-4 pb-7">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-medium">{item.title}</h2>
+                      <h2 className="text-lg font-medium">{dapp.name}</h2>
                       <div className="flex">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                           <path
@@ -168,10 +149,10 @@ const ExploreDapps: FC = () => {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <p className="text-xs font-semibold">{item.rating}</p>
+                        <p className="text-xs font-semibold">5</p>
                       </div>
                     </div>
-                    <p className="text-yellow-color text-sm font-normal">{item.category}</p>
+                    <p className="text-yellow-color text-sm font-normal">{dapp.category}</p>
                   </div>
                 </div>
               );

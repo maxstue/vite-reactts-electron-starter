@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface Item {
   id: number;
@@ -12,8 +14,11 @@ interface Item {
 // eslint-disable-next-line react/function-component-definition
 const Home: FC = () => {
   // profile item list
-
+  const [searchParams] = useSearchParams();
+  const userEmail = searchParams.get('userEmail');
   const navigate = useNavigate();
+  
+
   const items: Item[] = [
     {
       id: 1,
@@ -88,8 +93,12 @@ const Home: FC = () => {
   ];
 
   const handleNavigation = (): void => {
-    console.log('Im clicking');
-    navigate('/explore-dapps'); // Redirect to login page on successful registration
+    navigate({
+      pathname: '/explore-dapps',
+      search: createSearchParams({
+        userEmail: userEmail || ''
+      }).toString()
+    });
   };
 
   return (
@@ -100,7 +109,7 @@ const Home: FC = () => {
         </button>
         <h1 className="text-primary-color text-xl md:text-2xl font-medium capitalize">Welcome, Josh</h1>
         <p className="text-primary-color opacity-60 text-base font-medium capitalize">
-          nothing yet, click the plus icon to get start with dapphub
+          nothing yet, click the plus icon to get started with dapphub
         </p>
       </div>
       <section>

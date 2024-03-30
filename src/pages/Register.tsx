@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition */
 import React, { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginSlider from '../components/LoginSlider';
@@ -49,7 +50,7 @@ const Register: FC<RegisterProps> = () => {
 
   return (
     // Register section layout
-    <section className="max-w-[1440px] xl:max-w-full container min-h-screen mx-auto flex flex-col lg:flex-row xl:gap-14">
+    <section className="max-w-[1340px] xl:max-w-full container min-h-screen mx-auto flex flex-col lg:flex-row xl:gap-14">
       {/* Login slider component */}
       <LoginSlider />
 

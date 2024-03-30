@@ -1,3 +1,6 @@
+/* eslint-disable react/function-component-definition */
+/* eslint-disable react/jsx-curly-brace-presence */
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import React, { FC, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Context } from '../context/AppContext';
@@ -58,7 +61,7 @@ const Login: FC<LoginProps> = () => {
 
   return (
     // Login section layout
-    <section className="max-w-[1440px] xl:max-w-full container min-h-screen mx-auto flex flex-col lg:flex-row xl:gap-14">
+    <section className="max-w-[1340px] xl:max-w-full container min-h-screen mx-auto flex flex-col lg:flex-row xl:gap-14">
       {/* Login slider component */}
       <LoginSlider />
 

@@ -1,12 +1,13 @@
 {
-  "name": "vite-reactts-electron-starter",
+  "name": "Dapphub",
+  "icon": "src/Dapphub.ico",
   "version": "0.5.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "main": "main/index.js",
   "author": {
-    "name": "Maximilian Stümpfl"
+    "name": "Dapphub LLC."
   },
-  "description": "Starter using Vite 2+ React +Typescript + Electron for fast prototyping.",
+  "description": "Dapphub is an application built towards a more empowered and equitable digital future with OnChain technology.",
   "keywords": [
     "vite",
     "react",
@@ -16,7 +17,7 @@
   "repository": {
     "url": "https://github.com/lTimeless/vite-reactts-electron-starter"
   },
-  "productName": "vite-reactts-electron-starter",
+  "productName": "Dapphub",
   "scripts": {
     "dev": "concurrently \"yarn dev:vite\" \" yarn dev:electron\"",
     "dev:vite": "vite",
@@ -29,18 +30,27 @@
     "clean": "rimraf dist main src/out",
     "type-check": "tsc",
     "lint": "eslint . --ext js,jsx,ts,tsx",
-    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
+    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
+    "@electron-forge/cli": "^7.3.1",
     "@vitejs/plugin-react": "^1.2.0",
+    "axios": "^1.6.8",
     "electron-is-dev": "^2.0.0",
+    "ethers": "^6.11.1",
+    "firebase": "^10.9.0",
+    "path": "^0.12.7",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-slider": "^2.0.6",
     "swiper": "^11.0.7",
-    "vite": "^2.8.6"
+    "vite": "^2.8.6",
+    "web3": "^4.7.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.22",
@@ -51,7 +61,6 @@
     "autoprefixer": "^10.4.4",
     "concurrently": "^7.0.0",
     "electron": "^17.1.2",
-    "electron-builder": "^22.14.13",
     "eslint": "8.11.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.5.0",
