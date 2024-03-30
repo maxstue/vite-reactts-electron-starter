@@ -1,14 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@font-face {
+  font-family: 'SF Display Regular';
+  src: url('../src/public/fonts/SFPRODISPLAYREGULAR.OTF') format('truetype'); /* adjust path and format if necessary */
+}
+@font-face {
+  font-family: 'SF Display Bold';
+  src: url('../src/public/fonts/SFPRODISPLAYBOLD.OTF') format('truetype'); /* adjust path and format if necessary */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* For AppBar */
-.draggable {
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
+@layer base {
+  :root {
+    --color-primary: 37 43 33;
+    --color-secondary: 149 158 167;
+    --bg-primary: 249 249 249;
+    --button-primary: 18 18 18;
+    --color-yellow: 239 172 0;
+    --color-border: 222 228 230;
   }
+}
 
-.undraggable {
-    -webkit-app-region: no-drag;
-  }
+body {
+  font-family: 'SF Display Regular';
+}

@@ -1,13 +1,5 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-redeclare */
-/* eslint-disable no-else-return */
-/* eslint-disable no-case-declarations */
-/* eslint-disable no-fallthrough */
 /* eslint-disable @typescript-eslint/ban-types */
 import { ipcRenderer, contextBridge } from 'electron';
-import axios from 'axios';
-import { ethers } from 'ethers';
-// import WalletProvider = require('../main/accountProvider.cjs');
 
 declare global {
   interface Window {
@@ -16,29 +8,6 @@ declare global {
   }
 }
 
-declare global {
-  interface Window {
-    electronAPI?: {
-      sendUrl: (...args: any[]) => Promise<any>;
-      sendUserData: (...args: any[]) => Promise<any>;
-      requestUserData: (...args: any[]) => Promise<any>;
-    };
-  }
-}
-
-declare global {
-  interface Window {
-    ethereum?: {
-      // Define the properties and methods of 'ethereum' you use, for example:
-      userAddress: string;
-      privateKey: string;
-      isMetaMask: boolean;
-      isConnected: boolean;
-      autoRefreshOnNetworkChange: boolean;
-      request: (...args: any[]) => Promise<any>;
-    };
-  }
-}
 const api = {
   /**
    * Here you can expose functions to the renderer process
@@ -118,84 +87,53 @@ class SimpleEventEmitter {
 
 const ethereumEmitter = new SimpleEventEmitter();
 
-const walletApi = axios.create({
-  // baseURL: 'http://localhost:8080',
-  baseURL: 'https://dapphub-account-provider.fly.dev',
-  withCredentials: true
-});
-
-const ethMainnetUrl = 'https://ethereum-rpc.publicnode.com';
-const etherprovider = new ethers.JsonRpcProvider(ethMainnetUrl);
+// Mock account value for demonstration
+const mockAccount = ['0x76751Ac9f039b526EAa36561FFb8F49291700082'];
 
 // Example of exposing a mock `window.ethereum` object
 contextBridge.exposeInMainWorld('ethereum', {
   isMetaMask: true,
   isConnected: true,
+  autoRefreshOnNetworkChange: null,
   // Method to handle requests from dApps
   request: async ({ method, params }: { method: string; params: any[] }) => {
-    const { Address, PrivateKey } = await ipcRenderer.invoke('get-user-data');
-    const userAddress = [Address];
-    const etherswallet = new ethers.Wallet(PrivateKey, etherprovider);
-    // const walletProvider = new WalletProvider(PrivateKey);
     switch (method) {
       case 'eth_requestAccounts':
         // Return mock accounts
-        return userAddress;
+        return mockAccount;
       case 'eth_accounts':
-        return userAddress; // Return the currently connected accounts
-      case 'eth_sendTransaction':
-        const sendTransactionObj = { decryptedPrivateKey: PrivateKey, transaction: params[0] };
-        walletApi.post('/eth_sendTransaction', sendTransactionObj).then((response) => {
-          if (response.status === 200) {
-            return response.data.txReceipt;
-          } else {
-            return {
-              message: 'Internal Error',
-              code: -32603
-            };
-          }
-        });
-        break;
-      case 'personal_sign':
-        return etherswallet.signMessage(params[0]);
-
-      // must pass in the network id before the dapp is loaded
+        return mockAccount; // Return the currently connected accounts
+      // case 'eth_sendTransaction':
+      //   return walletProvider.sendTransaction(params[0]);
+      // case 'personal_sign':
+      //   return walletProvider.signMessage(params[0]);
+      // //must pass in the network id before the dapp is loaded
       case 'eth_chainId':
-        return etherprovider._network;
-      case 'eth_call':
-        return etherswallet.call(params[0]);
-      case 'eth_getBalance':
-        return etherprovider.getBalance(Address);
+        return '1';
+      // return walletProvider.chainId;
+      // case 'eth_call':
+      //   return walletProvider.eth_call(params[0]);
+      // case 'eth_getBalance':
+      //   return walletProvider.eth_getBalance(mockAccount[0]);
       // case 'eth_signTypedData_v4':
       //   return walletProvider.signTypedData(params);
-      case 'wallet_switchEthereumChain':
-        console.log(params[0]);
-        const chainId = parseInt(params[0].chainId, 16).toString();
-        const chainIdObj = { decryptedPrivateKey: PrivateKey, chainId };
-        await walletApi.post('/eth_switchEthereumChain', chainIdObj).then((response) => {
-          if (response.status === 200) {
-            return null;
-          } else {
-            return {
-              message: 'Internal Error',
-              code: 4902
-            };
-          }
-        });
-        break;
+      // case 'wallet_switchEthereumChain':
+      //   const chainId = parseInt(params[0].chainId, 16).toString();
+      //   return walletProvider.switchChain(chainId);
       // case 'wallet_addEthereumChain':
       //   console.log(params[0]);
       //   return;
-      case 'eth_getTransactionCount':
-        return etherprovider.getTransactionCount(params[0], params[1]);
-      case 'eth_estimateGas':
-        return etherprovider.estimateGas(params[0]);
-      case 'eth_blockNumber':
-        return etherprovider.getBlockNumber();
-      case 'eth_getTransactionByHash':
-        return null;
-      case 'eth_getTransactionReceipt':
-        return etherprovider.getTransactionReceipt(params[0]);
+      // case 'eth_getTransactionCount':
+      //   return walletProvider.getTransactionCount(params[0], params[1]);
+      // case 'eth_estimateGas':
+      //   return walletProvider.eth_gasPrice(params[0]);
+      // case 'eth_blockNumber':
+      //   console.log(params);
+      //   return walletProvider.eth_blockNumber();
+      // case 'eth_getTransactionByHash':
+      //   return walletProvider.getTransactionByHash(params[0]);
+      // case 'eth_getTransactionReceipt':
+      //   return walletProvider.getTransactionReceipt(params[0]);
       default:
         throw new Error(`Method ${method} not implemented. with ${params}`);
     }
@@ -238,32 +176,11 @@ contextBridge.exposeInMainWorld('ethereum', {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  sendUrl: (url: string) => ipcRenderer.send('open-url', url),
-  sendUserData: (data: any) => ipcRenderer.send('send-user-data', data),
-  requestUserData: () => ipcRenderer.invoke('get-user-data'),
-  createBrowserWindow: (data: any) => ipcRenderer.send('load-url', data),
-  toggleBrowserView: () => ipcRenderer.send('toggle-view'),
-  onVisibilityChanged: (callback: any) => ipcRenderer.on('update-view-visibility', callback),
-  queryViewVisibility: () => ipcRenderer.invoke('query-view-visibility'),
-  removeVisibilityChangedListener: (callback: any) => ipcRenderer.removeListener('update-view-visibility', callback),
-
-  send: (channel: any, data: any) => {
-    // whitelist channels
-    let validChannels = ['create-browser-view'];
-    if (validChannels.includes(channel)) {
-      ipcRenderer.send(channel, data);
-    }
-  },
-  receive: (channel: any, func: any) => {
-    let validChannels = ['fromMain'];
-    if (validChannels.includes(channel)) {
-      // Deliberately strip event as it includes `sender`
-      ipcRenderer.on(channel, (...args) => func(...args));
-    }
-  }
+  sendUrl: (url: string) => ipcRenderer.send('open-url', url)
 });
 contextBridge.exposeInMainWorld('Main', api);
 /**
  * Using the ipcRenderer directly in the browser through the contextBridge ist not really secure.
  * I advise using the Main/api way !!
  */
+contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
