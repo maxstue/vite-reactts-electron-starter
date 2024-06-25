@@ -1,6 +1,6 @@
 # Vite + React + Typescript + Electron - Starter
 
-![Vite + React + Typescript + Tailwind + Electron Starter](Screenshot.jpg)
+![Vite + React + Typescript + Tailwind + Electron Starter](demo.mp4)
 
 > It is a simple starter template without unnecessary packages.
 
