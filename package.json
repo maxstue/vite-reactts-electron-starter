@@ -2,7 +2,7 @@
   "name": "vite-reactts-electron-starter",
   "version": "0.5.0",
   "license": "MIT",
-  "main": "main/index.js",
+  "main": "dist-electron/index.js",
   "author": {
     "name": "Maximilian Stümpfl"
   },
@@ -18,13 +18,15 @@
   },
   "productName": "vite-reactts-electron-starter",
   "scripts": {
-    "dev": "concurrently \"yarn dev:vite\" \" yarn dev:electron\"",
-    "dev:vite": "vite",
+    "dev": "vite",
     "dev:electron": "npm run build:electron && electron .",
     "build": "npm run build:vite && npm run build:electron",
     "build:vite": "vite build",
     "build:electron": "tsc -p electron",
     "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux",
     "pack": "npm run build && electron-builder --dir",
     "clean": "rimraf dist main src/out",
     "type-check": "tsc",
@@ -32,11 +34,16 @@
     "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
   },
   "dependencies": {
+    "@material-tailwind/react": "^2.1.9",
     "@vitejs/plugin-react": "^1.2.0",
     "electron-is-dev": "^2.0.0",
+    "i18next": "^23.11.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "vite": "^2.8.6"
+    "react-i18next": "^14.1.2",
+    "vite": "^2.8.6",
+    "vite-plugin-electron": "^0.28.7",
+    "vite-plugin-electron-renderer": "^0.14.5"
   },
   "devDependencies": {
     "@types/node": "^17.0.22",
@@ -45,9 +52,8 @@
     "@typescript-eslint/eslint-plugin": "5.16.0",
     "@typescript-eslint/parser": "5.16.0",
     "autoprefixer": "^10.4.4",
-    "concurrently": "^7.0.0",
-    "electron": "^17.1.2",
-    "electron-builder": "^22.14.13",
+    "electron": "^30.0.7",
+    "electron-builder": "^24.13.3",
     "eslint": "8.11.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.5.0",
@@ -63,8 +69,8 @@
   "build": {
     "asar": true,
     "files": [
-      "main",
-      "src/out"
+      "dist-electron",
+      "dist-vite"
     ],
     "directories": {
       "buildResources": "resources"

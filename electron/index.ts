@@ -24,7 +24,7 @@ function createWindow() {
   });
 
   const port = process.env.PORT || 3000;
-  const url = isDev ? `http://localhost:${port}` : join(__dirname, '../src/out/index.html');
+  const url = isDev ? `http://localhost:${port}` : join(__dirname, '../dist-vite/index.html');
 
   // and load the index.html of the app.
   if (isDev) {
