@@ -12,3 +12,13 @@
 .undraggable {
     -webkit-app-region: no-drag;
   }
+
+@layer base {
+  code {
+    @apply mx-2 rounded bg-gray-200 px-1 py-0.5 dark:bg-gray-700;
+  }
+
+  .root {
+    @apply min-h-screen dark:bg-slate-900 dark:text-gray-200;
+  }
+}
