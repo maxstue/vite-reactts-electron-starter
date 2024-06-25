@@ -1,6 +1,6 @@
 # Vite + React + Typescript + Electron - Starter
 
-![Vite + React + Typescript + Tailwind + Electron Starter](demo.mp4)
+https://github.com/AleBL/vite-reactts-electron-starter/assets/26389226/2697ab5c-b6c5-4c28-ab40-1a237e12cf8d
 
 > It is a simple starter template without unnecessary packages.
 
