@@ -27,6 +27,10 @@ function App() {
   };
 
   useEffect(() => {
+    window.Main.removeLoading();
+  }, []);
+
+  useEffect(() => {
     if (isSent && window.Main)
       window.Main.on('message', (message: string) => {
         setFromMain(message);

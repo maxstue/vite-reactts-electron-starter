@@ -1,5 +1,7 @@
 import { ipcRenderer, contextBridge } from 'electron';
+import useLoading from './loading';
 
+const { appendLoading, removeLoading } = useLoading();
 declare global {
   interface Window {
     Main: typeof api;
@@ -30,6 +32,9 @@ const api = {
   Close: () => {
     ipcRenderer.send('close');
   },
+  removeLoading: () => {
+    removeLoading();
+  },
   /**
    * Provide an easier way to listen to events
    */
@@ -43,3 +48,20 @@ contextBridge.exposeInMainWorld('Main', api);
  * I advise using the Main/api way !!
  */
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
+
+// eslint-disable-next-line no-undef
+function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
+  return new Promise((resolve) => {
+    if (condition.includes(document.readyState)) {
+      resolve(true);
+    } else {
+      document.addEventListener('readystatechange', () => {
+        if (condition.includes(document.readyState)) {
+          resolve(true);
+        }
+      });
+    }
+  });
+}
+
+domReady().then(appendLoading);
