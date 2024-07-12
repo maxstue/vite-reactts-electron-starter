@@ -5,9 +5,9 @@ dist-ssr
 *.local
 
 # production
-/main
 /dist
-/src/out
+/dist-vite
+/dist-electron
 
 # debug
 npm-debug.log*

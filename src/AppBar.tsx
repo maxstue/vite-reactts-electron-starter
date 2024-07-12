@@ -16,7 +16,7 @@ function AppBar() {
 
   return (
     <>
-      <div className="py-0.5 flex justify-between draggable">
+      <div className="bg-slate-800 py-0.5 flex justify-between draggable text-white">
         <div className="inline-flex">
           <img className="h-6 lg:-ml-2" src={Icon} alt="Icon of Electron" />
           <p className="text-xs md:pt-1 md:-ml-1 lg:-ml-2">Vite App</p>
@@ -33,7 +33,7 @@ function AppBar() {
           </button>
         </div>
       </div>
-      <div className="bg-gray-900 text-white undraggable">
+      <div className="bg-slate-800 text-white undraggable">
         <div className="flex text-center">
           <div className="text-sm w-8  hover:bg-gray-700">File</div>
           <div className="text-sm w-8   hover:bg-gray-700">Edit</div>

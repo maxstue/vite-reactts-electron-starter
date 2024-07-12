@@ -2,7 +2,7 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme } from 'electron';
 import isDev from 'electron-is-dev';
 
 const height = 600;
@@ -24,7 +24,7 @@ function createWindow() {
   });
 
   const port = process.env.PORT || 3000;
-  const url = isDev ? `http://localhost:${port}` : join(__dirname, '../src/out/index.html');
+  const url = isDev ? `http://localhost:${port}` : join(__dirname, '../dist-vite/index.html');
 
   // and load the index.html of the app.
   if (isDev) {
@@ -49,6 +49,8 @@ function createWindow() {
   ipcMain.on('close', () => {
     window.close();
   });
+
+  nativeTheme.themeSource = 'dark';
 }
 
 // This method will be called when Electron has finished
@@ -77,5 +79,5 @@ app.on('window-all-closed', () => {
 // listen the channel `message` and resend the received message to the renderer process
 ipcMain.on('message', (event: IpcMainEvent, message: any) => {
   console.log(message);
-  setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
+  setTimeout(() => event.sender.send('message', 'common.hiElectron'), 500);
 });

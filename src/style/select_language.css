@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .div-select-language label,
+  .div-select-language span {
+    @apply dark:text-white;
+  }
+
+  .div-select-language ul {
+    @apply dark:text-white dark:bg-slate-800 !important;
+  }
+
+  .div-select-language span {
+    @apply gap-2;
+    display: flex;
+  }
+
+  .language {
+    @apply flex items-center gap-2;
+  }
+
+  .language-icon {
+    @apply h-5 w-5 rounded-full object-cover;
+  }
+}
+
