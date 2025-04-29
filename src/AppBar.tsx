@@ -17,9 +17,9 @@ function AppBar() {
   return (
     <>
       <div className="bg-slate-800 py-0.5 flex justify-between draggable text-white">
-        <div className="inline-flex">
-          <img className="h-6 lg:-ml-2" src={Icon} alt="Icon of Electron" />
-          <p className="text-xs md:pt-1 md:-ml-1 lg:-ml-2">Vite App</p>
+        <div className="inline-flex items-center">
+          <img className="h-6 min-w-10" src={Icon} alt="Icon of Electron" />
+          <p className="text-xs whitespace-nowrap">Vite App</p>
         </div>
         <div className="inline-flex -mt-1">
           <button onClick={window.Main.Minimize} className="undraggable md:px-4 lg:px-3 pt-1 hover:bg-gray-300">

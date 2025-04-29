@@ -7,12 +7,17 @@ import isDev from 'electron-is-dev';
 
 const height = 600;
 const width = 800;
+const minHeight = 300;
+const minWidth = 300;
 
 function createWindow() {
   // Create the browser window.
   const window = new BrowserWindow({
     width,
     height,
+    // defines the minimum size of the window
+    minWidth,
+    minHeight,
     //  change to false to use AppBar
     frame: false,
     show: true,
