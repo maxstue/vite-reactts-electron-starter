@@ -1,0 +1,13 @@
+appId: com.example.electron-react-starter
+productName: Electron React Starter
+directories:
+  buildResources: resources
+files:
+  - out/**/*
+win:
+  target: nsis
+mac:
+  target: dmg
+linux:
+  target: AppImage
+  category: Development

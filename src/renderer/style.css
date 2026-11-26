@@ -1,0 +1,155 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #152438;
+  background: radial-gradient(ellipse at top left, #deefff, transparent 55%), #f7faff;
+  --muted: #435971;
+  --surface: #fbfdff;
+  --line: #c7d6e6;
+  --button: #1768a3;
+  --button-text: #fff;
+  --focus: #0969b3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f7faff;
+    background: radial-gradient(ellipse at top left, #192e50, transparent 53%), #101622;
+    --muted: #b9d0e5;
+    --surface: #151e2a;
+    --line: #42556a;
+    --button: #96d8fb;
+    --button-text: #102238;
+    --focus: #96d8fb;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  align-items: center;
+}
+
+.starter {
+  width: min(100% - 3rem, 38.5rem);
+  margin-inline: auto;
+  padding-block: 2.5rem;
+}
+
+.brand-mark {
+  display: block;
+  object-fit: contain;
+  margin: 0 0 0.85rem -0.3rem;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.1rem, 6vw, 2.85rem);
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+}
+
+header p {
+  margin-top: 0.85rem;
+  font-size: 1.05rem;
+}
+
+p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem 1.2rem;
+  background: var(--surface);
+}
+
+h2 {
+  margin-bottom: 0.2rem;
+  font-size: 1.15rem;
+}
+
+.version p,
+.status {
+  font-size: 0.95rem;
+}
+
+button {
+  flex: none;
+  border: 0;
+  border-radius: 0.45rem;
+  padding: 0.65rem 0.95rem;
+  background: var(--button);
+  color: var(--button-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+button:hover:enabled {
+  filter: brightness(0.92);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.status {
+  min-height: 2.5rem;
+  margin-top: 1.55rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  .starter {
+    padding-block: 1rem;
+  }
+
+  .brand-mark {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.55rem;
+  }
+
+  header p {
+    margin-top: 0.65rem;
+  }
+
+  .version {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.85rem;
+  }
+
+  .status {
+    margin-top: 0.85rem;
+    padding-top: 0.6rem;
+  }
+}

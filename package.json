@@ -1,79 +1,48 @@
 {
-  "name": "vite-reactts-electron-starter",
-  "version": "0.6.0",
+  "name": "electron-react-starter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A minimal Electron desktop starter with React, TypeScript, and Vite.",
   "license": "MIT",
-  "main": "dist-electron/index.js",
-  "author": {
-    "name": "Maximilian Stümpfl"
-  },
-  "description": "Starter using Vite 2+ React +Typescript + Electron for fast prototyping.",
-  "keywords": [
-    "vite",
-    "react",
-    "electron",
-    "typescript"
-  ],
+  "author": "Maximilian Stümpfl",
   "repository": {
-    "url": "https://github.com/lTimeless/vite-reactts-electron-starter"
+    "type": "git",
+    "url": "https://github.com/maxstue/vite-reactts-electron-starter.git"
   },
-  "productName": "vite-reactts-electron-starter",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
-    "dev": "vite",
-    "dev:electron": "npm run build:electron && electron .",
-    "build": "npm run build:vite && npm run build:electron",
-    "build:vite": "vite build",
-    "build:electron": "tsc -p electron",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:linux": "npm run build && electron-builder --linux",
-    "pack": "npm run build && electron-builder --dir",
-    "clean": "rimraf dist main src/out",
-    "type-check": "tsc",
-    "lint": "eslint . --ext js,jsx,ts,tsx",
-    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
+    "dev": "install-electron && electron-vite dev --watch",
+    "start": "install-electron && electron-vite preview --skipBuild",
+    "typecheck": "tsc -p tsconfig.node.json && tsc -p tsconfig.renderer.json",
+    "lint": "eslint .",
+    "build": "npm run typecheck && electron-vite build",
+    "pack": "npm run build && electron-builder --dir --publish never",
+    "dist": "npm run build && electron-builder --publish never",
+    "test:packaged": "node scripts/smoke-packaged.mjs"
   },
   "dependencies": {
-    "@material-tailwind/react": "^2.1.9",
-    "@vitejs/plugin-react": "^1.2.0",
-    "electron-is-dev": "^2.0.0",
-    "i18next": "^23.11.5",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-i18next": "^14.1.2",
-    "vite": "^2.8.6",
-    "vite-plugin-electron": "^0.28.7",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.22",
-    "@types/react": "^17.0.41",
-    "@types/react-dom": "^17.0.14",
-    "@typescript-eslint/eslint-plugin": "5.16.0",
-    "@typescript-eslint/parser": "5.16.0",
-    "autoprefixer": "^10.4.4",
-    "electron": "^30.0.7",
-    "electron-builder": "^24.13.3",
-    "eslint": "8.11.0",
-    "eslint-config-airbnb": "19.0.4",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-prettier": "4.0.0",
-    "eslint-plugin-react": "^7.29.4",
-    "postcss": "^8.4.12",
-    "prettier": "2.6.0",
-    "tailwindcss": "^3.0.23",
-    "typescript": "^4.6.2"
-  },
-  "build": {
-    "asar": true,
-    "files": [
-      "dist-electron",
-      "dist-vite"
-    ],
-    "directories": {
-      "buildResources": "resources"
-    }
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.4",
+    "@types/react": "^19.3.3",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "45.5.0",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "playwright": "^1.65.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.74.0",
+    "vite": "^8.4.0"
   }
 }
