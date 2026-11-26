@@ -1,37 +1,57 @@
-# Vite + React + Typescript + Electron - Starter
+# Electron React Starter
 
-https://github.com/AleBL/vite-reactts-electron-starter/assets/26389226/2697ab5c-b6c5-4c28-ab40-1a237e12cf8d
+A small desktop app template with Electron, React, TypeScript, and Vite. The example shows how a React button can read the app version from Electron's main process through a typed preload API.
 
-> It is a simple starter template without unnecessary packages.
+![Electron React Starter showing the app version example in dark mode](docs/preview.png)
 
-This very simple Starter template, utilizes [Vite](https://github.com/vitejs/vite), [Tailwind](https://tailwindcss.com/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
+## Get started
 
-By default, the React framework is used for the interface, but you can easily use any other framework such as Vue, Preact, Angular, Svelte or anything else.
+Install Node.js 24 LTS with npm, then clone the repository and start the app:
 
-> Vite is framework agnostic
+```sh
+git clone https://github.com/maxstue/vite-reactts-electron-starter.git
+cd vite-reactts-electron-starter
+npm ci
+npm run dev
+```
 
-## Installation
+The first run may download the Electron binary. React changes use fast refresh, main-process changes restart Electron, and preload changes reload the window.
 
-Clone this repo and install all dependencies  
-`yarn` or `npm install`
+npm and `package-lock.json` are the reference for CI. To switch a project created from this template to Yarn or pnpm, use that manager to install dependencies, keep its lockfile, and update the install and cache steps in CI. Check packaging again after switching managers.
 
-## Development
+## Project layout
 
-`yarn dev` or `npm run dev`
+| Path                   | Purpose                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `src/main`             | Electron lifecycle, native window, IPC handlers, and the production app protocol |
+| `src/preload`          | The allowlisted methods available on `window.desktop`                            |
+| `src/renderer`         | React UI, styling, and the global type for `window.desktop`                      |
+| `src/shared`           | IPC channel and the types shared across the boundary                             |
+| `resources/icon.png`   | The app icon used by the demo and electron-builder                               |
+| `electron-builder.yml` | Application ID and distribution targets                                          |
 
-## Build
+Run `npm run lint` for Oxlint, `npm run format` to apply Oxfmt, and `npm run typecheck` for TypeScript. CI also runs `npm run format:check`.
 
-`yarn build` or `npm run build`
+When adding an IPC method, give the preload wrapper a specific purpose and validate its sender and any arguments in the main process. The production renderer loads from `app://renderer` under a restrictive content security policy.
 
-## Publish
+### Environment variables
 
-`yarn dist` or `npm run dist`
+If your app needs public build-time settings, add a local `.env` in the repository root and use `import.meta.env.RENDERER_VITE_*` in the renderer. These values are bundled with the app and are readable by anyone who installs it. Read runtime environment variables with `process.env` in the main process. Electron apps distributed to users cannot keep embedded secrets private.
 
-## More advanced templates  
+## Build and package
 
-If you are looking for more advanced templates than this, please go to one of the following links (these are some other links out of the **[awesome-vite](https://github.com/vitejs/awesome-vite)** repo) or you can help me make this template better 🙂  
+| Command                 | Result                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| `npm run build`         | Type-check and compile the app into `out/`                                                      |
+| `npm start`             | Run an existing production build locally                                                        |
+| `npm run pack`          | Build an unpacked desktop app in `dist/`                                                        |
+| `npm run test:packaged` | Start the unpacked app in a separate working directory and verify the renderer, assets, and IPC |
+| `npm run dist`          | Build a local DMG, NSIS installer, or AppImage on macOS, Windows, or Linux                      |
 
-Links: 
-- [vite-react-electron](https://github.com/caoxiemeihao/vite-react-electron)
-- [electron-vite-react](https://github.com/twstyled/electron-vite-react)
-- [vite-electron-esbuild-starter](https://github.com/jctaoo/vite-electron-esbuild-starter)
+Run packaging on the target operating system. Linux needs a graphical session for the smoke check. On headless CI, use `xvfb-run -a npm run test:packaged`. For public distribution, configure code signing and macOS notarization for your own app.
+
+Before shipping your own app, update the name, version, and repository in `package.json`, the product name and app ID in `electron-builder.yml`, the demo UI and window title in `src/`, and `resources/icon.png`. Update the example-specific smoke assertions as you replace the demo.
+
+## License
+
+[MIT](LICENSE.md)
