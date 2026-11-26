@@ -26,7 +26,8 @@ export function App() {
       <header>
         <img className="brand-mark" src={icon} alt="" width="78" height="78" />
         <h1>
-          Electron React <br />Starter
+          Electron React <br />
+          Starter
         </h1>
         <p>A desktop starting point built with Electron, React, TypeScript and Vite.</p>
       </header>

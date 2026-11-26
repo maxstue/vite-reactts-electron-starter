@@ -28,6 +28,7 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run pack
       - if: runner.os == 'Linux'

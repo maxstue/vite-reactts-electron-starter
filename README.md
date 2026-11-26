@@ -21,16 +21,18 @@ npm and `package-lock.json` are the reference for CI. To switch a project create
 
 ## Project layout
 
-| Path | Purpose |
-| --- | --- |
-| `src/main` | Electron lifecycle, native window, IPC handlers, and the production app protocol |
-| `src/preload` | The allowlisted methods available on `window.desktop` |
-| `src/renderer` | React UI, styling, and the global type for `window.desktop` |
-| `src/shared` | IPC channel and the types shared across the boundary |
-| `resources/icon.png` | The app icon used by the demo and electron-builder |
-| `electron-builder.yml` | Application ID and distribution targets |
+| Path                   | Purpose                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `src/main`             | Electron lifecycle, native window, IPC handlers, and the production app protocol |
+| `src/preload`          | The allowlisted methods available on `window.desktop`                            |
+| `src/renderer`         | React UI, styling, and the global type for `window.desktop`                      |
+| `src/shared`           | IPC channel and the types shared across the boundary                             |
+| `resources/icon.png`   | The app icon used by the demo and electron-builder                               |
+| `electron-builder.yml` | Application ID and distribution targets                                          |
 
-Run `npm run typecheck` and `npm run lint` while editing. When adding an IPC method, give the preload wrapper a specific purpose and validate its sender and any arguments in the main process. The production renderer loads from `app://renderer` under a restrictive content security policy.
+Run `npm run lint` for Oxlint, `npm run format` to apply Oxfmt, and `npm run typecheck` for TypeScript. CI also runs `npm run format:check`.
+
+When adding an IPC method, give the preload wrapper a specific purpose and validate its sender and any arguments in the main process. The production renderer loads from `app://renderer` under a restrictive content security policy.
 
 ### Environment variables
 
@@ -38,13 +40,13 @@ If your app needs public build-time settings, add a local `.env` in the reposito
 
 ## Build and package
 
-| Command | Result |
-| --- | --- |
-| `npm run build` | Type-check and compile the app into `out/` |
-| `npm start` | Run an existing production build locally |
-| `npm run pack` | Build an unpacked desktop app in `dist/` |
+| Command                 | Result                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| `npm run build`         | Type-check and compile the app into `out/`                                                      |
+| `npm start`             | Run an existing production build locally                                                        |
+| `npm run pack`          | Build an unpacked desktop app in `dist/`                                                        |
 | `npm run test:packaged` | Start the unpacked app in a separate working directory and verify the renderer, assets, and IPC |
-| `npm run dist` | Build a local DMG, NSIS installer, or AppImage on macOS, Windows, or Linux |
+| `npm run dist`          | Build a local DMG, NSIS installer, or AppImage on macOS, Windows, or Linux                      |
 
 Run packaging on the target operating system. Linux needs a graphical session for the smoke check. On headless CI, use `xvfb-run -a npm run test:packaged`. For public distribution, configure code signing and macOS notarization for your own app.
 

@@ -12,7 +12,11 @@ const executables = {
 };
 const pattern = executables[process.platform];
 const paths = process.argv[2] ? [process.argv[2]] : pattern ? globSync(pattern) : [];
-assert.equal(paths.length, 1, 'Run npm run pack first or pass the path to the packaged executable.');
+assert.equal(
+  paths.length,
+  1,
+  'Run npm run pack first or pass the path to the packaged executable.',
+);
 
 const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 const cwd = await mkdtemp(join(tmpdir(), 'electron-starter-smoke-'));
@@ -20,7 +24,12 @@ const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 
 try {
-  const app = await electron.launch({ executablePath: resolve(paths[0]), cwd, env, timeout: 30_000 });
+  const app = await electron.launch({
+    executablePath: resolve(paths[0]),
+    cwd,
+    env,
+    timeout: 30_000,
+  });
 
   try {
     const window = await app.firstWindow();
@@ -30,10 +39,12 @@ try {
     assert.equal(window.url(), 'app://renderer/index.html');
 
     const mark = window.locator('.brand-mark');
-    assert.ok(await mark.evaluate(async (image) => {
-      await image.decode();
-      return image.naturalWidth > 0;
-    }));
+    assert.ok(
+      await mark.evaluate(async (image) => {
+        await image.decode();
+        return image.naturalWidth > 0;
+      }),
+    );
     const layout = await window.locator('.version').evaluate((section) => {
       return globalThis.getComputedStyle(section).display;
     });
